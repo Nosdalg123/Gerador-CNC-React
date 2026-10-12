@@ -61,3 +61,13 @@
 {"at":"2026-10-12T21:41:30.682Z","sourceDigest":"37bebd35c7d70aa9c62271be5970a03471ff0d125b2e16fe128feb9618552a41","options":{"impact":"scripts/package-light.cjs"},"results":1}
 {"at":"2026-10-12T21:51:00.778Z","sourceDigest":"37bebd35c7d70aa9c62271be5970a03471ff0d125b2e16fe128feb9618552a41","options":{"query":"etapas cad face z0 pendencias salvar desenho"},"results":8}
 {"at":"2026-10-12T21:51:01.798Z","sourceDigest":"37bebd35c7d70aa9c62271be5970a03471ff0d125b2e16fe128feb9618552a41","options":{"impact":"public/engine/dxfimport.js"},"results":8}
+{"at":"2026-10-12T22:22:13.338Z","sourceDigest":"da67ec2743277be7ffc5816aa62e99ed1a4a0710f6f1cb2836a3557cac0475ee","options":{"query":"arquitetura gerador simulador cad dados sessao"},"results":8}
+{"at":"2026-10-12T22:22:14.291Z","sourceDigest":"da67ec2743277be7ffc5816aa62e99ed1a4a0710f6f1cb2836a3557cac0475ee","options":{"callees":"generate"},"results":4}
+{"at":"2026-10-12T22:22:26.759Z","sourceDigest":"da67ec2743277be7ffc5816aa62e99ed1a4a0710f6f1cb2836a3557cac0475ee","options":{"impact":"src/domain.mjs"},"results":8}
+{"at":"2026-10-12T22:27:38.340Z","sourceDigest":"da67ec2743277be7ffc5816aa62e99ed1a4a0710f6f1cb2836a3557cac0475ee","options":{"query":"consultar conferir atualizar mapa","limit":4},"results":4}
+{"at":"2026-10-12T22:27:39.285Z","sourceDigest":"da67ec2743277be7ffc5816aa62e99ed1a4a0710f6f1cb2836a3557cac0475ee","options":{"callees":"watchMap","limit":6},"results":1}
+{"at":"2026-10-12T22:34:33.720Z","sourceDigest":"da67ec2743277be7ffc5816aa62e99ed1a4a0710f6f1cb2836a3557cac0475ee","options":{"query":"CAD lado 2 invertido comprimentos gerador dois lados","limit":5},"results":5}
+{"at":"2026-10-12T22:34:34.649Z","sourceDigest":"da67ec2743277be7ffc5816aa62e99ed1a4a0710f6f1cb2836a3557cac0475ee","options":{"callers":"createOppositeCadSide","limit":10},"results":2}
+{"at":"2026-10-12T22:34:35.564Z","sourceDigest":"da67ec2743277be7ffc5816aa62e99ed1a4a0710f6f1cb2836a3557cac0475ee","options":{"symbol":"prepareCadSides","limit":4},"results":1}
+{"at":"2026-10-12T22:44:09.784Z","sourceDigest":"1c9487ca214be94f072a18fc05cf6a33b142b8c3ce09848fe7e56da1537ac86e","options":{"query":"comprimento trechos faixa sem usinar gerador","limit":3},"results":3}
+{"at":"2026-10-12T22:47:53.930Z","sourceDigest":"21df7fb6f1c6284b5ff0e624501357a63e10e4015a6c855e31a48ef3a68109be","options":{"query":"comprimentos lado 2 gerador métricas prévia"},"results":8}

@@ -1,4 +1,9 @@
-TORNO CNC 3.1.14 - VERSAO LEVE OFFLINE
+TORNO CNC 3.1.15 - VERSAO LEVE OFFLINE
+
+3.1.15: etapa 3 do DXF mostra os dois lados e cria o lado 2 invertido.
+As duas caixas de seleção ficam separadas. Salve ambos os perfis completos.
+Defina os comprimentos a usinar no Gerador de código, com metade por lado
+como padrão. Reabrir o lado 2 conserva o desenho e as configurações.
 
 3.1.14: face Z0 e comprimento definidos na etapa 2 do DXF.
 A etapa 3 exige preparação válida e mostra dicas para resolver pendências.

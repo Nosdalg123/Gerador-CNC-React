@@ -5,7 +5,7 @@ const path=[{kind:'line',a:[0,0],b:[0,20]},{kind:'line',a:[0,20],b:[-40,20]},{ki
 const drawing=()=>({id:'test',nome:'Eixo CAD',lPeca:100,lados:'1',trechos1:[{id:'cad',tipo:'cadperfil',path:structuredClone(path)}],trechos2:[],internos1:[],internos2:[],cadOrigem:{nativo:true,verificado:true,incompleto:false},custom:{preservar:1}});
 test('lado 2 inverte Z e ordem sem mudar raio, sentido combinado e dados de origem',async()=>{
  const {createOppositeCadSide,reverseCadPath}=await import('../src/cad-sides.mjs'),source=drawing(),before=structuredClone(source),d=createOppositeCadSide(source);
- assert.deepEqual(source,before);assert.deepEqual(d.custom,source.custom);assert.equal(d.lados,'2');assert.deepEqual(d.cadDuplo,{modo:'invertido',limite1:50,limite2:50,primeiro:'1'});assert.deepEqual(d.trechos1,source.trechos1);
+ assert.deepEqual(source,before);assert.deepEqual(d.custom,source.custom);assert.equal(d.lados,'2');assert.deepEqual(d.cadDuplo,{modo:'invertido',primeiro:'1'});assert.deepEqual(d.trechos1,source.trechos1);
  const second=d.trechos2[0].path;assert.equal(CAD.validate(second).ok,true);const arc=second.find(s=>s.kind==='arc');assert.equal(arc.r,5);assert.equal(arc.ccw,false);assert.deepEqual(arc.c,[-60,25]);assert.deepEqual(reverseCadPath(second,100),path);
 });
 test('limite em arco mantém círculo nativo e limite em cone mantém interpolação',async()=>{
@@ -29,6 +29,31 @@ test('limite continua sujeito à fixação e ao comprimento disponível fora da 
 });
 test('perfil divergente ou comprimento inválido não libera sobreposição entre lados',async()=>{
  const {createOppositeCadSide,prepareCadSides}=await import('../src/cad-sides.mjs'),d=createOppositeCadSide(drawing());d.trechos2[0].path[1].b[1]+=1;assert.throws(()=>prepareCadSides(d),/não correspondem/);
+});
+
+test('comprimentos pertencem ao Gerador e preservam os padrões e dados antigos do desenho',async()=>{
+ const {createOppositeCadSide,cadMachiningLimits,prepareCadSides}=await import('../src/cad-sides.mjs'),d=createOppositeCadSide(drawing()),before=structuredClone(d);
+ assert.deepEqual(cadMachiningLimits(d),{limite1:50,limite2:50});const clipped=prepareCadSides(d,'1',{limite1:60,limite2:40});assert.equal(CAD.validate(clipped.trechos1[0].path).length,60);assert.equal(CAD.validate(clipped.trechos2[0].path).length,40);assert.deepEqual(d,before);
+ assert.throws(()=>prepareCadSides(d,'1',{limite1:40,limite2:40}),/faixa sem usinar/);assert.throws(()=>prepareCadSides(d,'1',{limite1:'',limite2:100}),/comprimento/);
+ d.cadDuplo.limite1=70;d.cadDuplo.limite2=30;assert.deepEqual(cadMachiningLimits(d),{limite1:70,limite2:30});assert.deepEqual(cadMachiningLimits(d,{limite1:60}),{limite1:60,limite2:30});
+});
+
+test('reedição do lado 2 preserva identidade, arcos e ambos os perfis',async()=>{
+ const {createOppositeCadSide}=await import('../src/cad-sides.mjs'),{cadDocument}=await import('../src/cad-document.mjs'),d=createOppositeCadSide(drawing()),before=structuredClone(d);
+ const result=cadDocument({editingDrawing:d,cadSide:'2',nome:d.nome,lPeca:100,dRef:64,cadDuplo:d.cadDuplo,cadOrigem:{draftSide:'2',verificado:true},items:[{tipo:'cadperfil',side:'1',path:d.trechos2[0].path}]});
+ assert.equal(result.id,d.id);assert.deepEqual(result.custom,d.custom);assert.deepEqual(result.trechos1,d.trechos1);assert.deepEqual(result.trechos2,d.trechos2);assert.deepEqual(d,before);
+ const {generate}=await import('../src/domain.mjs'),form={tipo:'peca_simples',desenhoSel:d.id,cadUsinagem:{[d.id]:{limite1:60,limite2:40}},cadPrimeiro:{[d.id]:'2'},vals:{peca_simples:{dBruto:64,lBruto:102,grip1:10,grip2:10,sobre1:1}},maq:C.DEFAULT_MAQ};assert.deepEqual(generate(form,[result],tools).erros,[]);assert.deepEqual(result.trechos1,d.trechos1);
+});
+
+test('backup remapeia comprimentos e primeira operação sem perder configurações atuais',async()=>{
+ const {mergeWorkspace}=await import('../src/data.mjs'),d=drawing(),current={tools:[],drawings:[d],work:d,form:{cadUsinagem:{test:{limite1:60,limite2:40}},cadPrimeiro:{test:'1'}}},incoming={tools:[],drawings:[{...d,nome:'Outro desenho'}],form:{desenhoSel:'test',cadUsinagem:{test:{limite1:70,limite2:30}},cadPrimeiro:{test:'2'}}},before=structuredClone(current),out=mergeWorkspace(current,incoming,C),id=out.drawings[1].id;
+ assert.notEqual(id,'test');assert.equal(out.form.desenhoSel,id);assert.deepEqual(out.form.cadUsinagem.test,{limite1:60,limite2:40});assert.deepEqual(out.form.cadUsinagem[id],{limite1:70,limite2:30});assert.equal(out.form.cadPrimeiro[id],'2');assert.deepEqual(current,before);
+});
+
+test('internos salvos sobrevivem à reedição invertida e parcial não é criado na outra face',async()=>{
+ const {cadDocument}=await import('../src/cad-document.mjs'),{createOppositeCadSide}=await import('../src/cad-sides.mjs'),source=drawing();source.internos1=[{id:'furo-passante',tipo:'furo',a:10,b:100,extra:{manter:true}}];const d=createOppositeCadSide(source),before=structuredClone(d);
+ const result=cadDocument({editingDrawing:d,cadSide:'2',nome:d.nome,lPeca:100,dRef:64,cadDuplo:d.cadDuplo,items:[{tipo:'cadperfil',path:d.trechos2[0].path},...d.internos2]});assert.deepEqual(result.internos1,d.internos1);assert.deepEqual(result.internos2,d.internos2);assert.deepEqual(d,before);
+ assert.throws(()=>cadDocument({nome:'Parcial',lPeca:100,cadDuplo:{modo:'invertido'},items:[{tipo:'cadperfil',path},{tipo:'furo',a:10,b:30}]}),/parcial/);
 });
 test('Disco 7 preserva quatro arcos no desenho invertido e gera ambos os lados',async()=>{
  const fixture=require('./fixtures/disco-7-gap.json'),G=require('../public/engine/dxfgeometry.js'),P=require('../public/engine/dxfprofile.js'),geometry=structuredClone(fixture.geometry);G.repairEndpoints(geometry,fixture.ids);

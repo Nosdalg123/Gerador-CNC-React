@@ -565,7 +565,11 @@
         "marcador verde",
         "circulo",
         "aviso 3 segundos",
-        "seta"
+        "seta",
+        "comprimento no gerador",
+        "miniatura",
+        "previa lado 2",
+        "salvar ambos"
       ],
       "files": [
         "src/cad-sides.mjs",
@@ -577,7 +581,10 @@
         "public/engine/dxfprofile.js",
         "src/assets/cad.css",
         "tests/cad-sides.test.cjs",
-        "scripts/test-cad-dual.cjs"
+        "scripts/test-cad-dual.cjs",
+        "src/cad-document.mjs",
+        "src/data.mjs",
+        "RELATORIO-CAD-LADOS-GERADOR-3.1.15.md"
       ],
       "symbols": [
         "reverseCadPath",
@@ -587,7 +594,11 @@
         "showCorrectionNotice",
         "positionCorrectionNotice",
         "inspectCorrection",
-        "openSavedContour"
+        "openSavedContour",
+        "cadDocument",
+        "cadMachiningLimits",
+        "saveData",
+        "renderSaveSides"
       ]
     },
     {

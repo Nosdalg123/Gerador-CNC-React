@@ -1,14 +1,16 @@
-# TORNO CNC — 3.1.14 · versão leve
+# TORNO CNC — 3.1.15 · versão leve
+
+O CAD DXF gera a prévia do lado 2 invertido na etapa 3 e mostra botões com miniaturas para conferir ambos os lados. Os dois perfis completos ficam gravados no desenho; os comprimentos a usinar são definidos no **Gerador de código**, inicialmente metade por lado. As caixas de seleção ficam em linhas separadas. Reabrir e salvar o lado 2 preserva a identidade do desenho e suas configurações. Relatório: `RELATORIO-CAD-LADOS-GERADOR-3.1.15.md`.
 
 Na etapa **2 · Editar desenho**, escolha **Face Z0 voltada à ferramenta** e confira o comprimento. A etapa 3 exige o perfil preparado; se houver pendências, o editor lista o problema e como corrigi-lo. Rascunhos incompletos podem ser conservados na etapa 2. Detalhes em `RELATORIO-PREPARACAO-CAD-3.1.14.md`.
 
-Repositório: [Nosdalg123/Gerador-CNC-React](https://github.com/Nosdalg123/Gerador-CNC-React). O pacote pronto fica em `distribuicoes/CNC-Torno-Leve-3.1.14.zip`: baixe, extraia toda a pasta e execute `Iniciar-CNC-Leve.cmd`. O mapa atual fica na raiz e acompanha o pacote; mapas históricos estão disponíveis em `revisoes/mapas-arquivados/*.zip`, com os manifestos originais. Para consultá-los, extraia o ZIP da revisão desejada. Os dados de trabalho permanecem no computador do usuário.
+Repositório: [Nosdalg123/Gerador-CNC-React](https://github.com/Nosdalg123/Gerador-CNC-React). O pacote pronto fica em `distribuicoes/CNC-Torno-Leve-3.1.15.zip`: baixe, extraia toda a pasta e execute `Iniciar-CNC-Leve.cmd`. O mapa atual fica na raiz e acompanha o pacote; mapas históricos estão disponíveis em `revisoes/mapas-arquivados/*.zip`, com os manifestos originais. Para consultá-los, extraia o ZIP da revisão desejada. Os dados de trabalho permanecem no computador do usuário.
 
 O simulador enquadra a peça completa e as cavidades internas, inclusive quando o interno é mais profundo que o perfil externo. A vista permanece fixa durante a troca de ferramenta; **Ajustar** restaura o enquadramento completo e o zoom mantém o centro da peça. Relatório: `RELATORIO-SIMULADOR-INTERNO-3.1.13.md`.
 
 O círculo verde marca uma conexão corrigida; um aviso com seta explica o encontro por 3 segundos. A cor de seleção prevalece e conectar linhas já unidas libera a seleção sem alterar a peça.
 
-Para dois lados, marque **Salvar também lado 2 invertido** ao salvar o DXF, ou use **Criar lado 2 invertido** em Desenho da peça. Salve o desenho com os dois comprimentos de usinagem (metade por lado inicialmente). No Gerador, escolha **Primeiro lado a usinar** e use os botões Lado 1/Lado 2 para código e simulação. Detalhes em `RELATORIO-CAD-DOIS-LADOS-3.1.12.md`.
+Para dois lados, marque **Salvar também lado 2 invertido** ao salvar o DXF, ou use **Criar lado 2 invertido** em Desenho da peça. Salve os dois perfis completos; ajuste os comprimentos no Gerador de código (metade por lado inicialmente). No Gerador, escolha **Primeiro lado a usinar** e use os botões Lado 1/Lado 2 para código e simulação. Detalhes em `RELATORIO-CAD-DOIS-LADOS-3.1.12.md`.
 
 Apagar por retângulo acompanha o cursor também em quadros com margens, zoom e desenho movido. A mesma correção alinha a delimitação da vista e o movimento do desenho. Detalhes em `RELATORIO-RETANGULO-MOUSE-3.1.11.md`.
 

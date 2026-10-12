@@ -12,7 +12,7 @@ export function generate(form,drawings,tools) {
     if(d.cadOrigem?.incompleto||d.cadOrigem?.verificado===false)return {erros:['Desenho DXF é um RASCUNHO INCOMPLETO. Conclua o perfil no editor e confirme a revisão completa do CAD antes de gerar.'],avisos:[]};
     if(d.lados==='2'&&d.cadDuplo?.modo==='invertido'){
       firstCad=form.cadPrimeiro?.[d.id]||d.cadDuplo.primeiro||'1';dualCad=true;
-      try{d=prepareCadSides(d,firstCad)}catch(error){return {erros:[error.message],avisos:[]}}
+      try{d=prepareCadSides(d,firstCad,form.cadUsinagem?.[d.id])}catch(error){return {erros:[error.message],avisos:[]}}
       f.permiteSobrepor=true;
       if(firstCad==='2'){for(const prefix of ['grip','usin','sentE','sentI'])[f[prefix+'1'],f[prefix+'2']]=[f[prefix+'2'],f[prefix+'1']];f.brutoIntLado=f.brutoIntLado==='2'?'1':'2';}
     }

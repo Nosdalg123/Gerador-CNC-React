@@ -1,6 +1,6 @@
-# Mapa do código — versão 3.1.14
+# Mapa do código — versão 3.1.15
 
-Revisão: `da67ec2743277be7ffc5816aa62e99ed1a4a0710f6f1cb2836a3557cac0475ee`. 138 arquivos, 2649 símbolos, 5551 chamadas resolvidas e 116 relações JSX.
+Revisão: `cb2fc20449edb5f23102c051cc1aedea1815019b79cc38a2ddfc5c6d58cebc51`. 140 arquivos, 2668 símbolos, 5589 chamadas resolvidas e 115 relações JSX.
 
 Leia AGENTS.md e TRILHA-REACT.md antes de qualquer revisão. O índice tem hashes e faixas de linhas; GRAFO-CODIGO.json contém relações e evidências.
 
@@ -17,7 +17,7 @@ Consultas atualizam o mapa antes de responder. Dev/build/package também atualiz
 
 ## Limites e evidência
 
-EXTRACTED: referência resolvida pelo AST/escopo. INFERRED: alias global ou associação de conceito revisada. AMBIGUOUS: mais de um destino. 9002 chamadas externas/dinâmicas não foram resolvidas e estão registradas. Callbacks e funções anônimas têm nós próprios. Resolução estática não prova execução.
+EXTRACTED: referência resolvida pelo AST/escopo. INFERRED: alias global ou associação de conceito revisada. AMBIGUOUS: mais de um destino. 9138 chamadas externas/dinâmicas não foram resolvidas e estão registradas. Callbacks e funções anônimas têm nós próprios. Resolução estática não prova execução.
 
 A busca por assunto usa vocabulário de CNC e texto local, sem LLM ou embeddings. Não interpreta imagens/PDFs como documentação semântica. PowerShell tem inventário e declaração de função, sem grafo completo de comandos. Não há promessa de redução de tokens medida.
 
@@ -39,5 +39,5 @@ A busca por assunto usa vocabulário de CNC e texto local, sem LLM ou embeddings
 - **Etapas CAD, seleção de cadeias e ligação de falhas**: `src/assets/cad-panel.html`, `src/assets/cad.css`, `src/components/CadImport.jsx`, `public/engine/dxfimport.js`, `public/engine/dxfgeometry.js`, `public/engine/dxfprofile.js`, `scripts/test-cad-stages.cjs`, `scripts/cad-test-flow.cjs`, `tests/dxf-repair.test.cjs`
 - **Selecionar máquina e editar ferramentas por grupos**: `src/App.jsx`, `src/components/MachineSelector.jsx`, `src/components/Tools.jsx`, `src/components/ToolDrawing.jsx`, `src/assets/tool-drawing.mjs`, `src/style.css`, `scripts/test-machine-tools.cjs`, `tests/tool-layout.test.cjs`
 - **Conectar arcos e retas e ligar falhas circulares**: `public/engine/dxfgeometry.js`, `public/engine/dxfimport.js`, `public/engine/dxfprofile.js`, `src/assets/cad-panel.html`, `tests/dxf-arc-connections.test.cjs`, `scripts/test-dxf-arc-connections.cjs`
-- **CAD com lado 2 invertido e aviso de conexão**: `src/cad-sides.mjs`, `src/components/Drawing.jsx`, `src/components/Generator.jsx`, `src/components/CadImport.jsx`, `src/domain.mjs`, `public/engine/dxfimport.js`, `public/engine/dxfprofile.js`, `src/assets/cad.css`, `tests/cad-sides.test.cjs`, `scripts/test-cad-dual.cjs`
+- **CAD com lado 2 invertido e aviso de conexão**: `src/cad-sides.mjs`, `src/components/Drawing.jsx`, `src/components/Generator.jsx`, `src/components/CadImport.jsx`, `src/domain.mjs`, `public/engine/dxfimport.js`, `public/engine/dxfprofile.js`, `src/assets/cad.css`, `tests/cad-sides.test.cjs`, `scripts/test-cad-dual.cjs`, `src/cad-document.mjs`, `src/data.mjs`, `RELATORIO-CAD-LADOS-GERADOR-3.1.15.md`
 - **Preparação CAD, face Z0 e pendências antes de salvar**: `src/assets/cad-panel.html`, `public/engine/dxfimport.js`, `public/engine/dxfaudit.js`, `scripts/test-cad-stages.cjs`, `RELATORIO-PREPARACAO-CAD-3.1.14.md`

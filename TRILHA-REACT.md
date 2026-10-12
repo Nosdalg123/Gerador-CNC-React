@@ -1,4 +1,6 @@
-# Trilha de código — React 3.1.14
+# Trilha de código — React 3.1.15
+
+Dois lados no CAD: `dxfimport.js:saveData`, `renderSaveSides` → `CadImport.jsx:CNCDesenhos.previewSides` → `cad-document.mjs:cadDocument` → `cad-sides.mjs:createOppositeCadSide`. A etapa 3 visualiza ambos e salva perfis completos. Comprimentos: `Generator.jsx` → `form.cadUsinagem[desenhoId]` → `domain.mjs:generate` → `prepareCadSides`, `cadMachiningLimits`. A geração recorta uma cópia. `App.jsx:useDrawing` atualiza IDs existentes; `data.mjs:mergeWorkspace` remapeia parâmetros de backups. Relatório: `RELATORIO-CAD-LADOS-GERADOR-3.1.15.md`.
 
 Preparação CAD antes de salvar: `src/assets/cad-panel.html` define Z0/comprimento na etapa 2; `public/engine/dxfimport.js:setStep`, `checkPreparation`, `showPreparation` controlam a passagem à etapa 3. `public/engine/dxfaudit.js:preparation` reúne bloqueios e dicas, preservando a validação CNC existente. Regressões: `tests/cad-profile.test.cjs`, `scripts/test-cad-stages.cjs` e `scripts/test-disco-real.cjs`. Relatório: `RELATORIO-PREPARACAO-CAD-3.1.14.md`.
 

@@ -50,6 +50,7 @@ export function mergeWorkspace(current,incoming,CNC) {
     next[key].push(item);
   }
   if(incoming.form){next.form={...next.form,...clone(incoming.form)};if(idMap[next.form.desenhoSel])next.form.desenhoSel=idMap[next.form.desenhoSel];
+    for(const key of ['cadPrimeiro','cadUsinagem'])if(incoming.form[key])next.form[key]={...clone(current.form?.[key]||{}),...Object.fromEntries(Object.entries(incoming.form[key]).map(([id,value])=>[idMap[id]||id,clone(value)]))};
     for(const selection of Object.values(next.form.toolByTipo||{}))for(const slot of Object.keys(selection))if(idMap[selection[slot]])selection[slot]=idMap[selection[slot]];}
   for(const key of ['work','program','theme','seeded'])if(incoming[key]!=null)next[key]=clone(incoming[key]);
   if(next.work){next.work=normalizeDrawing(next.work,CNC);if(incoming.work)remapDraft(next.work);if(idMap[next.work.id])next.work.id=idMap[next.work.id];}

@@ -6,7 +6,7 @@ const $=q=>document.querySelector(q),DX=root.CNCDXF,P=root.CNCDXFPerfil,E=root.C
 let doc=null,sourceDoc=null,rect=null,axis=NaN,suggest=null,active=false,start=null,zoom=1,fileName='',
  selected={externo:new Set(),interno:new Set()},chainInfo=null,hidden=new Set(),undo=[],pendingExtension=null,pendingConnection=null,
  editCount=0,dragRect=null,projDrag=null,skipProjectedClick=false,projPan=null,camera={x:0,y:0,w:900,h:480},
- activeMode='',lastProfile='externo',step=1,corrections=[],noticeTimer=null,noticeIndex=0,noticeHover=0,editingDrawing=null,editingSide='1';
+ activeMode='',lastProfile='externo',step=1,corrections=[],noticeTimer=null,noticeIndex=0,noticeHover=0,editingDrawing=null,editingSide='1',saveSide='1',restoredInternals=null;
 const KEY='cnc_dxf_rascunhos_v1';
 const val=id=>$(id).value;
 const fmt=n=>Number(n).toLocaleString('pt-BR',{maximumFractionDigits:3});
@@ -22,6 +22,7 @@ function setStep(next){
  step=next;document.querySelectorAll('[data-dxf-step]').forEach(s=>s.hidden=Number(s.dataset.dxfStep)!==step);
  document.querySelectorAll('.dxf-steps [data-dxf-go]').forEach(b=>{if(Number(b.dataset.dxfGo)===step)b.setAttribute('aria-current','step');else b.removeAttribute('aria-current')});
  applyCamera();
+ if(step===3)renderProjection();
  if(preparation){showPreparation(preparation);if(!preparation.ok&&step===2){$('#dxfPending').scrollIntoView({block:'center'});$('#dxfPending').focus({preventScroll:true});}}
 }
 function checkPreparation(){
@@ -189,7 +190,7 @@ function renderProjection(){
  axis=a;
  let cand=P.analyze(doc,rect,a,val('#dxfFace'),new Set(),hidden).candidate;
  const picture=P.svg(doc,rect,{axis:a,face:val('#dxfFace'),selected:all,hidden,editing:new Set([pendingExtension,pendingConnection].filter(Boolean)),candidate:new Set(cand.map(s=>s.uid)),corrected:new Set(corrections.map(c=>c.uid)),corrections});
- host.innerHTML=picture;$('#dxfSavePreview').innerHTML=picture.replaceAll('cad-upper','cad-save-upper').replaceAll('cad-lower','cad-save-lower');
+ host.innerHTML=picture;
  applyCamera();
  drawChains();
  const e=analyse('externo'),i=analyse('interno'),warn=$('#dxfWarnings');
@@ -225,8 +226,30 @@ function renderProjection(){
  $('#dxfSaveSummary').textContent=warn.textContent;
  const internalOK=!i.selected.length||i.classified.every(t=>t.kind==='cil'||t.kind==='cone');
  $('#dxfSaveCNC').disabled=!(checked()&&!issues.length&&e.canExport&&internalOK&&doc.units===4&&val('#dxfNome').trim());
+ if(step===3&&!renderSaveSides())$('#dxfSaveCNC').disabled=true;
  if(!$('#dxfPending').hidden)showPreparation(checkPreparation());
 }
+function saveData(draftId){
+ const e=analyse('externo'),i=analyse('interno');if(!e?.nativeProfile?.ok)throw Error('Conclua o perfil superior na etapa 2.');
+ const items=[{tipo:'cadperfil',side:'1',path:clone(e.nativeProfile.path)}].concat(i?.selected.length?toItems('interno',i,val('#dxfFace')):(restoredInternals||[]).map(t=>({...clone(t),side:'1'})));
+ return {nome:val('#dxfNome').trim(),lPeca:Number(val('#dxfLength')),dRef:Math.ceil(2*e.nativeProfile.radius+4),items,cadSide:editingSide,editingDrawing:editingDrawing?clone(editingDrawing):undefined,
+  ...($('#dxfSaveTwoSides').checked?{cadDuplo:clone(editingDrawing?.cadDuplo||{modo:'invertido',primeiro:'1'})}:{}),
+  cadOrigem:{arquivo:fileName,unidade:doc.unitName,faceZ0:val('#dxfFace'),eixoCAD:axis,verificado:true,incompleto:false,nativo:true,draftId,draftSide:editingSide,alteradoCAD:editCount>0,segmentosExcluidos:hidden.size,entidadesSelecionadas:e.selected.length+(i?.selected.length||0)}};
+}
+function renderSaveSides(){
+ let views={},problem='';const api=root.CNCDesenhos;
+ try{const data=saveData();try{views=api.previewSides({...data,cadDuplo:data.cadDuplo||{modo:'invertido',primeiro:'1'}})}catch(error){problem=error.message;views=api.previewSides({...data,cadDuplo:undefined})}}
+ catch(error){problem=error.message}
+ if(!views[saveSide])saveSide='1';
+ document.querySelectorAll('[data-dxf-save-side]').forEach(b=>{const s=b.dataset.dxfSaveSide;b.disabled=!views[s];b.setAttribute('aria-pressed',String(s===saveSide));$('[data-dxf-side-thumbnail="'+s+'"]').innerHTML=views[s]?.thumbnail||''});
+ $('#dxfSavePreview').innerHTML=views[saveSide]?.svg||'';
+ $('#dxfSaveSideHint').textContent='Visualizando lado '+saveSide+' · perfil completo. '+($('#dxfSaveTwoSides').checked?'Os dois lados ficarão gravados no desenho.':'Somente o contorno atual será salvo. Marque a opção abaixo para gravar os dois lados.')+' Defina quanto usinar no Gerador de código.';
+ $('#dxfSideError').hidden=!problem;$('#dxfSideError').textContent=problem?'Não foi possível gerar o lado 2 automaticamente: '+problem:'';
+ return !!views['1']&&(!$('#dxfSaveTwoSides').checked||!!views['2']);
+}
+document.querySelectorAll('[data-dxf-save-side]').forEach(b=>b.onclick=()=>{saveSide=b.dataset.dxfSaveSide;renderSaveSides()});
+$('#dxfGenerateSide2').onclick=()=>{$('#dxfSaveTwoSides').checked=true;saveSide='2';resetConfirm();renderProjection()};
+$('#dxfSaveTwoSides').onchange=()=>{resetConfirm();renderProjection()};
 function autoRecognize(){
  if(!doc||!rect||val('#dxfAxis')==='')return;
  const result=E.autoSelect(doc,rect,Number(val('#dxfAxis')),hidden);
@@ -258,7 +281,7 @@ $('#dxfFile').onchange=async function(){
   let bytes=await f.arrayBuffer(),text=new TextDecoder('windows-1252').decode(bytes);
   status('Analisando entidades CAD, cotas e vistas do arquivo...');
   await new Promise(resolve=>root.requestAnimationFrame?root.requestAnimationFrame(()=>resolve()):resolve());
-  clearCorrectionNotice();editingDrawing=null;editingSide='1';$('#dxfSaveTwoSides').checked=false;doc=DX.read(text);sourceDoc=clone(doc);fileName=f.name;rect=null;suggest=null;axis=NaN;zoom=1;active=false;
+  clearCorrectionNotice();editingDrawing=null;editingSide='1';saveSide='1';restoredInternals=null;$('#dxfSaveTwoSides').checked=true;doc=DX.read(text);sourceDoc=clone(doc);fileName=f.name;rect=null;suggest=null;axis=NaN;zoom=1;active=false;
   fitCamera();$('#dxfPanMode').checked=false;
   hidden.clear();undo=[];corrections=[];setMode('');
   const cleanup=G.dedupeGeometry(doc.geometry);doc.count=doc.geometry.length;editCount=cleanup.removed.length?1:0;
@@ -481,7 +504,7 @@ $('#dxfSaveDraft').onclick=function(){
 };
 function openDraft(entry){
  if(!entry)return;
- clearCorrectionNotice();editingDrawing=null;editingSide='1';$('#dxfSaveTwoSides').checked=false;
+ clearCorrectionNotice();editingDrawing=null;editingSide='1';saveSide='1';restoredInternals=null;$('#dxfSaveTwoSides').checked=true;
  try{
   const original=clone(entry.sourceDoc||entry.doc),working=clone(original);
   if(entry.geometryEdits)working.geometry=G.restoreGeometry(original.geometry,entry.geometryEdits);
@@ -505,13 +528,13 @@ function openDraft(entry){
 $('#dxfOpenDraft').onclick=()=>openDraft(draftList()[Number(val('#dxfDraftList'))]);
 function openSavedContour(drawing,side='1'){
  const entry=draftList().find(d=>d.id===drawing.cadOrigem?.draftId);
- if(entry&&side===(drawing.cadOrigem?.draftSide||'1')){openDraft(entry);editingDrawing=clone(drawing);editingSide=side;$('#dxfSaveTwoSides').checked=!!drawing.cadDuplo;$('#dxfNome').value=drawing.nome;return}
+ if(entry&&side===(drawing.cadOrigem?.draftSide||'1')){openDraft(entry);editingDrawing=clone(drawing);editingSide=side;saveSide=side;$('#dxfSaveTwoSides').checked=drawing.lados==='2'&&!!drawing.cadDuplo;$('#dxfNome').value=drawing.nome;return}
  const item=drawing['trechos'+side]?.find(t=>t.tipo==='cadperfil'),cad=root.CNCPerfilCAD,info=cad.validate(item?.path);
  if(!info.ok){status('O desenho salvo não contém um contorno CAD válido.',true);return}
  const coord=p=>[p[0]+info.length+50,p[1]],geometry=item.path.map((s,i)=>({id:'saved'+i,type:s.kind==='arc'?'ARC':'LINE',a:coord(s.a),b:coord(s.b),...(s.kind==='arc'?{c:coord(s.c),r:s.r,sweep:s.ccw?1:-1}:{} )}));
  const base={geometry,entities:[],dimensions:[],units:4,unitName:'Milímetros',count:geometry.length,unsupported:{}};
  const b=DX.bounds(geometry);openDraft({sourceDoc:base,rect:{x1:b.x1-3,x2:b.x2+3,y1:b.y1-3,y2:b.y2+3},fileName:drawing.cadOrigem?.arquivo||'contorno-salvo',nome:drawing.nome,axis:0,face:'direita',length:info.length,externo:geometry.map(s=>s.id+':0')});
- editingDrawing=clone(drawing);editingSide=side;$('#dxfSaveTwoSides').checked=!!drawing.cadDuplo;
+ editingDrawing=clone(drawing);editingSide=side;saveSide=side;restoredInternals=clone(drawing['internos'+side]||[]);$('#dxfSaveTwoSides').checked=drawing.lados==='2'&&!!drawing.cadDuplo;
  status('Contorno salvo reaberto com medidas e arcos exatos. A fonte DXF completa não acompanha este backup; reimporte-a para recuperar referências auxiliares.');
 }
 function toItems(mode,ana,face){
@@ -541,8 +564,7 @@ $('#dxfSaveCNC').onclick=function(){
  let api=root.CNCDesenhos;
  if(!api||!api.salvarPDF){status('Editor CNC não disponível.',true);return}
  let draftId;try{draftId=preserveDraft()}catch(err){status('Não foi possível preservar a fonte CAD: '+err.message,true);return}
- let id;try{id=api.salvarPDF({nome:val('#dxfNome').trim(),lPeca:length,dRef:Math.ceil(max+4),items,...($('#dxfSaveTwoSides').checked?{cadDuplo:clone(editingDrawing?.cadDuplo||{modo:'invertido',limite1:length/2,limite2:length/2,primeiro:'1'}),cadSide:editingSide}:{}),
-   cadOrigem:{arquivo:fileName,unidade:doc.unitName,faceZ0:face,eixoCAD:axis,verificado:true,incompleto:false,nativo:true,draftId,draftSide:editingSide,alteradoCAD:editCount>0,segmentosExcluidos:hidden.size,entidadesSelecionadas:e.selected.length+(i?.selected.length||0)}})}catch(error){status('Não foi possível preparar os lados: '+error.message,true);return}
+ let id;try{id=api.salvarPDF(saveData(draftId))}catch(error){status('Não foi possível preparar os lados: '+error.message,true);return}
  if(id){resetConfirm();$('#dxfSaved').textContent='Perfil enviado ao Gerador: '+val('#dxfNome');status('Perfil CNC salvo. Revise fixação, ferramentas e simulação antes de usinar.')}
 };
 $('#dxfEditManual').onclick=function(){

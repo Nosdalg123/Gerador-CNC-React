@@ -15,9 +15,11 @@ Em 11/10/2026, o usuário determinou: “daqui em diante vamos usar apenas a ver
 
 Os arquivos `electron/` e `scripts/package.cjs` ficam como histórico e referência; não são o caminho padrão de execução ou entrega.
 
-## Uso obrigatório do mapa em cada revisão
+## Uso obrigatório do mapa em cada solicitação
 
 Pedido explícito do usuário em 11/10/2026: manter o mapa disponível em cada revisão e sempre usá-lo para aumentar a eficiência.
+
+Em 12/10/2026, o usuário tornou o uso obrigatório em toda solicitação referente ao projeto, inclusive perguntas sem alteração de código. Consulte o mapa e registre a consulta com `pnpm mapa:query` antes de analisar; confira `pnpm mapa:check` ao concluir. Mantenha o observador ativo durante o trabalho e verifique sua atualização. A ferramenta é o mapeador local inspirado no Graphify; não alegue execução do produto oficial sem comprovação.
 
 1. Antes de editar código, leia `MAPA-CODIGO.md` e `TRILHA-REACT.md`. Execute `pnpm mapa:query --query "assunto da tarefa"`; a consulta atualiza e confere o mapa automaticamente. Consulte `--symbol`, `--callers`, `--callees` ou `--impact` nos pontos relevantes. Confirme as faixas indicadas no fonte. Evite reler todo o grafo ou o projeto quando uma consulta específica bastar.
 2. Use somente o mapa desta pasta. O grafo em `G:/GPT/analise-v2.11.0` é histórico. Relações `INFERRED` e `AMBIGUOUS`, callbacks, chamadas dinâmicas e PowerShell exigem conferência no código; extração estática não demonstra execução.
@@ -27,3 +29,7 @@ Pedido explícito do usuário em 11/10/2026: manter o mapa disponível em cada r
 6. Para entregar, execute `pnpm build` e `pnpm package`. O pacote contém `mapa/` com índice, grafo, guia, trilha, configuração, estas instruções e manifesto. Empacotamento recusa build de outra revisão ou mapa inconsistente. Se editar fontes/documentação após o build, reconstrua antes de entregar. Preserve os ZIPs anteriores.
 
 O mapa é ferramenta de navegação; o comportamento deve ser confirmado nos trechos encontrados e nos testes pertinentes. Não invente medições de economia de tokens.
+
+## Links em toda entrega
+
+Ao entregar uma revisão, informe o link do commit publicado em `https://github.com/Nosdalg123/Gerador-CNC-React` e o link local absoluto do lançador `G:/GPT/CNC-Torno-Leve-<versão>/Iniciar-CNC-Leve.cmd`. Confira ambos. O ZIP pode ser adicional, mas não substitui o link de execução. Não publique em `Nosdalg123/gerador-cnc-fanuc`, destino cancelado pelo usuário. Se uma publicação estiver pendente, declare esse estado.

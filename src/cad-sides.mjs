@@ -32,7 +32,7 @@ function reverseInternals(items,length){
 export function createOppositeCadSide(drawing){
  const d=copy(drawing),item=d.trechos1?.find(t=>t.tipo==='cadperfil');if(!item||d.trechos1.length!==1)throw Error('A inversão automática exige um contorno CAD nativo completo no lado 1.');
  const length=Number(d.lPeca);d.trechos2=[{...copy(item),id:(item.id||'cad')+'-lado2',path:reverseCadPath(item.path,length)}];d.internos2=reverseInternals(d.internos1||[],length);d.lados='2';
- d.cadDuplo={modo:'invertido',limite1:length/2,limite2:length/2,primeiro:'1'};return d;
+ d.cadDuplo={...d.cadDuplo,modo:'invertido',primeiro:d.cadDuplo?.primeiro||'1'};return d;
 }
 function clipInternals(items,length){
  let used=0;const result=[];
@@ -42,8 +42,13 @@ function clipInternals(items,length){
   result.push(t);used+=take;
  }return result;
 }
-export function prepareCadSides(drawing,first='1'){
+export function cadMachiningLimits(drawing,settings={}){
+ const half=Number(drawing.lPeca)/2;
+ return Object.fromEntries(['1','2'].map(side=>['limite'+side,settings['limite'+side]??drawing.cadDuplo?.['limite'+side]??half]));
+}
+export function prepareCadSides(drawing,first='1',settings={}){
  const d=copy(drawing),length=Number(d.lPeca);
+ d.cadDuplo={...d.cadDuplo,...cadMachiningLimits(drawing,settings)};
  const expected=reverseCadPath(d.trechos1?.[0]?.path,length),opposite=d.trechos2?.[0]?.path;
  const samePoint=(a,b)=>Array.isArray(b)&&Math.hypot(a[0]-b[0],a[1]-b[1])<=.001;
  if(!opposite||opposite.length!==expected.length||expected.some((s,i)=>{const t=opposite[i];return s.kind!==t.kind||!samePoint(s.a,t.a)||!samePoint(s.b,t.b)||(s.kind==='arc'&&(!samePoint(s.c,t.c)||Math.abs(s.r-t.r)>.001||s.ccw!==t.ccw))}))throw Error('Os contornos dos lados não correspondem à mesma peça invertida. Confira a edição no CAD antes de gerar.');
