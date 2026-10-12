@@ -1,0 +1,8 @@
+<!doctype html><html lang="pt-BR"><meta charset="utf-8"><title>Exportar dados CNC anteriores</title><style>body{font:16px system-ui;max-width:850px;margin:50px auto;padding:24px;color:#123}pre{white-space:pre-wrap;background:#edf1f7;padding:24px}button{padding:12px}</style><h1>Trazer dados da versão antiga</h1><p>Abra a versão antiga no navegador e endereço que contém seus dados. Pressione F12 e abra Console. Copie o código abaixo e execute naquele Console. Ele baixa um JSON local sem alterar os dados existentes.</p><p>Esta página auxiliar apenas apresenta o código: seu armazenamento pertence a outra origem e não contém automaticamente os dados antigos.</p><button id="copy">Copiar código</button><pre id="code">const dados = {localStorage: {}};
+for (let i=0;i&lt;localStorage.length;i++) {
+  const k=localStorage.key(i);
+  if ((k.startsWith('cnc.')||k==='cnc_dxf_rascunhos_v1')) dados.localStorage[k]=localStorage.getItem(k);
+}
+const a=document.createElement('a');
+a.href=URL.createObjectURL(new Blob([JSON.stringify(dados,null,2)],{type:'application/json'}));
+a.download='cnc-dados-antigos.json'; a.click();</pre><p>Depois, no programa React, abra Dados e backup → Escolher arquivo JSON → Mesclar e manter dados existentes.</p><script>document.getElementById('copy').onclick=async()=>{try{await navigator.clipboard.writeText(document.getElementById('code').textContent);document.getElementById('copy').textContent='Código copiado'}catch{document.getElementById('copy').textContent='Selecione o código e pressione Ctrl+C'}};</script></html>

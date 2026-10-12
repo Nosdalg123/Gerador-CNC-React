@@ -1,0 +1,58 @@
+.pdf-row{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0;align-items:center}.pdf-row input{width:125px;min-width:0}.pdf-row select{max-width:180px}.pdf-row .pdf-remove{min-width:36px}#pdfCotas{margin:8px 0}#pdfRows{padding:8px 0}.pdf-workspace{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;margin-top:12px}.pdf-original,.pdf-projection{min-width:0;padding:12px;border:1px solid var(--border,#b9cbd9);border-radius:10px}.pdf-workspace-title{display:flex;align-items:baseline;flex-wrap:wrap;gap:8px;margin-bottom:10px}.pdf-workspace-title span{font-size:12px;color:var(--muted,#64748b)}.pdf-profile-svg{min-height:280px;background:white;border:1px solid #ced8e3;border-radius:8px;display:grid;place-items:center;overflow:hidden}.pdf-profile-svg svg{width:100%;height:auto;display:block}.pdf-extracted{margin:12px 0}.pdf-extracted summary{cursor:pointer;font-weight:600;margin-bottom:8px}#pdfSaved:not(:empty){margin-top:10px;font-weight:600}@media(max-width:980px){.pdf-workspace{grid-template-columns:1fr}}#pdfSaveActions[hidden]{display:none}
+
+#pdfStage{overflow:auto!important;cursor:crosshair!important;touch-action:none!important}
+#pdfCanvasWrap{margin:0 auto}#pdfSelectionOverlay rect{fill:#2b90ed33;stroke:#1a69ba;stroke-width:2;stroke-dasharray:6 3}
+#pdfProfileSvg{min-height:320px;overflow:auto!important;display:block!important}#pdfProfileSvg svg{max-width:none!important;margin:auto}#pdfProfileSvg .pdf-cota-edit:focus rect,#pdfProfileSvg .pdf-cota-edit:hover rect{fill:#9ccef8;stroke:#0059b3;stroke-width:2}#pdfProfileSvg .pdf-piece-edit:hover{fill:#5a9ad6;fill-opacity:.10}
+.pdf-save-strip{display:flex;align-items:end;flex-wrap:wrap;gap:12px;margin:14px 0;padding:16px;border:2px solid var(--border,#a4bad0);border-radius:10px;background:var(--surface,#e9f3fc)}
+.pdf-save-strip .pdf-name{flex:1 1 260px;min-width:0}.pdf-save-strip input{width:100%;min-height:44px}.pdf-save-button{padding:14px 22px!important;min-height:48px;white-space:normal;font-size:1rem!important;font-weight:800!important;flex:0 1 auto}.pdf-save-button:disabled{opacity:.55;cursor:not-allowed}
+.pdf-confirm{margin-top:15px;display:flex;align-items:center;gap:8px;font-weight:600}.pdf-edit-dialog{min-width:min(94vw,480px);max-width:600px}.pdf-edit-dialog::backdrop{background:#0008}
+
+.pdf-cnc-orientation{border:2px solid #9fbada;background:rgba(120,171,214,.08);padding:12px;border-radius:9px;margin-bottom:12px}.pdf-cnc-orientation .row{display:flex;gap:12px;flex-wrap:wrap}.pdf-cnc-orientation .field{flex:1 1 220px}.pdf-dimensions{margin:12px 0;padding-top:10px;border-top:1px solid #a9bdcc}.pdf-dimension-list{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.pdf-dim-tag{padding:5px 9px;border-radius:6px;background:#f1f5f9;color:#23374e;border:1px solid #c5d4e3;font-size:12px}.pdf-dim-tag[data-dim-kind="rosca"],.pdf-dim-tag[data-dim-kind="raio"],.pdf-dim-tag[data-dim-kind="angulo"]{background:#fff2dd;border-color:#e6c996}.pdf-dim-tag[data-dim-kind="linear_sem_tipo"]{border-style:dashed}
+
+.dxf-graphics{border:1px solid #cbd5e1;background:white;min-height:270px;max-height:540px;overflow:auto;border-radius:8px;cursor:crosshair}
+.dxf-graphics svg{display:block;width:100%;height:auto;min-width:530px}
+.dxf-graphics svg [data-cad-segment]:hover{stroke:#f97316;stroke-width:5}
+.dxf-save-bar{display:flex;flex-wrap:wrap;align-items:end;gap:12px;padding:14px;background:rgba(56,132,189,.08);border:2px solid #7eabcb;border-radius:9px;margin:14px 0}
+.dxf-save-bar .field{flex:1 1 220px}.dxf-save-bar input{min-height:42px;width:100%}
+.dxf-save-bar button{padding:14px 20px;font-size:1rem;font-weight:800}
+.dxf-measures{display:flex;flex-wrap:wrap;gap:6px;max-height:190px;overflow:auto}
+.dxf-measures span{display:inline-block;background:#eef5fa;color:#28445d;padding:5px 8px;border-radius:5px;border:1px solid #c4d4e4;font-size:12px}
+.dxf-setting-row{display:flex;gap:10px;flex-wrap:wrap}.dxf-setting-row .field{flex:1 1 180px}
+
+
+.dxf-chain-box{padding:10px;border:1px solid #bfcddb;border-radius:8px;margin:10px 0}
+.dxf-chain-list{display:flex;gap:6px;flex-wrap:wrap;max-height:160px;overflow:auto}
+.dxf-chain-list button{white-space:normal;max-width:260px;text-align:left;padding:7px 9px}
+.dxf-chain-list .chosen{outline:2px solid #ea6700}
+.dxf-chain-list button[aria-pressed=true]{background:#fff1e5;color:#9a4000;border-color:#ea6700}
+#dxfWarnings{border-left:3px solid #be6a19;padding:7px 10px;line-height:1.5}
+.dxf-graphics svg [data-cad-segment]{touch-action:manipulation}
+
+
+#dxfSource.selecting,#dxfProjected.box-deleting{cursor:crosshair!important;outline:3px solid #267ccb;outline-offset:-3px}
+#dxfSource svg,#dxfProjected svg{user-select:none}
+#dxfSource svg{touch-action:none}
+.dxf-drag-rect{fill:#3685d6;fill-opacity:.20;stroke:#1262c7;stroke-width:3;stroke-dasharray:8 5;pointer-events:none}
+.dxf-z0-actions{padding:8px;border:1px dashed #a4c4db;border-radius:8px;margin:9px 0}
+.dxf-z0-actions button[aria-pressed=true]{background:#d9edf9;color:#103e66;border:2px solid #2577b6}
+.dxf-extend-controls{display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:10px;margin-bottom:8px;background:#eef6fa;color:#21445d;border-radius:8px;border:1px solid #b5d1e6}
+.dxf-extend-controls[hidden]{display:none}
+.dxf-extend-controls input{width:90px;min-height:34px}
+
+.cad-host .pdf-workspace{display:grid;grid-template-columns:1fr 1fr;gap:18px}.cad-host .field{display:flex;flex-direction:column;gap:6px}.cad-host .row{display:flex;gap:12px}.cad-host [hidden]{display:none!important}.cad-host .pdf-workspace-title{display:flex;flex-direction:column;margin-bottom:12px}.cad-host input,.cad-host select{max-width:100%}
+
+.dxf-camera-controls { align-items:center; gap:8px; }
+.dxf-camera-controls label { display:flex; align-items:center; gap:6px; }
+#dxfZoomLevel { min-width:48px; text-align:center; font-variant-numeric:tabular-nums; }
+#dxfProjected { touch-action:none; }
+#dxfProjected.pan-ready, #dxfProjected.pan-ready path { cursor:grab !important; }
+#dxfProjected.panning, #dxfProjected.panning path { cursor:grabbing !important; }
+
+.dxf-steps{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.dxf-steps button{flex:1 1 200px;min-height:46px}.dxf-steps button[aria-current=step]{background:#124e78;color:white;border-color:#124e78;font-weight:700}
+.dxf-tools{align-items:center;gap:7px}.dxf-tools button[aria-pressed=true]{background:#ea6700;color:white;border-color:#ea6700;box-shadow:0 0 0 1px #ea6700}.dxf-tools button{min-height:38px}.dxf-tools #dxfUndo{margin-left:6px}
+.dxf-canvas-wrap{position:relative;margin-top:12px}.dxf-canvas-wrap .dxf-camera-controls{position:absolute;right:8px;top:8px;z-index:2;display:flex;flex-direction:column;align-items:stretch;gap:7px;padding:7px;background:#fffffff0;border-radius:8px;max-width:180px;color:#21445d}.dxf-zoom-row{display:flex;justify-content:space-between;align-items:center;gap:5px}.dxf-camera-controls label{font-size:14px;justify-content:center;white-space:nowrap}.dxf-camera-controls input{width:auto}.dxf-camera-controls .dxf-camera-help{align-self:flex-end;width:32px;min-height:30px;padding:3px;font-weight:700}.dxf-camera-hint{position:absolute;right:0;top:100%;width:min(310px,70vw);padding:12px;background:white;border:1px solid #adc5d7;border-radius:8px;box-shadow:0 5px 18px #15375026;font-size:13px;line-height:1.5}
+.cad-host #dxfProjected{max-height:none;overflow:hidden;min-height:240px}.cad-host #dxfProjected svg{min-width:0;max-height:620px}.dxf-stage-navigation{display:flex;justify-content:space-between;gap:12px;margin-top:16px;flex-wrap:wrap}.dxf-save-preview{max-width:900px;margin:10px auto;border:1px solid #cbd5e1;border-radius:8px;background:white;overflow:hidden}.dxf-save-preview svg{width:100%;display:block;max-height:340px}.dxf-suggestions{padding:10px 12px;border-left:3px solid #267cb0;background:#eaf5fb;color:#234762;white-space:pre-line;line-height:1.5;margin:10px 0}.dxf-correction-info{padding:12px;border:1px solid #77b89f;border-radius:8px;background:#edf9f3;color:#165841;white-space:pre-line;line-height:1.5;margin:10px 0}.dxf-drafts summary{cursor:pointer;font-weight:600}
+@media(max-width:620px){.dxf-steps{gap:5px}.dxf-steps button{flex-basis:100%;min-height:38px}.dxf-canvas-wrap .dxf-camera-controls{max-width:154px;gap:4px;padding:4px}.dxf-camera-controls button{font-size:12px}.dxf-camera-controls label{font-size:12px}.dxf-tools #dxfUndo{margin-left:0}}
+.dxf-correction-toast{position:absolute;z-index:4;width:min(340px,calc(100% - 16px));padding:10px 12px;border:1px solid #147c59;border-radius:8px;background:#edfff4;color:#165841;font-size:13px;line-height:1.4;box-shadow:0 3px 12px #15375025;pointer-events:none}
+.dxf-correction-arrow{position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none}
+.dxf-pending{padding:14px;border:1px solid #d76a3a;border-radius:8px;background:#fff4e8;color:#71390e;margin:12px 0;line-height:1.5}.dxf-pending li{margin:10px 0}.dxf-setting-row{flex-wrap:wrap;align-items:center}.dxf-setting-row .field{flex:1;min-width:180px}

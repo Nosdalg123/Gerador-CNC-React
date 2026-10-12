@@ -1,0 +1,2 @@
+const {spawnSync}=require('node:child_process'),path=require('node:path');
+for(const file of ['test.js','testpdf.js','testpdfview.js','testpdfscale.js','testpdfdisco.js','testpdforientcnc.js','testpdfcopo.js','testdxf.js','testdxfchains.js','testdxfaudit.js','testdxfedit.js']){const result=spawnSync(process.execPath,[file],{cwd:path.join(__dirname,'../public/engine'),encoding:'utf8'});console.log(file+'\n'+result.stdout+result.stderr);if(result.status!==0)process.exit(result.status||1)}

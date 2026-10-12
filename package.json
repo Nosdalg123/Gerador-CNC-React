@@ -1,0 +1,36 @@
+{
+  "name": "gerador-cnc-react",
+  "version": "3.1.14",
+  "private": true,
+  "description": "Gerador CNC Torno — React e distribuição leve local",
+  "main": "electron/main.cjs",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "start": "cmd /c Iniciar-CNC-Leve.cmd",
+    "desktop": "cmd /c Iniciar-CNC-Leve.cmd",
+    "package": "node scripts/package-light.cjs",
+    "test": "node --test tests/*.test.cjs",
+    "test:legacy": "node scripts/test-legacy.cjs",
+    "test:ui": "node scripts/test-light.cjs",
+    "mapa": "node scripts/index.cjs",
+    "mapa:check": "node scripts/index.cjs --check",
+    "mapa:query": "node scripts/query-map.cjs",
+    "mapa:watch": "node scripts/watch-map.cjs",
+    "test:mapa": "node --test tests/code-map.test.cjs"
+  },
+  "dependencies": {
+    "pdfjs-dist": "6.4.299",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@babel/parser": "^8.0.7",
+    "@babel/traverse": "^8.0.7",
+    "@electron/packager": "^19.0.1",
+    "@playwright/test": "^1.56.0",
+    "electron": "44.7.0",
+    "vite": "8.3.4"
+  }
+}

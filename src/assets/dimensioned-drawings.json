@@ -1,0 +1,22 @@
+{
+  "espina": {
+    "extra": {
+      "G": [
+        168,
+        306
+      ]
+    },
+    "legenda": "Lado 1 = encaixe (B × C) · Lado 2 = cabeça (F × E) · G = C + D",
+    "svg": "<svg viewBox=\"0 0 340 320\" xmlns=\"http://www.w3.org/2000/svg\" aria-hidden=\"true\"><line class=\"axis\" x1=\"118\" y1=\"170\" x2=\"274\" y2=\"170\"/><rect class=\"piece\" x=\"130\" y=\"98\" width=\"14\" height=\"144\"/><rect class=\"piece\" x=\"144\" y=\"90\" width=\"62\" height=\"160\"/><rect class=\"piece\" x=\"206\" y=\"132\" width=\"52\" height=\"76\"/><path class=\"ext\" d=\"M130 96V66M144 88V66M206 88V66M258 130V66M144 90H80M144 250H80M130 98H104M130 242H104M258 132H290M258 208H290M130 244V284M206 252V284\"/><path class=\"dim\" d=\"M130 70H144M130 66V74M144 66V74M144 70H206M206 66V74M206 70H258M258 66V74\"/><path class=\"dim\" d=\"M84 90V250M80 90H88M80 250H88M108 98V242M104 98H112M104 242H112M286 132V208M282 132H290M282 208H290M130 280H206M130 276V284M206 276V284\"/><path class=\"lead\" d=\"M96 29L137 69M176 57V69M250 29L232 69M80 120H84M86 270L108 240M290 239L286 209M168 293V281\"/></svg>"
+  },
+  "porta_matriz": {
+    "vb": [
+      560,
+      440
+    ],
+    "cls": "pm",
+    "extra": {},
+    "legenda": "Lado 1 = cone e rebaixo (K I M F G E) e borda L do furo C · Lado 2 = Ø E com chanfro H e furo D × B com borda L · A = comprimento final",
+    "svg": "<svg viewBox=\"0 0 560 440\" xmlns=\"http://www.w3.org/2000/svg\" aria-hidden=\"true\"><line class=\"axis\" x1=\"195\" y1=\"215\" x2=\"440\" y2=\"215\"/><polygon class=\"piece\" points=\"215,135 235,119 300,119 300,99 408,99 420,111 420,319 408,331 300,331 300,311 235,311 215,295\"/><polygon class=\"cav\" points=\"215,149 225,155 265,155 265,145 408,145 420,133 420,297 408,285 265,285 265,275 225,275 215,281\"/><path class=\"ext\" d=\"M215 131V56M300 95V56M235 119H44M235 311H44M215 135H96M215 295H96M215 155H148M215 275H148M424 99H474M424 331H474M215 299V400M420 335V400M265 289V364M420 323V364M215 135H255\"/><path class=\"dim\" d=\"M215 62H300M215 58V66M300 58V66M48 119V311M44 119H52M44 311H52M100 135V295M96 135H104M96 295H104M152 155V275M148 155H156M148 275H156M470 99V331M466 99H474M466 331H474M215 395H420M215 391V399M420 391V399M265 360H420M265 356V364M420 356V364M285 145V285M281 145H289M281 285H289M245 135A30 30 0 0 0 238 117\"/><path class=\"lead\" d=\"M257 40V62M345 40L303 97M433 40L416 104M192 127H224M303 175H285M387 225L415 140\"/><text x=\"215\" y=\"430\" text-anchor=\"start\">◄ lado 1 (cone)</text><text x=\"420\" y=\"430\" text-anchor=\"end\">lado 2 (furo D) ►</text></svg>"
+  }
+}

@@ -1,0 +1,141 @@
+{
+  "repository": "https://github.com/Nosdalg123/gerador-cnc-fanuc",
+  "branch": "feature/dxf-editor-interativo-v2.15.0",
+  "commit": "263caabb18557eedc1e399cf812241614105eda2",
+  "baseVersion": "2.15.0",
+  "reactVersion": "3.1.0",
+  "retainedWithLocalFixes": [
+    "core.js",
+    "progsim.js"
+  ],
+  "adapted": [
+    "dxfimport.js"
+  ],
+  "upstreamFiles": [
+    {
+      "name": "diagnostico.js",
+      "sha256": "6dd5b1e14ffe1008f46e837f22ff2f3c48c63b2c354879b7f98e46f640c1506e"
+    },
+    {
+      "name": "dxfaudit.js",
+      "sha256": "68d6505f518be7c2b3532cb9d8cf6aed3292b5c2c4df6382a171def87fd04cbd"
+    },
+    {
+      "name": "dxfchains.js",
+      "sha256": "a18ac7e737fa537a497493dec4f742154ef8adcc4e46ca3ca473b75a9089dfa7"
+    },
+    {
+      "name": "dxfcore.js",
+      "sha256": "ab457a6de56108ce755ee9c76ff3d69fdaaaf3579bd949b4faa4c40a4514ee49"
+    },
+    {
+      "name": "dxfedit.js",
+      "sha256": "2ede6010eb196eb84289f7af37045a85c553a5648e6c41bc21e34f004d9b4e5a"
+    },
+    {
+      "name": "dxfimport.js",
+      "sha256": "3b399d284d0720e62e8a0a7b97aedbede628d98e6a57b40f18025b7ae97ed6fb"
+    },
+    {
+      "name": "dxfprofile.js",
+      "sha256": "6cbcfcf449302790188110e8ff92b7a672e82bde646e04cbfa02e4676c42d04f"
+    },
+    {
+      "name": "pdfdimensions.js",
+      "sha256": "f753d157eed7500c410d539d03050d7cfe4e4dd1ace11321749f9ea9d8aedde2"
+    },
+    {
+      "name": "pdforientation.js",
+      "sha256": "bb2dcf0dc8e5eab9c0dd964545f94a6e53c9ff2c25e2ff453a566e7d5d4ab255"
+    },
+    {
+      "name": "pdfprofile.js",
+      "sha256": "59cdc670d60a0a8781a92b5332581cbebd9132fbdfbc75fbdeb4d02a5b3501e9"
+    },
+    {
+      "name": "pdfrecognizer.js",
+      "sha256": "8277ee99976b724b6204d0de06bd8ad659184a56a94055f9262d36267a2d19ce"
+    },
+    {
+      "name": "pdfregions.js",
+      "sha256": "79c2854ed4b7d3dda7fac0c62726c617c31e6f1e23ab3608a224f5aec48ef571"
+    },
+    {
+      "name": "pdfvector.js",
+      "sha256": "ce9559ca030a95effac20f5e35d2094ef2fc198c9a292e70605d3eb4f93c8f7e"
+    },
+    {
+      "name": "pecaview.js",
+      "sha256": "3635ed21fe208daf6eb601770fbd2c5fe4028d1fdbd02ab6483e38813e5007b3"
+    },
+    {
+      "name": "seed.js",
+      "sha256": "d608e1ed42ad4ef93f97b2bd28af75065f74bfd2f8122365b1e5c0398cba6ee6"
+    },
+    {
+      "name": "sim.js",
+      "sha256": "49995fcf36960f596b66300b9cc77d3526350f413cee2f49d6a1de645f32f9fb"
+    },
+    {
+      "name": "test.js",
+      "sha256": "f090f80ac34b08d886dc2099c077dc525d1f3e928c8d8e03a9166366e94943e3"
+    },
+    {
+      "name": "testdiag.js",
+      "sha256": "4c7478177ddf9b28e91bc0db9da6d6cffe1c03ad689f04657f7aac99e16d8de1"
+    },
+    {
+      "name": "testdxf.js",
+      "sha256": "e61546232088d09d54c4c7ed9b453fac012a6a9da83ec544df1cad265b90b26d"
+    },
+    {
+      "name": "testdxfaudit.js",
+      "sha256": "76107747ef4a6c7236f3ef788e6123794eb010055cdc02fae904916fc725d558"
+    },
+    {
+      "name": "testdxfchains.js",
+      "sha256": "476e923ac1a023ca4080951a5da318e7c84b7e11b8cfb4101ae3a063ec5acdc9"
+    },
+    {
+      "name": "testdxfedit.js",
+      "sha256": "0affd5f069dd3a695693c37cd064d036acf8aa07abffd135ca2cbc88d6cca4d3"
+    },
+    {
+      "name": "testdxfreal.js",
+      "sha256": "71dc00023a29862eccaff659ecc915cf636c969e495e678267c31666aff1a0a6"
+    },
+    {
+      "name": "testpdf.js",
+      "sha256": "65fee0e4e0fa24c7371feb0532e29e26a437ed0f1a54556e93fd3a28ffe955d8"
+    },
+    {
+      "name": "testpdfcopo.js",
+      "sha256": "11c9fc3dd85aaba522a36367168e2ab627e34e400554b3c8f01d5aa641a497a3"
+    },
+    {
+      "name": "testpdfdisco.js",
+      "sha256": "914dd47def0ca9c05b56e99385e73c22d8dd3e8ae7114b28a258628002ae46fa"
+    },
+    {
+      "name": "testpdforientcnc.js",
+      "sha256": "e7f359d6063a687c1cf28c8bc3c0cdfa00c990b81b1282889e888306efdc3ae3"
+    },
+    {
+      "name": "testpdfscale.js",
+      "sha256": "827a47693516f597e269556006ab90eda2cd59ad9c66b092392b02402a837131"
+    },
+    {
+      "name": "testpdfview.js",
+      "sha256": "575540d079bf3a946e8dab26c3e621bd9244bea5182c492c6d29677a0b6db4d1"
+    },
+    {
+      "name": "testprog.js",
+      "sha256": "0a17e6dfaeec75420097c55bcf48b7fe028ff51bd6e364b382f467e0bdd7393b"
+    },
+    {
+      "name": "version.js",
+      "sha256": "1e032264a3a1314dac7248afe423e95fbbbaac97c3da0f7bba2c86e4b3dc37da"
+    }
+  ],
+  "backup": "G:/GPT/backups/react-3.0.0-antes-base-2.15.0"
+}

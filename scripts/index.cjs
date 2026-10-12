@@ -1,0 +1,2 @@
+const {refreshMap,checkMap}=require('./code-map.cjs');
+try{if(process.argv.includes('--check')){const errors=checkMap();if(errors.length)throw Error(errors.join('\n'));console.log('Mapa atual e íntegro.')}else{const r=refreshMap({force:process.argv.includes('--force')});console.log(`${r.graph.stats.files} arquivos; ${r.graph.stats.symbols} símbolos; ${r.graph.stats.calls} chamadas. AST: ${r.parsed} analisados, ${r.reused} reutilizados. Revisão: ${r.revision}`)}}catch(e){console.error(e.message);process.exitCode=1}

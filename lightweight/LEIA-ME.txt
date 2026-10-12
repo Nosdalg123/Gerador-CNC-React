@@ -1,0 +1,92 @@
+TORNO CNC 3.1.14 - VERSAO LEVE OFFLINE
+
+3.1.14: face Z0 e comprimento definidos na etapa 2 do DXF.
+A etapa 3 exige preparação válida e mostra dicas para resolver pendências.
+O rascunho pode ser salvo na etapa 2. Os dados anteriores são preservados.
+Repositório: https://github.com/Nosdalg123/Gerador-CNC-React
+
+Extraia a pasta completa e abra Iniciar-CNC-Leve.cmd.
+Usa o Microsoft Edge instalado no Windows em uma janela de aplicativo.
+Se Edge nao estiver no caminho padrao, abre o navegador padrao.
+Nao precisa instalar Node, Electron ou baixar bibliotecas.
+PowerShell 5.1 ou superior deve estar disponivel.
+
+Inclui os mesmos motores, croquis, PDF, fontes, DXF e simulacao da versao Electron.
+O servidor atende apenas 127.0.0.1 e termina apos 30 minutos sem requisicoes.
+Enquanto a janela estiver ativa, ela mantem o servidor em funcionamento.
+
+Os dados ficam em %APPDATA%\CNC Torno React\workspace.json,
+a mesma pasta da versao Electron. A copia anterior fica em workspace.json.previous.
+Feche uma versao antes de abrir a outra. Nao copie dados para a pasta do programa.
+Dados existentes invalidos ou alterados por outro aplicativo nao sao sobrescritos.
+Use Dados e backup para exportar uma copia completa sempre que precisar.
+
+Versao original e versao Electron continuam preservadas.
+
+A pasta mapa inclui indice, grafo de chamadas, guia e manifesto da revisao.
+Os arquivos JSON foram compactados sem remover informacao.
+Para consultar/atualizar com os comandos do guia, use os fontes do projeto
+com Node e pnpm. Executar o aplicativo pronto continua sem exigir Node.
+
+3.1.3: a paleta original voltou em Desenho da peca.
+Escolha o elemento, preencha as cotas no croqui e adicione a peca.
+Para raio, escolha a quina numerada no desenho, inclusive em cones.
+Salvar desenho grava a versao usada pelo Gerador.
+Importar desenhos JSON mescla os antigos sem substituir os atuais.
+Dados, IDs e campos adicionais sao preservados.
+
+3.1.4: novos comandos no Editor CAD DXF.
+Quebrar linha: clique no trecho para dividir nos cruzamentos, inclusive com o eixo.
+Estender linha: selecione inicio ou fim; acrescente mm ou estenda ate o proximo elemento.
+Conectar linhas: clique em duas linhas para prolongar ate se encontrarem.
+A primeira linha selecionada fica roxa; Cancelar selecao reinicia os dois cliques.
+Na importacao, duplicadas e sobrepostas sao eliminadas automaticamente, mantendo a maior inteira.
+O painel 1 e os rascunhos guardam o original. Restaurar desenho original recupera a fonte.
+Desfazer edicao recupera os comandos; salvar/abrir rascunho preserva toda a geometria editada.
+A listagem Cotas e elementos reconhecidos foi retirada; as cotas originais continuam preservadas.
+
+3.1.5: meia secao superior aceita arcos e faces com medidas exatas.
+A metade inferior fica tracejada e nunca participa do contorno CNC.
+Zoom + e -; Enquadrar desenho; Mover com mouse ou Shift + arraste.
+Ctrl + roda muda o zoom. Cotas auxiliares nao poluem a tela de edicao.
+Use o comprimento medido do perfil superior; confirme vista, eixo e Z0.
+Reabra o desenho em Editar contorno no CAD. Fontes e dados permanecem preservados.
+A validade do desenho nao substitui a verificacao de ferramentas e fixacao.
+O desbaste G71 tipo II continua aproximado no simulador; confira o ciclo no comando.
+
+3.1.6: Ajustar conexoes do perfil corrige pequenas folgas ate 0,01 mm.
+Cadeias e salvamento usam 0,001 mm. Arcos preservados; confira novamente.
+
+3.1.7: Editor CAD com Entrada do DXF, Editar desenho e Salvar desenho.
+Volte pelas etapas sem perder edicoes. Funcoes em botoes que alternam ao clicar.
+Um clique seleciona a cadeia no desenho; outro clique a desmarca.
+Ligar falhas ajusta pontas de linhas a menos de 0,2 mm, mantendo os arcos.
+Linhas corrigidas ficam verdes, com pontos numerados. Desfazer restaura o estado.
+Confira novamente antes de salvar. Encontros ambiguos pedem revisao manual.
+Zoom e Mover ficam no canto superior direito; ajuda no ? abaixo de Mover.
+
+3.1.8: TORNO CNC, versao sem React e escolha de comando Fanuc/Siemens.
+A escolha identifica a maquina; a geracao atual nao e convertida para Siemens.
+Editar ferramenta: grupos em janela horizontal e suporte de rosca interna
+com inserto na cabeca, mantendo o estilo grafico e o motor de corte.
+
+3.1.9: Conectar linhas aceita retas/arcos e arcos/arcos.
+Ligar falhas tambem corrige encontros entre arcos com folga menor que 0,2 mm.
+Centros e raios ficam intactos; quando nao existe intersecao proxima, cria
+uma ligacao reta curta explicita. Ajustes verdes, pontos numerados e Desfazer.
+
+3.1.10: Rosca externa com haste vertical e inserto assentado na cabeça.
+Nome e Pastilha ampliados no cadastro, mantendo corte e dados existentes.
+
+3.1.11: Retângulo de exclusão e delimitação da vista alinhados ao mouse,
+incluindo margens, zoom e desenho movido. Movimento com mouse acompanha
+o arraste sem modificar coordenadas CAD ou dados existentes.
+
+3.1.12: Círculo verde indica conexão corrigida, com aviso e seta por 3 segundos.
+No DXF, marque Salvar também lado 2 invertido, ou use Criar lado 2 invertido
+em Desenho da peça. Metade por lado inicialmente; ajuste os comprimentos
+e salve. No Gerador escolha o primeiro lado, código e simulação de cada face.
+
+3.1.13: simulador enquadra o bruto completo e cavidades internas profundas.
+Vista fixa entre operacoes; zoom centrado e Ajustar restaura a peca inteira.
+Programas, trajetorias, geometria e dados existentes preservados.

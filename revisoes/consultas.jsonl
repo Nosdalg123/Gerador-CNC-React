@@ -1,0 +1,63 @@
+{"at":"2026-10-12T00:24:43.139Z","sourceDigest":"50122b086b53db7134b9c745c5441131c9039b5b34d0ec9e6f72d93aaa3d3a71","options":{"query":"mapa para empacotar versão leve","limit":3},"results":3}
+{"at":"2026-10-12T00:27:54.974Z","sourceDigest":"053547123b1c236364f1c815123ca6d7e4b97be918900b00455c81a2e7c73df4","options":{"query":"desenho com cotas da espina","limit":3},"results":3}
+{"at":"2026-10-12T00:27:55.275Z","sourceDigest":"053547123b1c236364f1c815123ca6d7e4b97be918900b00455c81a2e7c73df4","options":{"query":"empacotar versão leve","limit":3},"results":3}
+{"at":"2026-10-12T00:30:30.588Z","sourceDigest":"053547123b1c236364f1c815123ca6d7e4b97be918900b00455c81a2e7c73df4","options":{"query":"atualização automática do mapa","limit":4},"results":4}
+{"at":"2026-10-12T00:30:30.890Z","sourceDigest":"053547123b1c236364f1c815123ca6d7e4b97be918900b00455c81a2e7c73df4","options":{"query":"empacotar versão leve","limit":4},"results":4}
+{"at":"2026-10-12T00:36:39.549Z","sourceDigest":"a56476567c6b1274d0a8d0e2473baffe40d877d5f12cbf3e1cd694a3a43a7d60","options":{"query":"autenticação login usuário senha","limit":6},"results":0}
+{"at":"2026-10-12T00:37:23.364Z","sourceDigest":"a56476567c6b1274d0a8d0e2473baffe40d877d5f12cbf3e1cd694a3a43a7d60","options":{"symbol":"can","file":"src/App.jsx"},"results":1}
+{"at":"2026-10-12T00:37:23.664Z","sourceDigest":"a56476567c6b1274d0a8d0e2473baffe40d877d5f12cbf3e1cd694a3a43a7d60","options":{"callers":"can","file":"src/App.jsx","limit":15},"results":4}
+{"at":"2026-10-12T00:37:23.965Z","sourceDigest":"a56476567c6b1274d0a8d0e2473baffe40d877d5f12cbf3e1cd694a3a43a7d60","options":{"callees":"navigate","file":"src/App.jsx"},"results":1}
+{"at":"2026-10-12T00:37:24.262Z","sourceDigest":"a56476567c6b1274d0a8d0e2473baffe40d877d5f12cbf3e1cd694a3a43a7d60","options":{"impact":"src/App.jsx","limit":15},"results":2}
+{"at":"2026-10-12T00:38:15.556Z","sourceDigest":"f153f57a54616ce077c9cd82e7c4f6f095626273c87d52bd2233ad4421dc3867","options":{"query":"autenticação login","limit":3},"results":3}
+{"at":"2026-10-12T00:38:27.974Z","sourceDigest":"f153f57a54616ce077c9cd82e7c4f6f095626273c87d52bd2233ad4421dc3867","options":{"callees":"App","file":"src/App.jsx","limit":35},"results":19}
+{"at":"2026-10-12T00:42:02.042Z","sourceDigest":"f789d32a08e3bc1557522012a578ff0c1ad8c1845f72f8ca32b66139f4cc881b","options":{"query":"autenticação login","limit":2},"results":2}
+{"at":"2026-10-12T00:42:02.357Z","sourceDigest":"f789d32a08e3bc1557522012a578ff0c1ad8c1845f72f8ca32b66139f4cc881b","options":{"impact":"src/App.jsx","limit":8},"results":2}
+{"at":"2026-10-12T00:45:59.771Z","sourceDigest":"f789d32a08e3bc1557522012a578ff0c1ad8c1845f72f8ca32b66139f4cc881b","options":{"query":"gerar programa CNC","limit":3},"results":3}
+{"at":"2026-10-12T00:46:00.680Z","sourceDigest":"f789d32a08e3bc1557522012a578ff0c1ad8c1845f72f8ca32b66139f4cc881b","options":{"callees":"generate","file":"src/domain.mjs","limit":8},"results":3}
+{"at":"2026-10-12T00:46:01.570Z","sourceDigest":"f789d32a08e3bc1557522012a578ff0c1ad8c1845f72f8ca32b66139f4cc881b","options":{"impact":"public/engine/core.js","limit":8},"results":8}
+{"at":"2026-10-12T00:46:02.461Z","sourceDigest":"f789d32a08e3bc1557522012a578ff0c1ad8c1845f72f8ca32b66139f4cc881b","options":{"impact":"src/data.mjs","limit":8},"results":8}
+{"at":"2026-10-12T01:20:48.151Z","sourceDigest":"f789d32a08e3bc1557522012a578ff0c1ad8c1845f72f8ca32b66139f4cc881b","options":{"query":"desenho elementos cone raio perfil","limit":5},"results":5}
+{"at":"2026-10-12T01:20:49.023Z","sourceDigest":"f789d32a08e3bc1557522012a578ff0c1ad8c1845f72f8ca32b66139f4cc881b","options":{"symbol":"ElementsEditor"},"results":1}
+{"at":"2026-10-12T01:20:49.917Z","sourceDigest":"f789d32a08e3bc1557522012a578ff0c1ad8c1845f72f8ca32b66139f4cc881b","options":{"symbol":"Drawing"},"results":1}
+{"at":"2026-10-12T01:20:50.800Z","sourceDigest":"f789d32a08e3bc1557522012a578ff0c1ad8c1845f72f8ca32b66139f4cc881b","options":{"impact":"public/engine/core.js","limit":10},"results":10}
+{"at":"2026-10-12T01:21:07.801Z","sourceDigest":"f789d32a08e3bc1557522012a578ff0c1ad8c1845f72f8ca32b66139f4cc881b","options":{"symbol":"psCantos"},"results":1}
+{"at":"2026-10-12T01:21:08.715Z","sourceDigest":"f789d32a08e3bc1557522012a578ff0c1ad8c1845f72f8ca32b66139f4cc881b","options":{"symbol":"psCantosInt"},"results":1}
+{"at":"2026-10-12T01:21:09.617Z","sourceDigest":"f789d32a08e3bc1557522012a578ff0c1ad8c1845f72f8ca32b66139f4cc881b","options":{"query":"raio chanfro quina perfil","limit":3},"results":3}
+{"at":"2026-10-12T01:52:09.841Z","sourceDigest":"85761f0ea25d397dc86f69d87e8134e264b3c02979edea91f57b16f869a6ed78","options":{"query":"raio quina cone elementos"},"results":8}
+{"at":"2026-10-12T10:57:46.669Z","sourceDigest":"9671caca9f8a405754016679edd130976b779463b156f293d56a341d656f7089","options":{"query":"reconstrução vetorial quebrar estender conectar linhas eixo"},"results":8}
+{"at":"2026-10-12T10:59:12.575Z","sourceDigest":"9671caca9f8a405754016679edd130976b779463b156f293d56a341d656f7089","options":{"impact":"public/engine/dxfedit.js"},"results":7}
+{"at":"2026-10-12T11:23:56.913Z","sourceDigest":"9061e4c9e0f8bf97277c4137316f65ffac27d2ec72a58758b6969f56946f88b2","options":{"callers":"breakSegment"},"results":7}
+{"at":"2026-10-12T11:42:12.503Z","sourceDigest":"9061e4c9e0f8bf97277c4137316f65ffac27d2ec72a58758b6969f56946f88b2","options":{"query":"dxf perfil superior eixo central zoom validade arco"},"results":8}
+{"at":"2026-10-12T11:42:13.510Z","sourceDigest":"9061e4c9e0f8bf97277c4137316f65ffac27d2ec72a58758b6969f56946f88b2","options":{"impact":"public/engine/dxfprofile.js"},"results":8}
+{"at":"2026-10-12T12:23:40.860Z","sourceDigest":"7ff685074ab742f40d455e0c8c776acb682710d39df103d42138de21c4128324","options":{"query":"cadeia unica duas extremidades dxf disco salvamento tolerancia"},"results":8}
+{"at":"2026-10-12T12:24:09.272Z","sourceDigest":"7ff685074ab742f40d455e0c8c776acb682710d39df103d42138de21c4128324","options":{"impact":"public/engine/dxfturn.js"},"results":8}
+{"at":"2026-10-12T17:27:56.463Z","sourceDigest":"3b22a6c5f304e82b7bb428ef50ca5fffe349dcc9e1711148a531f4e28113510e","options":{"query":"Disco folga tangente ajustar conexoes salvamento"},"results":8}
+{"at":"2026-10-12T17:27:57.372Z","sourceDigest":"3b22a6c5f304e82b7bb428ef50ca5fffe349dcc9e1711148a531f4e28113510e","options":{"callers":"repairEndpoints"},"results":8}
+{"at":"2026-10-12T17:49:04.133Z","sourceDigest":"3b22a6c5f304e82b7bb428ef50ca5fffe349dcc9e1711148a531f4e28113510e","options":{"query":"cadeias selecao botoes editor dxf etapas ligar falhas"},"results":8}
+{"at":"2026-10-12T17:49:05.076Z","sourceDigest":"3b22a6c5f304e82b7bb428ef50ca5fffe349dcc9e1711148a531f4e28113510e","options":{"impact":"public/engine/dxfimport.js"},"results":6}
+{"at":"2026-10-12T18:11:07.870Z","sourceDigest":"1e16fd33c77809fb10a5f202c80a1e9380c0001fe872bb2b0e6dd06053c1d0e6","options":{"query":"etapas cad cadeias botoes ligar falhas"},"results":8}
+{"at":"2026-10-12T18:11:08.813Z","sourceDigest":"1e16fd33c77809fb10a5f202c80a1e9380c0001fe872bb2b0e6dd06053c1d0e6","options":{"callers":"linkGaps"},"results":6}
+{"at":"2026-10-12T18:17:59.259Z","sourceDigest":"1e16fd33c77809fb10a5f202c80a1e9380c0001fe872bb2b0e6dd06053c1d0e6","options":{"query":"maquina comando fanuc siemens editar ferramenta desenho rosca interna"},"results":8}
+{"at":"2026-10-12T18:18:00.192Z","sourceDigest":"1e16fd33c77809fb10a5f202c80a1e9380c0001fe872bb2b0e6dd06053c1d0e6","options":{"impact":"src/components/Tools.jsx"},"results":3}
+{"at":"2026-10-12T18:20:20.862Z","sourceDigest":"1e16fd33c77809fb10a5f202c80a1e9380c0001fe872bb2b0e6dd06053c1d0e6","options":{"query":"maquina comando fanuc siemens ferramentas"},"results":8}
+{"at":"2026-10-12T18:20:21.777Z","sourceDigest":"1e16fd33c77809fb10a5f202c80a1e9380c0001fe872bb2b0e6dd06053c1d0e6","options":{"impact":"src/assets/tool-drawing.mjs"},"results":6}
+{"at":"2026-10-12T18:23:59.935Z","sourceDigest":"cb673611073b7e72f0c34a33fd22e006009b67adabe0d4f308d7f76855e70a0b","options":{"impact":"src/App.jsx"},"results":2}
+{"at":"2026-10-12T18:32:05.862Z","sourceDigest":"43d9ef79749be26d74aeefd07358a674e4a7a5f3a3ac724a91a921143898d5c4","options":{"query":"conectar linhas ligar falhas arcos"},"results":8}
+{"at":"2026-10-12T18:32:06.984Z","sourceDigest":"43d9ef79749be26d74aeefd07358a674e4a7a5f3a3ac724a91a921143898d5c4","options":{"impact":"public/engine/dxfgeometry.js"},"results":8}
+{"at":"2026-10-12T18:48:10.223Z","sourceDigest":"f6e7be9528cb3f4d6bdac3a3d90f37ec013fd3cf166c93954a28e4941fa388f7","options":{"symbol":"connectLines"},"results":1}
+{"at":"2026-10-12T18:56:43.306Z","sourceDigest":"fa05d31a59ed4862ea8a20b47a663e446de72d90a5ee68490cf77f8c0a1f5791","options":{"query":"ferramenta rosca externa suporte inserto nome"},"results":8}
+{"at":"2026-10-12T18:56:44.276Z","sourceDigest":"fa05d31a59ed4862ea8a20b47a663e446de72d90a5ee68490cf77f8c0a1f5791","options":{"impact":"src/assets/tool-drawing.mjs"},"results":6}
+{"at":"2026-10-12T19:03:52.523Z","sourceDigest":"26663d8233aa3d8e45a5fba907338db6c520c79fd5ca1c10bf328e16bc9f9a85","options":{"impact":"scripts/test-disco-real.cjs"},"results":2}
+{"at":"2026-10-12T19:10:10.873Z","sourceDigest":"a40a551e0a6944f35e3d2fce34f581c5833c8d3ac6ef141a2a3754a47b4e5246","options":{"query":"apagar retangulo mouse zoom camera"},"results":8}
+{"at":"2026-10-12T19:10:11.822Z","sourceDigest":"a40a551e0a6944f35e3d2fce34f581c5833c8d3ac6ef141a2a3754a47b4e5246","options":{"impact":"public/engine/dxfimport.js"},"results":8}
+{"at":"2026-10-12T19:20:55.054Z","sourceDigest":"ae8cac1bebbeae3ff00129765bc208036a9f711c2ce1a7c6e09fee8c0f2d3553","options":{"query":"conectar linhas verdes marcadores lado 2 inverter lado CAD"},"results":8}
+{"at":"2026-10-12T19:20:56.034Z","sourceDigest":"ae8cac1bebbeae3ff00129765bc208036a9f711c2ce1a7c6e09fee8c0f2d3553","options":{"impact":"public/engine/dxfprofile.js"},"results":8}
+{"at":"2026-10-12T19:31:28.275Z","sourceDigest":"c877009a07e0be6e4597c178a0f82fef27ef351f3a87792854fa83253df91145","options":{"impact":"src/domain.mjs"},"results":8}
+{"at":"2026-10-12T19:50:42.948Z","sourceDigest":"e3abe66e72138672b2e7fb9338c40007505cffba59def5ab76978804920b372f","options":{"query":"simulador usinagem interna enquadramento camera ferramenta"},"results":8}
+{"at":"2026-10-12T19:50:43.924Z","sourceDigest":"e3abe66e72138672b2e7fb9338c40007505cffba59def5ab76978804920b372f","options":{"impact":"public/engine/progsim.js"},"results":8}
+{"at":"2026-10-12T19:50:50.803Z","sourceDigest":"e3abe66e72138672b2e7fb9338c40007505cffba59def5ab76978804920b372f","options":{"impact":"public/engine/sim.js"},"results":8}
+{"at":"2026-10-12T19:51:48.879Z","sourceDigest":"e3abe66e72138672b2e7fb9338c40007505cffba59def5ab76978804920b372f","options":{"impact":"src/components/Simulation.jsx"},"results":5}
+{"at":"2026-10-12T21:41:29.740Z","sourceDigest":"37bebd35c7d70aa9c62271be5970a03471ff0d125b2e16fe128feb9618552a41","options":{"query":"publicar github distribuicao leve"},"results":7}
+{"at":"2026-10-12T21:41:30.682Z","sourceDigest":"37bebd35c7d70aa9c62271be5970a03471ff0d125b2e16fe128feb9618552a41","options":{"impact":"scripts/package-light.cjs"},"results":1}
+{"at":"2026-10-12T21:51:00.778Z","sourceDigest":"37bebd35c7d70aa9c62271be5970a03471ff0d125b2e16fe128feb9618552a41","options":{"query":"etapas cad face z0 pendencias salvar desenho"},"results":8}
+{"at":"2026-10-12T21:51:01.798Z","sourceDigest":"37bebd35c7d70aa9c62271be5970a03471ff0d125b2e16fe128feb9618552a41","options":{"impact":"public/engine/dxfimport.js"},"results":8}
