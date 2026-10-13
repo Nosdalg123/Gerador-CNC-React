@@ -1,6 +1,3 @@
-Ícone: Lathe Machine, SVG Repo.
-Fonte: https://www.svgrepo.com/svg/234349/lathe-machine
-Download: https://www.svgrepo.com/download/234349/lathe-machine.svg
-Licença declarada na página: CC0 (domínio público).
-SVG original preservado. PNG 1024 e ICO multirresolução exportados para o aplicativo.
-Cópia usada: https://www.svgviewer.dev/s/128691/lathe-machine
+Ícone escolhido e fornecido pelo usuário em 12/10/2026: programas.gif (640 x 640, 50 quadros).
+GIF original preservado. PNG: primeiro quadro na resolução nativa. ICO: 16, 24, 32, 48, 64, 128 e 256 pixels, gerado por scripts/export-icon.cjs a partir do PNG.
+O SVG antigo permanece apenas como referência histórica.

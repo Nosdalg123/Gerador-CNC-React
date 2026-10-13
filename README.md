@@ -1,4 +1,6 @@
-# TORNO CNC — 3.1.19 · versão leve
+# TORNO CNC — 3.1.20 · versão leve
+
+Ícone escolhido pelo usuário: animação ao lado de TORNO CNC e versão estática nítida no atalho do Windows e na aba do navegador. A interface respeita a preferência por movimento reduzido. Relatório: `RELATORIO-ICONE-PROGRAMAS-3.1.20.md`.
 
 A cilindragem CAD continua até o comprimento escolhido: após uma rampa/fresta inacessível, mantém o maior diâmetro da peça completa. O acabamento não entra no rebaixo protegido. Os comprimentos continuam independentes, com limite de castanha e aviso para faixas fora das duas operações. Perfis salvos e dados permanecem intactos. Relatório: `RELATORIO-CILINDRAGEM-PROTEGIDA-3.1.17.md`.
 
@@ -6,7 +8,7 @@ O CAD DXF gera a prévia do lado 2 invertido na etapa 3 e mostra botões com min
 
 Na etapa **2 · Editar desenho**, escolha **Face Z0 voltada à ferramenta** e confira o comprimento. A etapa 3 exige o perfil preparado; se houver pendências, o editor lista o problema e como corrigi-lo. Rascunhos incompletos podem ser conservados na etapa 2. Detalhes em `RELATORIO-PREPARACAO-CAD-3.1.14.md`.
 
-Repositório: [Nosdalg123/Gerador-CNC-React](https://github.com/Nosdalg123/Gerador-CNC-React). O pacote pronto fica em `distribuicoes/CNC-Torno-Leve-3.1.19.zip`: baixe, extraia toda a pasta e execute `Iniciar-CNC-Leve.vbs`. O mapa atual fica na raiz e acompanha o pacote; mapas históricos estão disponíveis em `revisoes/mapas-arquivados/*.zip`, com os manifestos originais. Para consultá-los, extraia o ZIP da revisão desejada. Os dados de trabalho permanecem no computador do usuário.
+Repositório: [Nosdalg123/Gerador-CNC-React](https://github.com/Nosdalg123/Gerador-CNC-React). O pacote pronto fica em `distribuicoes/CNC-Torno-Leve-3.1.20.zip`: baixe, extraia toda a pasta e execute `Iniciar-CNC-Leve.vbs`. O mapa atual fica na raiz e acompanha o pacote; mapas históricos estão disponíveis em `revisoes/mapas-arquivados/*.zip`, com os manifestos originais. Para consultá-los, extraia o ZIP da revisão desejada. Os dados de trabalho permanecem no computador do usuário.
 
 O simulador enquadra a peça completa e as cavidades internas, inclusive quando o interno é mais profundo que o perfil externo. A vista permanece fixa durante a troca de ferramenta; **Ajustar** restaura o enquadramento completo e o zoom mantém o centro da peça. Relatório: `RELATORIO-SIMULADOR-INTERNO-3.1.13.md`.
 
@@ -157,4 +159,4 @@ Testes: `tests/dxf-arc-connections.test.cjs` (geometria, polilinha, ambiguidades
 
 3.1.18: `Simulation.jsx` exibe corte, rápido e progresso em minutos (motor e velocidade continuam em segundos). `lightweight/Iniciar-CNC-Leve.vbs` abre o servidor oculto e cria o atalho local com `torno-cnc.ico`; CMD fica por compatibilidade. Use VBS ou TORNO CNC.lnk para não abrir console. Ícone CC0: `public/assets/torno-cnc-fonte.txt`. Relatório: `RELATORIO-MINUTOS-ABERTURA-ICONE-3.1.18.md`.
 
-3.1.19: a marca `Desenvolvido por Gladson Bernardo` foi restaurada no canto inferior direito, conforme a base original. Relatório: `RELATORIO-AUTORIA-3.1.19.md`.
+3.1.20: a marca `Desenvolvido por Gladson Bernardo` foi restaurada no canto inferior direito, conforme a base original. Relatório: `RELATORIO-AUTORIA-3.1.20.md`.
