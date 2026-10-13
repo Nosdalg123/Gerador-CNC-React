@@ -665,6 +665,33 @@
         "prepareCadSides",
         "safeMachiningPath"
       ]
+    },
+    {
+      "id": "tempos-abertura-icone",
+      "label": "Tempos em minutos, abertura sem terminal e ícone do torno",
+      "terms": [
+        "tempo",
+        "minutos",
+        "corte",
+        "rápido",
+        "terminal",
+        "oculto",
+        "ícone",
+        "atalho"
+      ],
+      "files": [
+        "src/components/Simulation.jsx",
+        "lightweight/Iniciar-CNC-Leve.vbs",
+        "lightweight/Iniciar-CNC-Leve.cmd",
+        "scripts/package-light.cjs",
+        "public/assets/torno-cnc.svg",
+        "public/assets/torno-cnc-fonte.txt",
+        "scripts/export-icon.cjs",
+        "RELATORIO-MINUTOS-ABERTURA-ICONE-3.1.18.md"
+      ],
+      "symbols": [
+        "Simulation"
+      ]
     }
   ]
 }

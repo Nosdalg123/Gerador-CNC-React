@@ -1,14 +1,14 @@
 {
-  "version": "3.1.17",
+  "version": "3.1.18",
   "repository": "Nosdalg123/Gerador-CNC-React",
-  "sourceDigest": "9a599682c13c0462c3c9a548971db66e722ea7d6b632974fd20e57dcf221bf9e",
+  "sourceDigest": "3a9199bae3f2974b3b2c325b16da170fef4d9273a66d9e30b159aee846c4dc4b",
   "tests": {
     "unit": 101,
     "legacy": true,
     "fullUi": true
   },
   "package": {
-    "path": "distribuicoes/CNC-Torno-Leve-3.1.17.zip",
-    "sha256": "d348c5beb584635aa779e6cb68053240f9514d9d53944ebe91af6b6dd3593d8c"
+    "path": "distribuicoes/CNC-Torno-Leve-3.1.18.zip",
+    "sha256": "e46d12d819cb77e83af8d85297cab3bcd397fd80f2e5841dba6f8ddd8c2a9dc2"
   }
 }

@@ -1,4 +1,4 @@
-# TORNO CNC — 3.1.17 · versão leve
+# TORNO CNC — 3.1.18 · versão leve
 
 A cilindragem CAD continua até o comprimento escolhido: após uma rampa/fresta inacessível, mantém o maior diâmetro da peça completa. O acabamento não entra no rebaixo protegido. Os comprimentos continuam independentes, com limite de castanha e aviso para faixas fora das duas operações. Perfis salvos e dados permanecem intactos. Relatório: `RELATORIO-CILINDRAGEM-PROTEGIDA-3.1.17.md`.
 
@@ -6,7 +6,7 @@ O CAD DXF gera a prévia do lado 2 invertido na etapa 3 e mostra botões com min
 
 Na etapa **2 · Editar desenho**, escolha **Face Z0 voltada à ferramenta** e confira o comprimento. A etapa 3 exige o perfil preparado; se houver pendências, o editor lista o problema e como corrigi-lo. Rascunhos incompletos podem ser conservados na etapa 2. Detalhes em `RELATORIO-PREPARACAO-CAD-3.1.14.md`.
 
-Repositório: [Nosdalg123/Gerador-CNC-React](https://github.com/Nosdalg123/Gerador-CNC-React). O pacote pronto fica em `distribuicoes/CNC-Torno-Leve-3.1.17.zip`: baixe, extraia toda a pasta e execute `Iniciar-CNC-Leve.cmd`. O mapa atual fica na raiz e acompanha o pacote; mapas históricos estão disponíveis em `revisoes/mapas-arquivados/*.zip`, com os manifestos originais. Para consultá-los, extraia o ZIP da revisão desejada. Os dados de trabalho permanecem no computador do usuário.
+Repositório: [Nosdalg123/Gerador-CNC-React](https://github.com/Nosdalg123/Gerador-CNC-React). O pacote pronto fica em `distribuicoes/CNC-Torno-Leve-3.1.18.zip`: baixe, extraia toda a pasta e execute `Iniciar-CNC-Leve.vbs`. O mapa atual fica na raiz e acompanha o pacote; mapas históricos estão disponíveis em `revisoes/mapas-arquivados/*.zip`, com os manifestos originais. Para consultá-los, extraia o ZIP da revisão desejada. Os dados de trabalho permanecem no computador do usuário.
 
 O simulador enquadra a peça completa e as cavidades internas, inclusive quando o interno é mais profundo que o perfil externo. A vista permanece fixa durante a troca de ferramenta; **Ajustar** restaura o enquadramento completo e o zoom mantém o centro da peça. Relatório: `RELATORIO-SIMULADOR-INTERNO-3.1.13.md`.
 
@@ -22,7 +22,7 @@ Versão local criada a partir da base GitHub 2.15.0, com as correções anterior
 
 ## Abrir no Windows
 
-Execute `Iniciar-CNC-Leve.cmd` ou `pnpm start`. Para copiar o programa, mantenha **toda a pasta `release/CNC-Torno-Leve`** junta e abra o lançador nela. Use os mesmos usuários e senhas da versão anterior. O usuário administrador continua `admin`. A distribuição Electron anterior permanece arquivada como referência.
+Execute `Iniciar-CNC-Leve.vbs` ou `pnpm start`. Para copiar o programa, mantenha **toda a pasta `release/CNC-Torno-Leve`** junta e abra o VBS ou o atalho TORNO CNC nela. Use os mesmos usuários e senhas da versão anterior. O usuário administrador continua `admin`. A distribuição Electron anterior permanece arquivada como referência.
 
 Os dados são salvos automaticamente na pasta própria do aplicativo no perfil Windows. Consulte o caminho pela tela **Dados e backup → Mostrar caminho dos dados**. `workspace.json` contém o estado atual; `workspace.json.previous` contém o estado anterior à última gravação. Exporte backups JSON regularmente, pois essa cópia anterior é rotativa.
 
@@ -154,3 +154,5 @@ Ligar falhas conserva o limite estrito de menos de 0,2 mm e a escolha de vizinho
 As alterações ficam verdes, com encontros numerados. O texto informa quando um trecho reto foi criado. A ligação curta entra automaticamente no perfil quando seus dois elementos pertenciam a ele. Desfazer, rascunho, salvamento, revisão CAD e reabertura conservam os ajustes e a fonte original. A auditoria do contorno superior e a confirmação das cotas continuam necessárias.
 
 Testes: `tests/dxf-arc-connections.test.cjs` (geometria, polilinha, ambiguidades, limites, contorno circular CNC e simulação) e `scripts/test-dxf-arc-connections.cjs` (cliques reais, correções, seleção, desfazer e salvamento/reabertura em Edge com banco temporário).
+
+3.1.18: `Simulation.jsx` exibe corte, rápido e progresso em minutos (motor e velocidade continuam em segundos). `lightweight/Iniciar-CNC-Leve.vbs` abre o servidor oculto e cria o atalho local com `torno-cnc.ico`; CMD fica por compatibilidade. Use VBS ou TORNO CNC.lnk para não abrir console. Ícone CC0: `public/assets/torno-cnc-fonte.txt`. Relatório: `RELATORIO-MINUTOS-ABERTURA-ICONE-3.1.18.md`.

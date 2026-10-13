@@ -18,7 +18,7 @@ async function verifyDeliveryMap(directory, expectedDigest) {
   return manifest;
 }
 
-async function packageLight({ root = ROOT } = {}) {
+async function packageLight({ root = ROOT, createShortcut = process.platform === 'win32' } = {}) {
   const { graph, revision } = refreshMap({ root });
   const built = JSON.parse(await fs.readFile(path.join(root, 'dist', 'BUILD-REVISION.json'), 'utf8'));
   if (built.sourceDigest !== graph.sourceDigest) throw Error('Build desatualizado. Execute pnpm build antes de pnpm package.');
@@ -30,9 +30,11 @@ async function packageLight({ root = ROOT } = {}) {
     await fs.rm(target, { recursive: true, force: true });
     await fs.cp(folder === 'app' ? path.join(root, 'dist') : revision, target, { recursive: true });
   }
-  for (const file of ['Iniciar-CNC-Leve.cmd', 'Servidor-CNC.ps1', 'LEIA-ME.txt']) {
+  for (const file of ['Iniciar-CNC-Leve.cmd', 'Iniciar-CNC-Leve.vbs', 'Servidor-CNC.ps1', 'LEIA-ME.txt']) {
     await fs.copyFile(path.join(root, 'lightweight', file), path.join(out, file));
   }
+  await fs.copyFile(path.join(root, 'public/assets/torno-cnc.ico'), path.join(out, 'torno-cnc.ico'));
+  if(createShortcut)require('node:child_process').execFileSync('wscript.exe',[path.join(out,'Iniciar-CNC-Leve.vbs'),'/atalho'],{windowsHide:true});
   await verifyDeliveryMap(path.join(out, 'mapa'), graph.sourceDigest);
   if (checkMap(root).length) throw Error('Fontes mudaram durante o empacotamento. Reconstrua a entrega.');
   console.log(out + '\nMapa incluído e conferido: ' + graph.sourceDigest.slice(0, 16));

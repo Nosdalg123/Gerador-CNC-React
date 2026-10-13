@@ -7,7 +7,7 @@ Em 11/10/2026, o usuário determinou: “daqui em diante vamos usar apenas a ver
 - Desenvolva, valide e entregue somente a distribuição leve. Não gere nem execute novos pacotes Electron, salvo se o usuário mudar expressamente essa decisão.
 - Preserve fontes, executáveis anteriores, backups, base GitHub e dados existentes. A mudança de padrão não autoriza exclusão de arquivos.
 - A interface React e os motores CNC continuam os mesmos. Preserve os recursos offline de PDF/DXF, os croquis cotados, simulação, ferramentas, importação e backups.
-- Para abrir, use `Iniciar-CNC-Leve.cmd` ou `pnpm start`. `pnpm desktop` também aponta para o lançador leve.
+- Para abrir, use `Iniciar-CNC-Leve.vbs` ou `pnpm start`. `pnpm desktop` também aponta para o lançador leve.
 - Para construir, execute `pnpm build`; para empacotar, `pnpm package` (`scripts/package-light.cjs`). A distribuição fica em `release/CNC-Torno-Leve`.
 - Para testes pertinentes de interface/persistência, use `pnpm test:ui` (`scripts/test-light.cjs`), que usa Edge e perfil temporário. Não rode testes contra o banco real. Use `pnpm test` e `pnpm test:legacy` conforme a mudança.
 - A versão leve usa `lightweight/Servidor-CNC.ps1` com servidor em loopback e navegador instalado. Preserve o caminho `%APPDATA%\CNC Torno React\workspace.json`, a cópia `.previous` e a proteção contra sobrescrita por outra sessão.
@@ -33,3 +33,5 @@ O mapa é ferramenta de navegação; o comportamento deve ser confirmado nos tre
 ## Links em toda entrega
 
 Ao entregar uma revisão, informe o link do commit publicado em `https://github.com/Nosdalg123/Gerador-CNC-React` e o link local absoluto do lançador `G:/GPT/CNC-Torno-Leve-<versão>/Iniciar-CNC-Leve.cmd`. Confira ambos. O ZIP pode ser adicional, mas não substitui o link de execução. Não publique em `Nosdalg123/gerador-cnc-fanuc`, destino cancelado pelo usuário. Se uma publicação estiver pendente, declare esse estado.
+
+3.1.18: `Simulation.jsx` exibe corte, rápido e progresso em minutos (motor e velocidade continuam em segundos). `lightweight/Iniciar-CNC-Leve.vbs` abre o servidor oculto e cria o atalho local com `torno-cnc.ico`; CMD fica por compatibilidade. Use VBS ou TORNO CNC.lnk para não abrir console. Ícone CC0: `public/assets/torno-cnc-fonte.txt`. Relatório: `RELATORIO-MINUTOS-ABERTURA-ICONE-3.1.18.md`.

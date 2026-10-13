@@ -3,7 +3,7 @@ const {analyzeJS}=require('./code-map-ast.cjs');
 const SCHEMA=2,ROOT=path.resolve(__dirname,'..');
 const ignored=new Set(['node_modules','dist','release','.packaging','.git','.code-map','revisoes','backups','pdf-assets','Exemplos de programaçaõ','.agents','.codex','.aws']);
 const generated=new Set(['PROJECT_INDEX.json','GRAFO-CODIGO.json','MAPA-CODIGO.md']);
-const extensions=new Set(['.js','.jsx','.mjs','.cjs','.ts','.tsx','.css','.html','.md','.ps1','.cmd','.json','.yaml','.yml','.txt','.dxf','.pdf','.svg']);
+const extensions=new Set(['.js','.jsx','.mjs','.cjs','.ts','.tsx','.css','.html','.md','.ps1','.cmd','.vbs','.json','.yaml','.yml','.txt','.dxf','.pdf','.svg']);
 const digest=b=>crypto.createHash('sha256').update(b).digest('hex');
 const normalize=s=>String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
 function collect(root=ROOT){const files=[];function walk(dir){for(const e of fs.readdirSync(dir,{withFileTypes:true}).sort((a,b)=>a.name.localeCompare(b.name))){if(e.isSymbolicLink()||ignored.has(e.name))continue;const full=path.join(dir,e.name),rel=path.relative(root,full).replaceAll('\\','/');if(e.isDirectory()){walk(full);continue}if(generated.has(rel)||!extensions.has(path.extname(e.name))||(/^tests\//.test(rel)&&(/-result\.json$|package-sizes\.json$|desktop-smoke\.json$|evidencias/.test(e.name))))continue;

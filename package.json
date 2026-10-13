@@ -1,6 +1,6 @@
 {
   "name": "gerador-cnc-react",
-  "version": "3.1.17",
+  "version": "3.1.18",
   "private": true,
   "description": "Gerador CNC Torno — React e distribuição leve local",
   "main": "electron/main.cjs",
@@ -8,8 +8,8 @@
     "dev": "vite --host 127.0.0.1",
     "build": "vite build",
     "preview": "vite preview --host 127.0.0.1",
-    "start": "cmd /c Iniciar-CNC-Leve.cmd",
-    "desktop": "cmd /c Iniciar-CNC-Leve.cmd",
+    "start": "wscript.exe release/CNC-Torno-Leve/Iniciar-CNC-Leve.vbs",
+    "desktop": "wscript.exe release/CNC-Torno-Leve/Iniciar-CNC-Leve.vbs",
     "package": "node scripts/package-light.cjs",
     "test": "node --test tests/*.test.cjs",
     "test:legacy": "node scripts/test-legacy.cjs",

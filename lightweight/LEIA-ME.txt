@@ -1,4 +1,4 @@
-TORNO CNC 3.1.17 - VERSAO LEVE OFFLINE
+TORNO CNC 3.1.18 - VERSAO LEVE OFFLINE
 
 3.1.15: etapa 3 do DXF mostra os dois lados e cria o lado 2 invertido.
 As duas caixas de seleção ficam separadas. Salve ambos os perfis completos.
@@ -99,3 +99,8 @@ Programas, trajetorias, geometria e dados existentes preservados.
 3.1.16: comprimentos independentes por lado, bloqueio de rampas/frestas inacessíveis ao percurso atual e retirada da saída rápida do perfil geométrico.
 
 3.1.17: cilindragem continua no maior diâmetro da peça depois de rampas/frestas inacessíveis, até o comprimento programado, mantendo os limites da castanha.
+
+3.1.18: tempos em minutos, ícone de torno e abertura sem console.
+Abra Iniciar-CNC-Leve.vbs ou o atalho TORNO CNC.lnk. O VBS atualiza o atalho
+para a pasta atual ao abrir, inclusive após mover ou extrair o programa.
+Iniciar-CNC-Leve.cmd permanece disponível por compatibilidade.
