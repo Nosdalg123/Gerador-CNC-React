@@ -627,6 +627,39 @@
         "showPreparation",
         "preparation"
       ]
+    },
+    {
+      "id": "cad-seguranca-percurso",
+      "label": "Comprimentos independentes e bloqueio de rampas e frestas no CAD",
+      "terms": [
+        "colisao",
+        "fresta",
+        "rampa",
+        "acabamento",
+        "faceamento",
+        "sombra",
+        "comprimentos independentes",
+        "castanha",
+        "limite",
+        "sobra central",
+        "saida rapida"
+      ],
+      "files": [
+        "public/engine/cadprofile.js",
+        "public/engine/core.js",
+        "src/cad-sides.mjs",
+        "src/components/Generator.jsx",
+        "tests/cad-machining-safety.test.cjs",
+        "scripts/test-cad-machining-safety.cjs",
+        "RELATORIO-SEGURANCA-CAD-3.1.16.md"
+      ],
+      "symbols": [
+        "machiningSafety",
+        "psLado",
+        "compile",
+        "clipCadPath",
+        "prepareCadSides"
+      ]
     }
   ]
 }

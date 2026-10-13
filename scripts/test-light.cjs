@@ -16,7 +16,7 @@ async function main(){const server=spawn('powershell.exe',['-NoProfile','-Execut
   await command(['scripts/test-cad-half.cjs'],{CNC_TEST_URL:url,CNC_TEST_BROWSER:'msedge'});
   await command(['scripts/test-disco-real.cjs'],{CNC_TEST_URL:url,CNC_TEST_BROWSER:'msedge'});
   await command(['scripts/test-cad-stages.cjs'],{CNC_TEST_URL:url,CNC_TEST_BROWSER:'msedge'});
-  await command(['scripts/test-cad-dual.cjs'],{CNC_TEST_URL:url,CNC_TEST_BROWSER:'msedge'});
+  await command(['scripts/test-cad-dual.cjs'],{CNC_TEST_URL:url,CNC_TEST_BROWSER:'msedge'});await command(['scripts/test-cad-machining-safety.cjs'],{CNC_TEST_URL:url,CNC_TEST_BROWSER:'msedge'});
   await command(['scripts/test-piece-editor.cjs'],{CNC_TEST_URL:url,CNC_TEST_BROWSER:'msedge'});
   await command(['scripts/test-machine-tools.cjs'],{CNC_TEST_URL:url,CNC_TEST_BROWSER:'msedge'});
   const original=await (await call('load')).json();assert.ok(original.drawings.length&&original.tools.length);

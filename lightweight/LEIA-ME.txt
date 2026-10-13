@@ -1,4 +1,4 @@
-TORNO CNC 3.1.15 - VERSAO LEVE OFFLINE
+TORNO CNC 3.1.16 - VERSAO LEVE OFFLINE
 
 3.1.15: etapa 3 do DXF mostra os dois lados e cria o lado 2 invertido.
 As duas caixas de seleção ficam separadas. Salve ambos os perfis completos.
@@ -95,3 +95,5 @@ e salve. No Gerador escolha o primeiro lado, código e simulação de cada face.
 3.1.13: simulador enquadra o bruto completo e cavidades internas profundas.
 Vista fixa entre operacoes; zoom centrado e Ajustar restaura a peca inteira.
 Programas, trajetorias, geometria e dados existentes preservados.
+
+3.1.16: comprimentos independentes por lado, bloqueio de rampas/frestas inacessíveis ao percurso atual e retirada da saída rápida do perfil geométrico.

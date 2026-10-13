@@ -32,6 +32,25 @@ function monotonicRadius(path){
  for(const s of path){if(s.kind==='line'){direction(s.b[1]-s.a[1]);continue}const a=arcInfo(s),cuts=[0,a.span];for(const t of [Math.PI/2,3*Math.PI/2]){const v=mod(a.sign*(t-a.start));if(v>EPS&&v<a.span-EPS)cuts.push(v)}cuts.sort((x,y)=>x-y);for(let i=1;i<cuts.length;i++)direction(a.sign*Math.cos(a.start+a.sign*(cuts[i-1]+cuts[i])/2))}
  return !(up&&down);
 }
+// A estratégia externa atual entra pela face e não desbasta bolsões atrás de um ombro.
+// A geometria continua válida/salva; somente a liberação do percurso é bloqueada.
+function machiningSafety(path){
+ const info=validate(path);if(!info.ok)return {ok:false,problems:info.problems};
+ for(let i=0;i<path.length;i++){
+  const s=path[i],points=[s.a];
+  if(s.kind==='arc'){
+   const arc=arcInfo(s),cuts=[];
+   for(const t of [Math.PI/2,3*Math.PI/2]){const v=mod(arc.sign*(t-arc.start));if(v>EPS&&v<arc.span-EPS)cuts.push(v)}
+   cuts.sort((a,b)=>a-b).forEach(v=>{const t=arc.start+arc.sign*v;points.push([s.c[0]+s.r*Math.cos(t),s.c[1]+s.r*Math.sin(t)])});
+  }
+  points.push(s.b);
+  for(let k=1;k<points.length;k++)if(points[k][1]<points[k-1][1]-JOIN){
+   const p=points[k-1],depth=Math.max(0,-p[0]),limit=Math.floor(depth*1000)/1000;
+   return {ok:false,index:i,sourceId:s.sourceId,point:p,limit,problems:['Risco de colisão no contorno CAD a partir de Z-'+limit+' mm: rampa, face reversa ou fresta atrás de material que o desbaste atual não remove. O acabamento/faceamento desse trecho foi bloqueado. '+(limit>0?'Reduza o comprimento deste lado para no máximo '+limit+' mm e trabalhe o restante pela outra face.':'Use a outra face ou prepare uma operação própria para esse rebaixo.')+' Para usinar a fresta, é necessária uma estratégia e ferramenta próprias; trocar apenas G71/G72/G73 não libera este trecho.']};
+  }
+ }
+ return {ok:true,problems:[]};
+}
 function compile(path,stock,mode,fmt){
  const info=validate(path);if(!info.ok)return {...info,moves:[],pts:[],pieces:[],defs:[],calcs:[],canais:[]};
  if(mode==='G72'&&!monotonicRadius(path))return {ok:false,problems:['O contorno CAD sobe e desce em X e não é compatível com G72. Escolha desbaste longitudinal (G71) ou paralelo ao perfil (G73).'],moves:[],pts:[],pieces:[],defs:[],calcs:[],canais:[]};
@@ -45,8 +64,8 @@ function compile(path,stock,mode,fmt){
   if(i&&dist(segments[i-1].b,s.a)>EPS){add('G1X'+fmt(2*s.a[1])+'Z'+fmt(s.a[0]),'cadjoin'+i,'G1',segments[i-1].b,s.a);points.push(s.a)}
   const g=s.kind==='line'?'G1':s.ccw?'G3':'G2';add(g+'X'+fmt(2*s.b[1])+'Z'+fmt(s.b[0])+(s.kind==='arc'?'R'+fmt(s.r):''),'cad'+i,g,s.a,s.b,s.r);points.push(...sample(s,48).slice(1));
  });
- const last=segments.at(-1).b;add('N2G0X#1','psn2','G0',last,[last[0],stock]);points.push([last[0],stock]);
+ const last=segments.at(-1).b;add('N2G0X#1','psn2','G0',last,[last[0],stock]);
  return {ok:true,native:true,segmentCount:path.length,arcCount:path.filter(s=>s.kind==='arc').length,defs:[],calcs:[],moves,pts:points,canais:[],pieces:[],zEnd:info.length,somaL:info.length,hMax:info.radius};
 }
-return {validate,sample,extrema,arcInfo,compile};
+return {validate,sample,extrema,arcInfo,compile,machiningSafety};
 });

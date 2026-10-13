@@ -10,9 +10,8 @@ export function clipCadPath(path,length){
  const info=checked(path);length=Number(length);if(!Number.isFinite(length)||length<=0||length>info.length+EPS)throw Error('Informe um comprimento de usinagem maior que zero e até '+info.length+' mm.');
  const result=[],cut=-length;
  for(const original of path){
-  const s=copy(original);if(s.a[0]<cut-EPS)break;
+  const s=copy(original);if(s.a[0]<=cut+EPS)break;
   if(s.b[0]>=cut-EPS){result.push(s);continue}
-  if(s.a[0]<=cut+EPS)break;
   if(s.kind==='line'){const t=(cut-s.a[0])/(s.b[0]-s.a[0]);s.b=[cut,s.a[1]+t*(s.b[1]-s.a[1])];}
   else{
    const arc=globalThis.CNCPerfilCAD.arcInfo(s);let lo=0,hi=arc.span;
@@ -56,7 +55,6 @@ export function prepareCadSides(drawing,first='1',settings={}){
   const item=d['trechos'+side]?.find(t=>t.tipo==='cadperfil');if(!item)throw Error('Contorno CAD do lado '+side+' ausente.');
   d['trechos'+side]=[{...item,path:clipCadPath(item.path,d.cadDuplo['limite'+side])}];d['internos'+side]=clipInternals(d['internos'+side]||[],Number(d.cadDuplo['limite'+side]));
  }
- if(Number(d.cadDuplo.limite1)+Number(d.cadDuplo.limite2)<length-.001)throw Error('Os comprimentos dos lados 1 e 2 deixam uma faixa sem usinar. Ajuste os limites para cobrir os '+length+' mm da peça.');
  if(first==='2')for(const prefix of ['trechos','internos'])[d[prefix+'1'],d[prefix+'2']]=[d[prefix+'2'],d[prefix+'1']];
  return d;
 }

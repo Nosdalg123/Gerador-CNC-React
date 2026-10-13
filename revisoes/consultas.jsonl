@@ -71,3 +71,10 @@
 {"at":"2026-10-12T22:34:35.564Z","sourceDigest":"da67ec2743277be7ffc5816aa62e99ed1a4a0710f6f1cb2836a3557cac0475ee","options":{"symbol":"prepareCadSides","limit":4},"results":1}
 {"at":"2026-10-12T22:44:09.784Z","sourceDigest":"1c9487ca214be94f072a18fc05cf6a33b142b8c3ce09848fe7e56da1537ac86e","options":{"query":"comprimento trechos faixa sem usinar gerador","limit":3},"results":3}
 {"at":"2026-10-12T22:47:53.930Z","sourceDigest":"21df7fb6f1c6284b5ff0e624501357a63e10e4015a6c855e31a48ef3a68109be","options":{"query":"comprimentos lado 2 gerador métricas prévia"},"results":8}
+{"at":"2026-10-12T23:55:10.062Z","sourceDigest":"cb2fc20449edb5f23102c051cc1aedea1815019b79cc38a2ddfc5c6d58cebc51","options":{"query":"CAD acabamento colisão rampa G71 castanha comprimentos lados"},"results":8}
+{"at":"2026-10-12T23:55:21.797Z","sourceDigest":"cb2fc20449edb5f23102c051cc1aedea1815019b79cc38a2ddfc5c6d58cebc51","options":{"symbol":"CNCPerfilCAD"},"results":0}
+{"at":"2026-10-12T23:55:22.731Z","sourceDigest":"cb2fc20449edb5f23102c051cc1aedea1815019b79cc38a2ddfc5c6d58cebc51","options":{"impact":"src/cad-sides.mjs"},"results":8}
+{"at":"2026-10-12T23:58:49.988Z","sourceDigest":"cb2fc20449edb5f23102c051cc1aedea1815019b79cc38a2ddfc5c6d58cebc51","options":{"callers":"compile"},"results":8}
+{"at":"2026-10-12T23:58:50.964Z","sourceDigest":"cb2fc20449edb5f23102c051cc1aedea1815019b79cc38a2ddfc5c6d58cebc51","options":{"impact":"public/engine/cadprofile.js"},"results":8}
+{"at":"2026-10-13T00:08:06.366Z","sourceDigest":"3d99ca170343ea41a7350047ec2618ffc93fc6cdf2a1b3e71deee0c9b8f42d54","options":{"callers":"machiningSafety"},"results":4}
+{"at":"2026-10-13T00:08:07.547Z","sourceDigest":"3d99ca170343ea41a7350047ec2618ffc93fc6cdf2a1b3e71deee0c9b8f42d54","options":{"query":"fresta rampa comprimentos independentes"},"results":7}

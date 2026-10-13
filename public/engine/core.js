@@ -2219,6 +2219,7 @@
     if (prof > livre + EPS) erros.push(rot + 'A usinagem chega a ' + fmt(prof) + ' mm da face, mas o trecho livre fora da placa é ' + fmt(livre) + ' (peça ' + fmt(o.lPeca) + ' − preso ' + fmt(maq.grip) + '): a ferramenta bateria nas castanhas.');
     else if (livre - prof < 1) avisos.push(rot + 'Folga de só ' + fmt(livre - prof) + ' mm entre o fim da usinagem e as castanhas.');
     if (sobreZ < EPS) avisos.push(rot + 'Sobremetal em Z é zero: o faceamento corta direto em Z0.');
+    if (ct.native && ct.ok) CAD.machiningSafety(o.lista[0].path).problems.forEach(function (m) { erros.push(rot + m); });
     if (erros.length) return { erros: erros, avisos: avisos };
 
     var acabT = num(t1.acabTorn), acabF = num(t1.acabFace);
@@ -2586,20 +2587,22 @@
       var before = outline.filter(function (p) { return p[0] > -cn.z + EPS; }), after = outline.filter(function (p) { return p[0] < -(cn.z + cn.w) - EPS; });
       outline = before.concat([[-cn.z, rN], [-cn.z, cn.d / 2], [-(cn.z + cn.w), cn.d / 2], [-(cn.z + cn.w), rF]], after);
     });
-    var lado1Pts = outline.concat([[-o.lPeca, R0]]);       // contorno completo deste lado ate o fundo (para o lado 2)
+    var lado1Pts = outline.concat(ct.native ? [[-ct.zEnd, R0], [-o.lPeca, R0]] : [[-o.lPeca, R0]]); // limite seguido do bruto, sem inventar rampa
     var full = outline.slice();
     var bruto = null;
     if (o.outro) {
       // lado 2: o contorno do lado 1 (espelhado) completa a peca acabada e define o bruto
       // z2 = -lPeca - z1; da maior cota (sobremetal do lado 2) ate a face do lado 1
       var ot = o.outro, mapa = ot.pts.map(function (p) { return [-o.lPeca - p[0], p[1]]; }).reverse();
-      full = full.concat(mapa.filter(function (p) { return p[0] <= -ct.zEnd + EPS; })); // peca acabada: so o que fica depois do contorno deste lado
+      full = ct.native
+        ? full.concat([[-ct.zEnd, psRaioEm(mapa, ct.zEnd + 2 * EPS)]], mapa.filter(function (p) { return p[0] < -ct.zEnd - EPS; }))
+        : full.concat(mapa.filter(function (p) { return p[0] <= -ct.zEnd + EPS; })); // saída rápida não pertence ao perfil da peça
       bruto = [];
       for (var i = 0; i < mapa.length - 1; i++) {
         var top = mapa[i], bot = mapa[i + 1];
         if (top[0] - bot[0] > EPS) bruto.push({ z0: top[0], z1: bot[0], d: 2 * top[1], d1: 2 * bot[1] });
       }
-    } else full.push([-o.lPeca, R0]);
+    } else if (ct.native) full = lado1Pts.slice(); else full.push([-o.lPeca, R0]);
 
     // rosca interna: o filete chega ao Ø nominal; a parede ate o perfil externo acabado nao pode acabar
     rosI.forEach(function (pc) {
@@ -2662,8 +2665,7 @@
     est.push('A ferramenta T' + T1 + ' (' + t1.nome + ') faceia e usina o perfil com Vc constante (G96, ' + fmt(t1.vc) + ' m/min) limitada a ' + fmt(t1.rpm) + ' RPM por G50 e giro M' + Number(t1.sentido) + '.' + txtPressao(fx.pr) + ' O bloco bruto Ø' + fmt(o.dBruto) + ' x ' + fmt(o.lBruto) + ' deixa ' + fmt(sobreZ) + ' mm de sobremetal em Z. O faceamento é G75 (passes de ' + fmt(incZ) + ' mm).');
     var nCil = ct.pieces.filter(function (p) { return p.t === 'cil'; }).length, nCone = ct.pieces.length - nCil;
     if (!ext) est.push('Só interno neste lado: não há torneamento externo, o bloco mantém o Ø bruto (Ø' + fmt(o.dBruto) + ') e só é feito o faceamento antes das operações internas.');
-    if (ct.native && sentE === 'G71') avisos.push(rot + 'Contorno CAD G71 tipo II: o desbaste do simulador é uma aproximação tipo I e pode não reproduzir cavidades. Confira o ciclo no comando da máquina; acabamento e arcos permanecem no perfil.');
-    if (ct.native) est.push('Contorno CAD nativo: ' + ct.segmentCount + ' segmentos, ' + ct.arcCount + ' arcos circulares preservados em G2/G3 e faces/degraus em G1. O G71 usa contorno tipo II; o simulador de desbaste mantém as limitações de tipo I indicadas no diagnóstico. Confirme o suporte do comando e a fixação.');
+    if (ct.native) est.push('Contorno CAD nativo: ' + ct.segmentCount + ' segmentos, ' + ct.arcCount + ' arcos circulares preservados em G2/G3. O percurso externo foi conferido para impedir entrada atrás de ombros, rampas reversas e frestas não desbastadas. Os comprimentos dos lados são independentes; regiões não programadas permanecem no bruto.');
     if (ext && !ct.native) est.push('O perfil tem ' + plural(nCil, 'cilindro', 'cilindros') + (nCone ? ' e ' + plural(nCone, 'cone', 'cones') : '') + ', com ' + fmt(ct.zEnd) + ' mm da face ao último trecho, e fica no bloco N1–N2. ' + (sentE === 'G73'
       ? 'O desbaste é PARALELO AO PERFIL: o G73 repete o contorno ' + g73R + (g73R === 1 ? ' vez' : ' vezes') + ', afastado ' + fmt(g73Di) + ' mm no raio no 1º corte (U, #20) e se aproximando igualmente até o perfil acabado, com no máximo ' + fmt(incX) + ' mm por corte (R, #22). Serve para bruto forjado ou fundido, já perto da forma final; em barra maciça gasta cortes no ar'
       : sentE === 'G72'

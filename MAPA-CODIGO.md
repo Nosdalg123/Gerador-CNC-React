@@ -1,6 +1,6 @@
-# Mapa do código — versão 3.1.15
+# Mapa do código — versão 3.1.16
 
-Revisão: `cb2fc20449edb5f23102c051cc1aedea1815019b79cc38a2ddfc5c6d58cebc51`. 140 arquivos, 2668 símbolos, 5589 chamadas resolvidas e 115 relações JSX.
+Revisão: `db689e45862c740a18132d417e1da5b7edc850f193c332c1c5d1c4889bde17ca`. 143 arquivos, 2689 símbolos, 5613 chamadas resolvidas e 115 relações JSX.
 
 Leia AGENTS.md e TRILHA-REACT.md antes de qualquer revisão. O índice tem hashes e faixas de linhas; GRAFO-CODIGO.json contém relações e evidências.
 
@@ -17,7 +17,7 @@ Consultas atualizam o mapa antes de responder. Dev/build/package também atualiz
 
 ## Limites e evidência
 
-EXTRACTED: referência resolvida pelo AST/escopo. INFERRED: alias global ou associação de conceito revisada. AMBIGUOUS: mais de um destino. 9138 chamadas externas/dinâmicas não foram resolvidas e estão registradas. Callbacks e funções anônimas têm nós próprios. Resolução estática não prova execução.
+EXTRACTED: referência resolvida pelo AST/escopo. INFERRED: alias global ou associação de conceito revisada. AMBIGUOUS: mais de um destino. 9328 chamadas externas/dinâmicas não foram resolvidas e estão registradas. Callbacks e funções anônimas têm nós próprios. Resolução estática não prova execução.
 
 A busca por assunto usa vocabulário de CNC e texto local, sem LLM ou embeddings. Não interpreta imagens/PDFs como documentação semântica. PowerShell tem inventário e declaração de função, sem grafo completo de comandos. Não há promessa de redução de tokens medida.
 
@@ -41,3 +41,4 @@ A busca por assunto usa vocabulário de CNC e texto local, sem LLM ou embeddings
 - **Conectar arcos e retas e ligar falhas circulares**: `public/engine/dxfgeometry.js`, `public/engine/dxfimport.js`, `public/engine/dxfprofile.js`, `src/assets/cad-panel.html`, `tests/dxf-arc-connections.test.cjs`, `scripts/test-dxf-arc-connections.cjs`
 - **CAD com lado 2 invertido e aviso de conexão**: `src/cad-sides.mjs`, `src/components/Drawing.jsx`, `src/components/Generator.jsx`, `src/components/CadImport.jsx`, `src/domain.mjs`, `public/engine/dxfimport.js`, `public/engine/dxfprofile.js`, `src/assets/cad.css`, `tests/cad-sides.test.cjs`, `scripts/test-cad-dual.cjs`, `src/cad-document.mjs`, `src/data.mjs`, `RELATORIO-CAD-LADOS-GERADOR-3.1.15.md`
 - **Preparação CAD, face Z0 e pendências antes de salvar**: `src/assets/cad-panel.html`, `public/engine/dxfimport.js`, `public/engine/dxfaudit.js`, `scripts/test-cad-stages.cjs`, `RELATORIO-PREPARACAO-CAD-3.1.14.md`
+- **Comprimentos independentes e bloqueio de rampas e frestas no CAD**: `public/engine/cadprofile.js`, `public/engine/core.js`, `src/cad-sides.mjs`, `src/components/Generator.jsx`, `tests/cad-machining-safety.test.cjs`, `scripts/test-cad-machining-safety.cjs`, `RELATORIO-SEGURANCA-CAD-3.1.16.md`
