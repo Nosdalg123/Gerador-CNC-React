@@ -1,4 +1,4 @@
-# Trilha de código — React 3.1.18
+# Trilha de código — React 3.1.19
 
 Cilindragem protegida: `cad-sides.mjs:prepareCadSides` conserva o maior raio do perfil completo em cadRadiusLimit na cópia recortada. `cadprofile.js:safeMachiningPath` mantém o prefixo acessível e substitui a região após a primeira queda radial por cilindragem no maior Ø até o comprimento selecionado. `core.js:psContorno` compila essa cópia; `psLado` usa o mesmo contorno no desbaste, acabamento e simulador. O desenho salvo permanece integral. Regressões: `tests/cad-machining-safety.test.cjs`, `scripts/test-cad-machining-safety.cjs`. Relatório: `RELATORIO-CILINDRAGEM-PROTEGIDA-3.1.17.md`.
 
@@ -188,3 +188,5 @@ Backup: `G:/GPT/backups/react-3.1.11-antes-lados-cad-avisos`. Consulta: `pnpm ma
 Consulta: `pnpm mapa:query --query "simulador interno profundo enquadramento"`; impacto de `src/components/Simulation.jsx`. Backup: `G:/GPT/backups/react-3.1.12-antes-enquadramento-interno`. Relatório: `RELATORIO-SIMULADOR-INTERNO-3.1.13.md`. Pacote 3.1.12 e dados reais preservados; somente versão leve.
 
 3.1.18: `Simulation.jsx` exibe corte, rápido e progresso em minutos (motor e velocidade continuam em segundos). `lightweight/Iniciar-CNC-Leve.vbs` abre o servidor oculto e cria o atalho local com `torno-cnc.ico`; CMD fica por compatibilidade. Use VBS ou TORNO CNC.lnk para não abrir console. Ícone CC0: `public/assets/torno-cnc-fonte.txt`. Relatório: `RELATORIO-MINUTOS-ABERTURA-ICONE-3.1.18.md`.
+
+3.1.19: `App.jsx` renderiza `.autoria` no app; `style.css` fixa a marca no canto inferior direito. A referência recuperada está em `base-github-v2.15.0/Gerador/index.html`. Teste: `scripts/test-machine-tools.cjs`. Relatório: `RELATORIO-AUTORIA-3.1.19.md`.

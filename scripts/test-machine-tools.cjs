@@ -12,7 +12,7 @@ async function main(){
   const saved=()=>expect(page.getByRole('status')).toHaveText('Dados salvos neste dispositivo');
   const load=()=>page.evaluate(async()=>globalThis.desktop?await globalThis.desktop.loadWorkspace():JSON.parse(localStorage.getItem('cnc.react.workspace.v3')));
   await saved();const before=await load(),code=await page.getByLabel('Código CNC gerado').inputValue();
-  await expect(page.locator('.brand strong')).toHaveText('TORNO CNC');await expect(page.locator('.brand small')).toHaveText('Versão '+require('../package.json').version);
+  await expect(page.locator('.brand strong')).toHaveText('TORNO CNC');await expect(page.locator('.brand small')).toHaveText('Versão '+require('../package.json').version);await expect(page.locator('.autoria')).toHaveText('Desenvolvido por Gladson Bernardo');
   await page.getByRole('button',{name:/Comando:/}).click();await expect(page.getByRole('dialog',{name:'Selecionar máquina'})).toBeVisible();
   await page.screenshot({path:'tests/maquina-popup.png'});
   await page.getByRole('button',{name:/^Siemens/}).click();await expect(page.getByRole('button',{name:'Comando: Siemens'})).toBeVisible();await saved();

@@ -1,4 +1,4 @@
-TORNO CNC 3.1.18 - VERSAO LEVE OFFLINE
+TORNO CNC 3.1.19 - VERSAO LEVE OFFLINE
 
 3.1.15: etapa 3 do DXF mostra os dois lados e cria o lado 2 invertido.
 As duas caixas de seleção ficam separadas. Salve ambos os perfis completos.
@@ -104,3 +104,5 @@ Programas, trajetorias, geometria e dados existentes preservados.
 Abra Iniciar-CNC-Leve.vbs ou o atalho TORNO CNC.lnk. O VBS atualiza o atalho
 para a pasta atual ao abrir, inclusive após mover ou extrair o programa.
 Iniciar-CNC-Leve.cmd permanece disponível por compatibilidade.
+
+3.1.19: restaurada a marca "Desenvolvido por Gladson Bernardo" no canto inferior direito.

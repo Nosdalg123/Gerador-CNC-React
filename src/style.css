@@ -61,6 +61,8 @@
 .tool-editor .tool-diagram .ps-svg{height:140px}
 .tool-editor .tool-diagram[data-tool-kind="rosca"] .ps-svg{height:180px}
 .tool-editor .tool-diagram p{font-size:11px;margin:8px 0 0}
+.autoria{position:fixed;right:12px;bottom:8px;z-index:20;font-size:12px;color:var(--muted);background:var(--panel);border:1px solid var(--border);border-radius:999px;padding:2px 10px;opacity:.92;pointer-events:none}
+@media print{.autoria{display:none}}
 .tool-editor-actions{justify-content:flex-end;border-top:1px solid var(--border);padding-top:12px}
 @media(max-width:900px){.tool-editor-grid{grid-template-columns:1fr 1fr}.tool-editor-grid>fieldset{grid-column:1/-1}}
 @media(max-width:600px){.tool-editor-grid{grid-template-columns:1fr}.tool-editor .fields{grid-template-columns:1fr 1fr}.tool-editor{padding:14px}.modal-overlay{padding:12px}}

@@ -1,6 +1,6 @@
-# Mapa do código — versão 3.1.18
+# Mapa do código — versão 3.1.19
 
-Revisão: `3a9199bae3f2974b3b2c325b16da170fef4d9273a66d9e30b159aee846c4dc4b`. 149 arquivos, 2693 símbolos, 5636 chamadas resolvidas e 115 relações JSX.
+Revisão: `d04a73e25b9fd3b92795044ba0b536d5df62739796fab470c8448129bee428b6`. 150 arquivos, 2693 símbolos, 5636 chamadas resolvidas e 115 relações JSX.
 
 Leia AGENTS.md e TRILHA-REACT.md antes de qualquer revisão. O índice tem hashes e faixas de linhas; GRAFO-CODIGO.json contém relações e evidências.
 
@@ -17,7 +17,7 @@ Consultas atualizam o mapa antes de responder. Dev/build/package também atualiz
 
 ## Limites e evidência
 
-EXTRACTED: referência resolvida pelo AST/escopo. INFERRED: alias global ou associação de conceito revisada. AMBIGUOUS: mais de um destino. 9425 chamadas externas/dinâmicas não foram resolvidas e estão registradas. Callbacks e funções anônimas têm nós próprios. Resolução estática não prova execução.
+EXTRACTED: referência resolvida pelo AST/escopo. INFERRED: alias global ou associação de conceito revisada. AMBIGUOUS: mais de um destino. 9428 chamadas externas/dinâmicas não foram resolvidas e estão registradas. Callbacks e funções anônimas têm nós próprios. Resolução estática não prova execução.
 
 A busca por assunto usa vocabulário de CNC e texto local, sem LLM ou embeddings. Não interpreta imagens/PDFs como documentação semântica. PowerShell tem inventário e declaração de função, sem grafo completo de comandos. Não há promessa de redução de tokens medida.
 
@@ -43,3 +43,4 @@ A busca por assunto usa vocabulário de CNC e texto local, sem LLM ou embeddings
 - **Preparação CAD, face Z0 e pendências antes de salvar**: `src/assets/cad-panel.html`, `public/engine/dxfimport.js`, `public/engine/dxfaudit.js`, `scripts/test-cad-stages.cjs`, `RELATORIO-PREPARACAO-CAD-3.1.14.md`
 - **Comprimentos independentes e bloqueio de rampas e frestas no CAD**: `public/engine/cadprofile.js`, `public/engine/core.js`, `src/cad-sides.mjs`, `src/components/Generator.jsx`, `tests/cad-machining-safety.test.cjs`, `scripts/test-cad-machining-safety.cjs`, `RELATORIO-SEGURANCA-CAD-3.1.16.md`, `RELATORIO-CILINDRAGEM-PROTEGIDA-3.1.17.md`
 - **Tempos em minutos, abertura sem terminal e ícone do torno**: `src/components/Simulation.jsx`, `lightweight/Iniciar-CNC-Leve.vbs`, `lightweight/Iniciar-CNC-Leve.cmd`, `scripts/package-light.cjs`, `public/assets/torno-cnc.svg`, `public/assets/torno-cnc-fonte.txt`, `scripts/export-icon.cjs`, `RELATORIO-MINUTOS-ABERTURA-ICONE-3.1.18.md`
+- **Marca de autoria no canto inferior direito**: `src/App.jsx`, `src/style.css`, `scripts/test-machine-tools.cjs`, `RELATORIO-AUTORIA-3.1.19.md`

@@ -692,6 +692,27 @@
       "symbols": [
         "Simulation"
       ]
+    },
+    {
+      "id": "marca-autoria",
+      "label": "Marca de autoria no canto inferior direito",
+      "terms": [
+        "Gladson",
+        "Bernardo",
+        "desenvolvido por",
+        "autoria",
+        "assinatura",
+        "canto inferior direito"
+      ],
+      "files": [
+        "src/App.jsx",
+        "src/style.css",
+        "scripts/test-machine-tools.cjs",
+        "RELATORIO-AUTORIA-3.1.19.md"
+      ],
+      "symbols": [
+        "App"
+      ]
     }
   ]
 }
