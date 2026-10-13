@@ -642,7 +642,10 @@
         "castanha",
         "limite",
         "sobra central",
-        "saida rapida"
+        "saida rapida",
+        "cilindragem protegida",
+        "maior diâmetro",
+        "envelope"
       ],
       "files": [
         "public/engine/cadprofile.js",
@@ -651,14 +654,16 @@
         "src/components/Generator.jsx",
         "tests/cad-machining-safety.test.cjs",
         "scripts/test-cad-machining-safety.cjs",
-        "RELATORIO-SEGURANCA-CAD-3.1.16.md"
+        "RELATORIO-SEGURANCA-CAD-3.1.16.md",
+        "RELATORIO-CILINDRAGEM-PROTEGIDA-3.1.17.md"
       ],
       "symbols": [
         "machiningSafety",
         "psLado",
         "compile",
         "clipCadPath",
-        "prepareCadSides"
+        "prepareCadSides",
+        "safeMachiningPath"
       ]
     }
   ]

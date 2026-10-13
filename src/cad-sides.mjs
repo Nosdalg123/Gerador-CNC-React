@@ -53,7 +53,7 @@ export function prepareCadSides(drawing,first='1',settings={}){
  if(!opposite||opposite.length!==expected.length||expected.some((s,i)=>{const t=opposite[i];return s.kind!==t.kind||!samePoint(s.a,t.a)||!samePoint(s.b,t.b)||(s.kind==='arc'&&(!samePoint(s.c,t.c)||Math.abs(s.r-t.r)>.001||s.ccw!==t.ccw))}))throw Error('Os contornos dos lados não correspondem à mesma peça invertida. Confira a edição no CAD antes de gerar.');
  for(const side of ['1','2']){
   const item=d['trechos'+side]?.find(t=>t.tipo==='cadperfil');if(!item)throw Error('Contorno CAD do lado '+side+' ausente.');
-  d['trechos'+side]=[{...item,path:clipCadPath(item.path,d.cadDuplo['limite'+side])}];d['internos'+side]=clipInternals(d['internos'+side]||[],Number(d.cadDuplo['limite'+side]));
+  d['trechos'+side]=[{...item,cadRadiusLimit:checked(item.path).radius,path:clipCadPath(item.path,d.cadDuplo['limite'+side])}];d['internos'+side]=clipInternals(d['internos'+side]||[],Number(d.cadDuplo['limite'+side]));
  }
  if(first==='2')for(const prefix of ['trechos','internos'])[d[prefix+'1'],d[prefix+'2']]=[d[prefix+'2'],d[prefix+'1']];
  return d;

@@ -1,12 +1,12 @@
-# TORNO CNC — 3.1.16 · versão leve
+# TORNO CNC — 3.1.17 · versão leve
 
-Comprimentos dos lados são independentes no Gerador: uma região central sem usinagem gera aviso, sem bloquear ou redistribuir valores. A geração CAD impede acabamento em rampas/frestas atrás de material não desbastado, com posição Z e dica para limitar o lado. O retorno rápido não é parte do perfil acabado. Relatório: RELATORIO-SEGURANCA-CAD-3.1.16.md.
+A cilindragem CAD continua até o comprimento escolhido: após uma rampa/fresta inacessível, mantém o maior diâmetro da peça completa. O acabamento não entra no rebaixo protegido. Os comprimentos continuam independentes, com limite de castanha e aviso para faixas fora das duas operações. Perfis salvos e dados permanecem intactos. Relatório: `RELATORIO-CILINDRAGEM-PROTEGIDA-3.1.17.md`.
 
 O CAD DXF gera a prévia do lado 2 invertido na etapa 3 e mostra botões com miniaturas para conferir ambos os lados. Os dois perfis completos ficam gravados no desenho; os comprimentos a usinar são definidos no **Gerador de código**, inicialmente metade por lado. As caixas de seleção ficam em linhas separadas. Reabrir e salvar o lado 2 preserva a identidade do desenho e suas configurações. Relatório: `RELATORIO-CAD-LADOS-GERADOR-3.1.15.md`.
 
 Na etapa **2 · Editar desenho**, escolha **Face Z0 voltada à ferramenta** e confira o comprimento. A etapa 3 exige o perfil preparado; se houver pendências, o editor lista o problema e como corrigi-lo. Rascunhos incompletos podem ser conservados na etapa 2. Detalhes em `RELATORIO-PREPARACAO-CAD-3.1.14.md`.
 
-Repositório: [Nosdalg123/Gerador-CNC-React](https://github.com/Nosdalg123/Gerador-CNC-React). O pacote pronto fica em `distribuicoes/CNC-Torno-Leve-3.1.16.zip`: baixe, extraia toda a pasta e execute `Iniciar-CNC-Leve.cmd`. O mapa atual fica na raiz e acompanha o pacote; mapas históricos estão disponíveis em `revisoes/mapas-arquivados/*.zip`, com os manifestos originais. Para consultá-los, extraia o ZIP da revisão desejada. Os dados de trabalho permanecem no computador do usuário.
+Repositório: [Nosdalg123/Gerador-CNC-React](https://github.com/Nosdalg123/Gerador-CNC-React). O pacote pronto fica em `distribuicoes/CNC-Torno-Leve-3.1.17.zip`: baixe, extraia toda a pasta e execute `Iniciar-CNC-Leve.cmd`. O mapa atual fica na raiz e acompanha o pacote; mapas históricos estão disponíveis em `revisoes/mapas-arquivados/*.zip`, com os manifestos originais. Para consultá-los, extraia o ZIP da revisão desejada. Os dados de trabalho permanecem no computador do usuário.
 
 O simulador enquadra a peça completa e as cavidades internas, inclusive quando o interno é mais profundo que o perfil externo. A vista permanece fixa durante a troca de ferramenta; **Ajustar** restaura o enquadramento completo e o zoom mantém o centro da peça. Relatório: `RELATORIO-SIMULADOR-INTERNO-3.1.13.md`.
 

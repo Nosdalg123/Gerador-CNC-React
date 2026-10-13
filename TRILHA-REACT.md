@@ -1,6 +1,6 @@
-# Trilha de código — React 3.1.16
+# Trilha de código — React 3.1.17
 
-Segurança CAD: `cadprofile.js:machiningSafety` → `core.js:psLado` bloqueia trechos externos inacessíveis à estratégia atual antes de liberar código. `compile` conserva somente geometria em pts; psLado completa o bruto e une os lados sem incluir N2/saída rápida. `cad-sides.mjs:clipCadPath` para antes de faces no limite; `prepareCadSides` aceita comprimentos independentes. Regressões: `tests/cad-machining-safety.test.cjs`, `scripts/test-cad-machining-safety.cjs`. Relatório: `RELATORIO-SEGURANCA-CAD-3.1.16.md`.
+Cilindragem protegida: `cad-sides.mjs:prepareCadSides` conserva o maior raio do perfil completo em cadRadiusLimit na cópia recortada. `cadprofile.js:safeMachiningPath` mantém o prefixo acessível e substitui a região após a primeira queda radial por cilindragem no maior Ø até o comprimento selecionado. `core.js:psContorno` compila essa cópia; `psLado` usa o mesmo contorno no desbaste, acabamento e simulador. O desenho salvo permanece integral. Regressões: `tests/cad-machining-safety.test.cjs`, `scripts/test-cad-machining-safety.cjs`. Relatório: `RELATORIO-CILINDRAGEM-PROTEGIDA-3.1.17.md`.
 
 Dois lados no CAD: `dxfimport.js:saveData`, `renderSaveSides` → `CadImport.jsx:CNCDesenhos.previewSides` → `cad-document.mjs:cadDocument` → `cad-sides.mjs:createOppositeCadSide`. A etapa 3 visualiza ambos e salva perfis completos. Comprimentos: `Generator.jsx` → `form.cadUsinagem[desenhoId]` → `domain.mjs:generate` → `prepareCadSides`, `cadMachiningLimits`. A geração recorta uma cópia. `App.jsx:useDrawing` atualiza IDs existentes; `data.mjs:mergeWorkspace` remapeia parâmetros de backups. Relatório: `RELATORIO-CAD-LADOS-GERADOR-3.1.15.md`.
 

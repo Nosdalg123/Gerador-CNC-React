@@ -33,7 +33,7 @@ function monotonicRadius(path){
  return !(up&&down);
 }
 // A estratégia externa atual entra pela face e não desbasta bolsões atrás de um ombro.
-// A geometria continua válida/salva; somente a liberação do percurso é bloqueada.
+// A geometria continua válida/salva; safeMachiningPath substitui o trecho inacessível.
 function machiningSafety(path){
  const info=validate(path);if(!info.ok)return {ok:false,problems:info.problems};
  for(let i=0;i<path.length;i++){
@@ -51,6 +51,21 @@ function machiningSafety(path){
  }
  return {ok:true,problems:[]};
 }
+// Só a cópia de usinagem muda: após o primeiro trecho inacessível, mantém o maior Ø.
+function safeMachiningPath(path,radiusLimit){
+ const info=validate(path);if(!info.ok)return {...info,path:[]};
+ const radius=radiusLimit==null?info.radius:Number(radiusLimit);
+ if(!Number.isFinite(radius)||radius<info.radius-EPS)return {ok:false,problems:['O diâmetro de proteção deve cobrir o maior diâmetro do contorno CAD.'],path:[]};
+ const safety=machiningSafety(path);
+ if(safety.ok)return {ok:true,path:structuredClone(path),deferred:false,problems:[]};
+ const next=structuredClone(path.slice(0,safety.index)),s=path[safety.index],p=[...safety.point];
+ if(dist(s.a,p)>EPS)next.push({...structuredClone(s),b:p});
+ if(radius>p[1]+EPS)next.push({kind:'line',a:p,b:[p[0],radius],safetyEnvelope:true});
+ const start=next.length?next.at(-1).b:p,end=path.at(-1).b;
+ if(start[0]>end[0]+EPS)next.push({kind:'line',a:[...start],b:[end[0],radius],safetyEnvelope:true});
+ const check=validate(next),checked=check.ok?machiningSafety(next):check;
+ return {ok:checked.ok,path:next,deferred:true,from:safety.point[0],diameter:radius*2,length:info.length,problems:checked.problems||[]};
+}
 function compile(path,stock,mode,fmt){
  const info=validate(path);if(!info.ok)return {...info,moves:[],pts:[],pieces:[],defs:[],calcs:[],canais:[]};
  if(mode==='G72'&&!monotonicRadius(path))return {ok:false,problems:['O contorno CAD sobe e desce em X e não é compatível com G72. Escolha desbaste longitudinal (G71) ou paralelo ao perfil (G73).'],moves:[],pts:[],pieces:[],defs:[],calcs:[],canais:[]};
@@ -67,5 +82,5 @@ function compile(path,stock,mode,fmt){
  const last=segments.at(-1).b;add('N2G0X#1','psn2','G0',last,[last[0],stock]);
  return {ok:true,native:true,segmentCount:path.length,arcCount:path.filter(s=>s.kind==='arc').length,defs:[],calcs:[],moves,pts:points,canais:[],pieces:[],zEnd:info.length,somaL:info.length,hMax:info.radius};
 }
-return {validate,sample,extrema,arcInfo,compile,machiningSafety};
+return {validate,sample,extrema,arcInfo,compile,machiningSafety,safeMachiningPath};
 });

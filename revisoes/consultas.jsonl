@@ -78,3 +78,6 @@
 {"at":"2026-10-12T23:58:50.964Z","sourceDigest":"cb2fc20449edb5f23102c051cc1aedea1815019b79cc38a2ddfc5c6d58cebc51","options":{"impact":"public/engine/cadprofile.js"},"results":8}
 {"at":"2026-10-13T00:08:06.366Z","sourceDigest":"3d99ca170343ea41a7350047ec2618ffc93fc6cdf2a1b3e71deee0c9b8f42d54","options":{"callers":"machiningSafety"},"results":4}
 {"at":"2026-10-13T00:08:07.547Z","sourceDigest":"3d99ca170343ea41a7350047ec2618ffc93fc6cdf2a1b3e71deee0c9b8f42d54","options":{"query":"fresta rampa comprimentos independentes"},"results":7}
+{"at":"2026-10-13T01:28:23.339Z","sourceDigest":"db689e45862c740a18132d417e1da5b7edc850f193c332c1c5d1c4889bde17ca","options":{"query":"rampa fresta envelope cilindragem limite comprimento"},"results":8}
+{"at":"2026-10-13T01:29:49.060Z","sourceDigest":"db689e45862c740a18132d417e1da5b7edc850f193c332c1c5d1c4889bde17ca","options":{"callers":"machiningSafety"},"results":4}
+{"at":"2026-10-13T01:29:49.990Z","sourceDigest":"db689e45862c740a18132d417e1da5b7edc850f193c332c1c5d1c4889bde17ca","options":{"symbol":"psContorno"},"results":1}

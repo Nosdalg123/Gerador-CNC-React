@@ -1388,7 +1388,9 @@
   function psContorno(lista, R0, dBrutoSym, rot, erros, modo) {
     if (Array.isArray(lista) && lista.some(function (it) { return it.tipo === 'cadperfil'; })) {
       if (lista.length !== 1 || !CAD) { erros.push(rot + 'Edite o contorno CAD no editor DXF; não misture com trechos manuais.'); return {ok:false,defs:[],calcs:[],moves:[],pts:[],canais:[],pieces:[],zEnd:0}; }
-      var native = CAD.compile(lista[0].path, R0, modo, fmt);
+      var safe = CAD.safeMachiningPath(lista[0].path, lista[0].cadRadiusLimit);
+      var native = safe.ok ? CAD.compile(safe.path, R0, modo, fmt) : {ok:false,problems:safe.problems,defs:[],calcs:[],moves:[],pts:[],canais:[],pieces:[],zEnd:0};
+      if (safe.deferred) native.safetyEnvelope = safe;
       if (!native.ok) native.problems.forEach(function (m) { erros.push(rot + m); });
       return native;
     }
@@ -2219,7 +2221,7 @@
     if (prof > livre + EPS) erros.push(rot + 'A usinagem chega a ' + fmt(prof) + ' mm da face, mas o trecho livre fora da placa é ' + fmt(livre) + ' (peça ' + fmt(o.lPeca) + ' − preso ' + fmt(maq.grip) + '): a ferramenta bateria nas castanhas.');
     else if (livre - prof < 1) avisos.push(rot + 'Folga de só ' + fmt(livre - prof) + ' mm entre o fim da usinagem e as castanhas.');
     if (sobreZ < EPS) avisos.push(rot + 'Sobremetal em Z é zero: o faceamento corta direto em Z0.');
-    if (ct.native && ct.ok) CAD.machiningSafety(o.lista[0].path).problems.forEach(function (m) { erros.push(rot + m); });
+    if (ct.safetyEnvelope) avisos.push(rot + 'Cilindragem protegida: a partir de Z' + fmt(ct.safetyEnvelope.from) + ', mantém Ø' + fmt(ct.safetyEnvelope.diameter) + ' (maior diâmetro da peça) até ' + fmt(ct.safetyEnvelope.length) + ' mm da face. A rampa/fresta abaixo desse diâmetro permanece sem acabamento neste lado; use a outra face ou uma operação própria.');
     if (erros.length) return { erros: erros, avisos: avisos };
 
     var acabT = num(t1.acabTorn), acabF = num(t1.acabFace);
