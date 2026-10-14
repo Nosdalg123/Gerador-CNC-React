@@ -131,11 +131,12 @@
   }
 
   function simTool(tool, kind) {
-    if (kind === 'canal' || kind === 'canalext' || kind === 'canalint') return { kind: kind, largura: Number(tool.largura) || 4.5, vc: Number(tool.vc), rpm: Number(tool.rpm), modo: tool.modo || 'G96' };
-    if (kind === 'rosca' || kind === 'roscaint') return { kind: kind, vc: 0, rpm: Number(tool.rpm), modo: 'G97' };
-    if (kind === 'broca') return { kind: 'broca', largura: Number(tool.diametro) || 10, vc: Number(tool.vc), rpm: Number(tool.rpm), modo: tool.modo || 'G97' };
-    if (kind === 'interna') return { kind: 'interna', ang: Number(tool.angulo) || 80, raio: Number(tool.raio) || 0, tip:tool.tip, ap: Number(tool.apSuporte) || 0, vc: Number(tool.vc), rpm: Number(tool.rpm), modo: tool.modo || 'G96' };
-    return { kind: 'rombo', ang: Number(tool.angulo) || 80, raio: Number(tool.raio) || 0, tip:tool.tip, ap: Number(tool.apSuporte) || 0, vc: Number(tool.vc), rpm: Number(tool.rpm), modo: tool.modo || 'G96' };
+    function assembly(shape){var keys={larguraInserto:'insertWidth',comprimentoInserto:'insertLength',espessuraHaste:'shankThickness'};Object.keys(keys).forEach(function(key){if(tool[key]!==''&&tool[key]!=null)shape[keys[key]]=Number(tool[key]);});if(tool.posicaoInserto)shape.mount=tool.posicaoInserto;if(shape.mount!=null||shape.insertWidth||shape.insertLength||shape.shankThickness){if(tool.apSuporte!==''&&tool.apSuporte!=null)shape.ap=Number(tool.apSuporte);if(kind==='rosca'||kind==='roscaint')shape.ang=Number(tool.angulo)||60;}return shape;}
+    if (kind === 'canal' || kind === 'canalext' || kind === 'canalint') return assembly({ kind: kind, largura: Number(tool.largura) || 4.5, vc: Number(tool.vc), rpm: Number(tool.rpm), modo: tool.modo || 'G96' });
+    if (kind === 'rosca' || kind === 'roscaint') return assembly({ kind: kind, vc: 0, rpm: Number(tool.rpm), modo: 'G97' });
+    if (kind === 'broca') return assembly({ kind: 'broca', largura: Number(tool.diametro) || 10, vc: Number(tool.vc), rpm: Number(tool.rpm), modo: tool.modo || 'G97' });
+    if (kind === 'interna') return assembly({ kind: 'interna', ang: Number(tool.angulo) || 80, raio: Number(tool.raio) || 0, tip:tool.tip, ap: Number(tool.apSuporte) || 0, vc: Number(tool.vc), rpm: Number(tool.rpm), modo: tool.modo || 'G96' });
+    return assembly({ kind: 'rombo', ang: Number(tool.angulo) || 80, raio: Number(tool.raio) || 0, tip:tool.tip, ap: Number(tool.apSuporte) || 0, vc: Number(tool.vc), rpm: Number(tool.rpm), modo: tool.modo || 'G96' });
   }
 
   function arcPoints(zc, rc, R, th0, th1, n) {

@@ -1,4 +1,8 @@
-TORNO CNC 3.1.23 - VERSAO LEVE OFFLINE
+TORNO CNC 3.1.24 - VERSAO LEVE OFFLINE
+
+3.1.24: velocidade 400x no simulador.
+Geometria e suporte: medidas do inserto/canal, espessura da haste,
+quatro posicoes fisicas e angulo kappa, com desenho atualizado ao digitar.
 
 3.1.23: croqui do programa e animacao usam o mesmo inserto e corretor.
 Associe as geometrias pendentes antes de simular.

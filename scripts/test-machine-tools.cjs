@@ -36,7 +36,7 @@ async function main(){
   assert.deepEqual(edited.tools[0],{...first,obs:(first.obs||'')+' · revisão de teste'});assert.deepEqual(edited.drawings,before.drawings);assert.deepEqual(edited.cadDrafts,before.cadDrafts);
   await page.getByRole('button',{name:'+ Nova ferramenta',exact:true}).click();await page.getByLabel('Tipo',{exact:true}).selectOption('rosca');
   await page.getByLabel('Nome',{exact:true}).fill('Suporte de rosca interna · teste');await page.getByLabel('Limite / RPM fixo').fill('600');
-  await page.getByLabel('Orientação da ferramenta').selectOption('roscaint');await expect(modal.locator('svg')).toHaveAttribute('aria-label',/vista inferior/);
+  await page.getByLabel('Orientação da ferramenta').selectOption('roscaint');await expect(modal.locator('svg')).toHaveAttribute('aria-label',/montagem no plano XZ/);
   await page.screenshot({path:'tests/ferramenta-rosca-interna.png'});
   await page.getByRole('button',{name:'Salvar ferramenta'}).click();await saved();await page.reload();await page.getByRole('button',{name:/Ferramentas$/}).first().click();
   const row=page.getByRole('row').filter({hasText:'Suporte de rosca interna · teste'});await row.getByRole('button',{name:'Editar',exact:true}).click();
@@ -45,7 +45,7 @@ async function main(){
   await page.setViewportSize({width:1280,height:720});await page.getByRole('button',{name:'+ Nova ferramenta',exact:true}).click();await page.getByLabel('Tipo',{exact:true}).selectOption('rosca');
   const externalName='Suporte de rosca externa · haste vertical · inserto triangular 60°';
   await page.getByLabel('Nome',{exact:true}).fill(externalName);await page.getByLabel('Limite / RPM fixo').fill('600');
-  await expect(modal.locator('svg')).toHaveAttribute('aria-label',/suporte vertical de rosca externa/);
+  await expect(modal.locator('svg')).toHaveAttribute('aria-label',/montagem no plano XZ/);
   assert.ok(await modal.evaluate(el=>el.scrollHeight<=el.clientHeight+1),'Rosca externa deve caber sem rolagem em 1280x720');
   await page.screenshot({path:'tests/ferramenta-rosca-externa.png'});
   await page.getByRole('button',{name:'Salvar ferramenta'}).click();await saved();await page.reload();await page.getByRole('button',{name:/Ferramentas$/}).first().click();

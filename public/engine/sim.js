@@ -7,36 +7,43 @@
 })(globalThis, function () {
   var DEG = Math.PI / 180;
   var MARGEM = 0.03; // mm: tolerancia p/ encostar sem contar como colisao
+  function mounting(tool){
+    var internal=['interna','canalint','roscaint'].includes(tool.kind),nativeR=internal?-1:1;
+    var positions={inferior_esquerdo:[1,1,3],inferior_direito:[-1,1,4],superior_esquerdo:[1,-1,2],superior_direito:[-1,-1,1]},position=tool.kind!=='broca'&&Object.hasOwn(positions,tool.mount)?positions[tool.mount]:null;
+    return {z:position?position[0]:1,r:position?position[1]/nativeR:1,tip:position?position[2]:(internal?2:3)};
+  }
+  function configurableTool(tool){return tool.mount!=null||['insertWidth','insertLength','shankThickness'].some(k=>Number(tool[k])>0);}
+  function positive(value,fallback){return Number(value)>0?Number(value):fallback;}
 
   /* ---------- geometria da ferramenta (poligono convexo, anti-horario) ---------- */
   // Ponto de referencia (0,0) = ponta programada. Eixos: [z, r].
   function toolShape(tool) {
     var pts = [], i, nose = null; // nose = centro do raio de ponta em relacao a ponta de referencia [z, r] (para G41/G42)
     if (tool.kind === 'canal') {
-      var w = Math.max(0.5, Number(tool.largura) || 4.5), L = 12;
+      var w = Math.max(configurableTool(tool) ? 0.01 : 0.5, Number(tool.largura) || 4.5), L = positive(tool.insertLength,12);
       // canto interno (lado do centro) = ponto programado; largura cresce para fora (+r)
       pts = [[0, 0], [L, 0], [L, w], [0, w]];
     } else if (tool.kind === 'canalext') {
       // canal externo (radial): largura em Z, corpo para fora (+r); ponto programado = canto da ponta do lado da face (+z)
-      var we = Math.max(0.5, Number(tool.largura) || 4.5), Le = 14;
+      var we = Math.max(configurableTool(tool) ? 0.01 : 0.5, Number(tool.largura) || 4.5), Le = positive(tool.insertLength,14);
       pts = [[-we, 0], [0, 0], [0, Le], [-we, Le]];
     } else if (tool.kind === 'canalint') {
       // canal interno (radial): a barra fica dentro do furo (lado do eixo, -r) e a pastilha corta para fora (+r); ponto programado = canto da ponta do lado da face (+z)
-      var wi = Math.max(0.5, Number(tool.largura) || 4.5), Li = 8;
+      var wi = Math.max(configurableTool(tool) ? 0.01 : 0.5, Number(tool.largura) || 4.5), Li = positive(tool.insertLength,8);
       pts = [[-wi, 0], [-wi, -Li], [0, -Li], [0, 0]];
     } else if (tool.kind === 'rosca' || tool.kind === 'roscaint') {
       // ferramenta de rosca 60 graus: ponta em V; externa fica fora (+r) com a ponta para o eixo, interna dentro (-r) com a ponta para fora
-      var hr = 8, ar = hr * Math.tan(30 * DEG);
+      var threadAngle=positive(tool.ang,60)/2*DEG,hr=Number(tool.insertWidth)>0?Number(tool.insertWidth)/(2*Math.tan(threadAngle)):8,ar=hr*Math.tan(threadAngle);
       pts = tool.kind === 'rosca' ? [[0, 0], [ar, hr], [-ar, hr]] : [[0, 0], [-ar, -hr], [ar, -hr]];
     } else if (tool.kind === 'broca') {
       // broca (furacao no eixo): ponta programada = centro da ponta; o corpo cobre de r = 0 ate o raio da broca e recua em +z
-      var rd = Math.max(0.5, (Number(tool.largura) || 10) / 2), Ld = 40;
+      var rd = configurableTool(tool)?positive(tool.largura,10)/2:Math.max(0.5,(Number(tool.largura)||10)/2), Ld = 40;
       pts = [[0, 0], [Ld, 0], [Ld, rd], [0, rd]];
     } else {
-      var a = (Number(tool.ang) || 80) * DEG, rn = Math.max(0, Number(tool.raio) || 0), Lb = 12;
+      var a = (Number(tool.ang) || 80) * DEG, rn = Math.max(0, Number(tool.raio) || 0), Lb = Number(tool.insertWidth)>0?Number(tool.insertWidth)/Math.sin(a):12,configured=configurableTool(tool);
       // suporte (angulo de posicao kappa): o inserto gira phi = 180 - kappa - ponta; a aresta de tras sobe para +Z
       // e deixa de cortar alem de um perfil que desce em direcao a placa. Sem kappa: aresta de tras reta (phi = 0)
-      var kap = Number(tool.ap) || 0, phi = kap > 0 ? Math.max(0, Math.min(60, 180 - kap - (Number(tool.ang) || 80))) * DEG : 0;
+      var kap = Number(tool.ap) || 0, phi = kap > 0 ? (configured?180-kap-(Number(tool.ang)||80):Math.max(0,Math.min(60,180-kap-(Number(tool.ang)||80)))) * DEG : 0;
       var u1 = [Math.cos(phi), Math.sin(phi)], u2 = [Math.cos(a + phi), Math.sin(a + phi)], C = null;
       var E1 = [Lb * u1[0], Lb * u1[1]], E2 = [Lb * u2[0], Lb * u2[1]];
       var far = [E1[0] + E2[0], E1[1] + E2[1]];
@@ -49,7 +56,7 @@
           var th = th2 + (th1 - th2) * i / n;
           pts.push([C[0] + rn * Math.cos(th), C[1] + rn * Math.sin(th)]);
         }
-      } else pts.push([0, 0]);
+      } else {pts.push([0, 0]);if(configured)C=[0,0];}
       pts.push(E1, far, E2);
       // referencia = canto do inserto real (zerado encostando na face e no Ø), nao o canto virtual:
       // sem compensacao de raio (G41/G42) o raio de ponta so deixa a sobra do canto, nao uma camada na face
@@ -64,9 +71,11 @@
         if (nose) nose = [nose[0], -nose[1]];
       }
     }
+    var mount=mounting(tool);if(mount.z!==1||mount.r!==1){pts=pts.map(p=>[p[0]*mount.z,p[1]*mount.r]);if(mount.z*mount.r<0)pts.reverse();if(nose)nose=[nose[0]*mount.z,nose[1]*mount.r];}
     // Referência do corretor: vetor centro -> ponta imaginária (Fanuc/Haas 1..9).
     var directions={1:[-1,-1],2:[1,-1],3:[1,1],4:[-1,1],5:[-1,0],6:[0,-1],7:[1,0],8:[0,1],9:[0,0]};
-    if(nose&&directions[tool.tip]){var offset=directions[tool.tip],radius=Number(tool.raio),target=[offset[0]*radius,offset[1]*radius];pts=pts.map(function(p){return [p[0]+target[0]-nose[0],p[1]+target[1]-nose[1]];});nose=target;}
+    var tip=tool.tip||(configurableTool(tool)?mount.tip:null);
+    if(nose&&directions[tip]){var offset=directions[tip],radius=Number(tool.raio)||0,target=[offset[0]*radius,offset[1]*radius];pts=pts.map(function(p){return [p[0]+target[0]-nose[0],p[1]+target[1]-nose[1]];});nose=target;}
     // arestas
     var edges = [], zmin = 1e9, zmax = -1e9, rmin = 1e9, rmax = -1e9;
     for (i = 0; i < pts.length; i++) {
@@ -336,7 +345,7 @@
     return sh.pts.map(function (p) { return [z + p[0], x / 2 + p[1]]; });
   };
 
-  return { Sim: Sim, toolShape: toolShape, inPoly: inPoly };
+  return { Sim: Sim, toolShape: toolShape, inPoly: inPoly, mounting:mounting, configurableTool:configurableTool };
 });
 
 
