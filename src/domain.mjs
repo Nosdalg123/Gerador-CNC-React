@@ -1,10 +1,10 @@
 import {prepareCadSides} from './cad-sides.mjs';
+import {slotSetup,composeCode} from './tool-setup.mjs';
+export {programTool,programOrientation,programGeometry} from './tool-setup.mjs';
 export const CNC=globalThis.CNC, Prog=globalThis.CNCProg, Sim=globalThis.CNCSim, Diag=globalThis.CNCDiag;
 export function fieldsFor(type,stored={}) {return Object.fromEntries(CNC.GERADORES[type].campos.map(c=>[c.id,stored[c.id]??(Array.isArray(c.def)?structuredClone(c.def):c.def)]));}
 export function numericFields(type,stored={}) {const fields=fieldsFor(type,stored);for(const c of CNC.GERADORES[type].campos){if(c.tipo==='trechos')continue;if(c.tipo==='select')fields[c.id]=String(fields[c.id]??'');else fields[c.id]=fields[c.id]===''?NaN:Number(fields[c.id]);}return fields;}
 export function selectedDrawing(form,drawings){return Object.hasOwn(form,'desenhoSel')?drawings.find(d=>d.id===form.desenhoSel):drawings[0];}
-export function programTool(state,tools,reference){if(Object.hasOwn(state.ferr||{},reference.codigo))return tools.find(t=>t.id===state.ferr[reference.codigo]);const matches=tools.filter(t=>CNC.tcode(t.t)===reference.codigo);return matches.find(t=>t.tipo===reference.sug?.tipo)||matches[0];}
-export function programOrientation(state,reference,tool){const allowed=tool?.tipo==='encaixe'?['canal','canalext','canalint']:tool?.tipo==='rosca'?['rosca','roscaint']:[];const saved=state.orient?.[reference.codigo];return allowed.includes(saved)?saved:allowed.includes(reference.sug?.orient)?reference.sug.orient:allowed[0];}
 export function generate(form,drawings,tools) {
   const type=CNC.GERADORES[form.tipo]?form.tipo:'matriz_solida',g=CNC.GERADORES[type],f=numericFields(type,form.vals?.[type]);
   let firstCad='1',dualCad=false;
@@ -20,7 +20,8 @@ export function generate(form,drawings,tools) {
     for(const side of ['1','2'])if(f['usin'+side]==='ambos'&&!f['trechos'+side].length&&f['internos'+side].length)f['usin'+side]='int';}
   f.pressao=form.pressao||'';
   const selection=form.toolByTipo?.[type]||{},selected={};
-  for(const slot of g.ferramentas){let t=tools.find(x=>x.id===selection[slot.id]);if(!t&&!Object.hasOwn(selection,slot.id))t=tools.find(x=>slot.tipos.includes(x.tipo));
+  for(const [index,slot] of g.ferramentas.entries()){let t=tools.find(x=>x.id===selection[slot.id]);if(!t&&!Object.hasOwn(selection,slot.id))t=tools.find(x=>slot.tipos.includes(x.tipo));
+    if(t){const setup=slotSetup(form,type,slot.id,index,t);try{t={...t,t:composeCode(setup.position,setup.offset),tip:Number(setup.tip)}}catch(error){if(!slot.usado||slot.usado(f))return {erros:[slot.papel+': '+error.message],avisos:[]};}}
     selected[slot.id]=slot.id==='t1'&&t?{...t,...Object.fromEntries(Object.entries(form.over?.[type]||{}).filter(([,v])=>v!==''&&Number.isFinite(Number(v))).map(([k,v])=>[k,Number(v)]))}:t;}
   try{const result=g.gerar(f,selected,{maq:form.maq,autor:form.autor||'FERRAMENTARIA',data:form.dataManual||CNC.mesAno(),...(form.nomeManual&&form.nome?{nome:form.nome}:{})});
     if(dualCad&&firstCad==='2')for(const key of ['erros','avisos'])if(result[key])result[key]=result[key].map(m=>m.replace(/([Ll]ado )([12])/g,(_,prefix,n)=>prefix+(3-Number(n))));

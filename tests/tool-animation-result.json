@@ -1,0 +1,37 @@
+{
+  "missingGeometryBlocked": true,
+  "sharedPhysicalPolygon": true,
+  "frames": [
+    {
+      "tool": "0101",
+      "x": 90,
+      "z": -23.99999999999998,
+      "kind": "rombo",
+      "aligned": true
+    },
+    {
+      "tool": "0404",
+      "x": 0,
+      "z": -53.25000000000003,
+      "kind": "broca",
+      "aligned": true
+    },
+    {
+      "tool": "0606",
+      "x": 60,
+      "z": -25.000000000000096,
+      "kind": "interna",
+      "aligned": true
+    },
+    {
+      "tool": "0808",
+      "x": 64,
+      "z": -14.000000000002856,
+      "kind": "roscaint",
+      "aligned": true
+    }
+  ],
+  "playback": true,
+  "bankPreserved": true,
+  "errors": []
+}

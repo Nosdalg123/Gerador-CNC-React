@@ -1,0 +1,17 @@
+# Graphify: fonte ativa; artefatos e dependências ficam fora das consultas
+node_modules/
+dist/
+release/
+revisoes/
+.code-map/
+.packaging/
+.git/
+graphify-out/
+graphify.out/
+public/pdf-assets/
+electron/
+scripts/package.cjs
+PROJECT_INDEX.json
+GRAFO-CODIGO.json
+*-result.json
+*.zip

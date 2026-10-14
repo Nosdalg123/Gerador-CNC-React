@@ -1,4 +1,4 @@
-param([switch]$UiTest,[int]$Port=0,[switch]$NoBrowser,[string]$TestProfile='')
+param([switch]$UiTest,[int]$Port=0,[switch]$NoBrowser,[string]$TestProfile='',[switch]$RestartExisting)
 $ErrorActionPreference='Stop'
 $utf8=New-Object System.Text.UTF8Encoding($false)
 $root=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot 'app'))
@@ -25,10 +25,25 @@ try {
       if($session.url -match '^http://127\.0\.0\.1:\d+/\?token=([a-f0-9]{64})$'){
         $existingToken=$Matches[1];$existingOrigin=([Uri]$session.url).GetLeftPart([UriPartial]::Authority)
         $alive=Invoke-WebRequest -UseBasicParsing -Uri ($existingOrigin+'/api/alive') -Headers @{'X-CNC-Token'=$existingToken} -TimeoutSec 3
-        if($alive.StatusCode -eq 200){Open-CNC $session.url;return}
+        if($alive.StatusCode -eq 200){
+          if(!$RestartExisting){
+            $versionPattern='<title>[^<]*?(\d+\.\d+\.\d+)</title>'
+            $currentVersion=[regex]::Match([IO.File]::ReadAllText((Join-Path $root 'index.html')),$versionPattern).Groups[1].Value
+            $previousHtml=(Invoke-WebRequest -UseBasicParsing -Uri $session.url -TimeoutSec 3).Content
+            $previousVersion=[regex]::Match($previousHtml,$versionPattern).Groups[1].Value
+            if($currentVersion -and $previousVersion -and [Version]$currentVersion -gt [Version]$previousVersion){$RestartExisting=$true}
+          }
+          if(!$RestartExisting){Open-CNC $session.url;return}
+          $previousPid=[int]$session.pid
+          $previousProcess=Get-CimInstance Win32_Process -Filter ('ProcessId='+$previousPid)
+          $previousProfile=(Invoke-WebRequest -UseBasicParsing -Uri ($existingOrigin+'/api/path') -Headers @{'X-CNC-Token'=$existingToken} -TimeoutSec 3).Content|ConvertFrom-Json
+          if($previousPid -eq $PID -or $previousProcess.Name -ne 'powershell.exe' -or $previousProcess.CommandLine -notmatch 'Servidor-CNC\.ps1' -or [IO.Path]::GetFullPath($previousProfile) -ne [IO.Path]::GetFullPath($profile)){throw 'A sessao anterior nao foi identificada com seguranca. Nenhum processo foi encerrado.'}
+          Stop-Process -Id $previousPid -ErrorAction Stop
+          for($retry=0;$retry -lt 30 -and !$lock;$retry++){try{$lock=New-Object IO.FileStream((Join-Path $profile 'lightweight.lock'),[IO.FileMode]::OpenOrCreate,[IO.FileAccess]::ReadWrite,[IO.FileShare]::None)}catch{Start-Sleep -Milliseconds 100}}
+        }
       }
     }
-    throw 'Outra sessao esta abrindo a versao leve. Aguarde alguns segundos e tente novamente.'
+    if(!$lock){throw 'Outra sessao esta abrindo a versao leve. Aguarde alguns segundos e tente novamente.'}
   }
   $file=Join-Path $profile 'workspace.json'
   $script:expected=if([IO.File]::Exists($file)){[IO.File]::ReadAllText($file)}else{$null}
@@ -92,7 +107,11 @@ setInterval(()=>request('/api/alive').catch(()=>{}),15000);
         }
       }
       $res.ContentLength64=$bytes.Length;$res.OutputStream.Write($bytes,0,$bytes.Length)
-    }catch{$res.StatusCode=400;$bytes=$utf8.GetBytes($_.Exception.Message);$res.ContentType='text/plain; charset=utf-8';$res.ContentLength64=$bytes.Length;$res.OutputStream.Write($bytes,0,$bytes.Length)}finally{$res.Close()}
+    }catch{
+      $requestError=$_.Exception.Message
+      # A janela pode fechar durante uma resposta; essa desconexao nao encerra o servidor.
+      try{$res.StatusCode=400;$bytes=$utf8.GetBytes($requestError);$res.ContentType='text/plain; charset=utf-8';$res.ContentLength64=$bytes.Length;$res.OutputStream.Write($bytes,0,$bytes.Length)}catch{}
+    }finally{$res.Close()}
   }
 }catch{
   if($UiTest){throw}

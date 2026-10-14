@@ -1,0 +1,15 @@
+const {spawn}=require('node:child_process'),fs=require('node:fs/promises'),path=require('node:path'),assert=require('node:assert/strict');
+const pause=ms=>new Promise(r=>setTimeout(r,ms));
+function start(args=[],script=path.resolve('release/CNC-Torno-Leve/Servidor-CNC.ps1')){const proc=spawn('powershell.exe',['-NoProfile','-ExecutionPolicy','Bypass','-File',script,'-UiTest','-NoBrowser',...args],{windowsHide:true});let out='';const ready=new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(Error('Servidor nao iniciou')),20000);proc.stdout.on('data',b=>{out+=b;const m=out.match(/http:\/\/127\.0\.0\.1:\d+\/\?token=[a-f0-9]+/);if(m){clearTimeout(timer);resolve(m[0])}});proc.stderr.on('data',b=>process.stderr.write(b));proc.once('error',reject);proc.once('exit',code=>{clearTimeout(timer);if(!out)reject(Error('Servidor terminou '+code))})});return {proc,ready}}
+async function main(){
+ const old=await fs.mkdtemp(path.join(require('node:os').tmpdir(),'cnc-react-light-test-old-release-'));await fs.mkdir(path.join(old,'app'));await fs.writeFile(path.join(old,'app/index.html'),'<html><head><title>Gerador CNC · 3.1.22</title></head></html>');for(const file of ['Servidor-CNC.ps1','Usuarios-CNC.ps1'])await fs.copyFile(path.resolve('release/CNC-Torno-Leve',file),path.join(old,file));
+ let first=start([],path.join(old,'Servidor-CNC.ps1')),second,third;
+ try{const url=await first.ready,uri=new URL(url),headers={'X-CNC-Token':uri.searchParams.get('token')},profile=await (await fetch(uri.origin+'/api/path',{headers})).json();
+  const workspace={format:'cnc-workspace',tools:[{id:'preservar',nome:'Banco de teste'}],drawings:[],program:{texto:'M30'}};assert.equal((await fetch(uri.origin+'/api/save',{method:'POST',headers:{...headers,'Content-Type':'application/json'},body:JSON.stringify(workspace)})).status,200);const registry=await fs.readFile(path.join(profile,'users.json'),'utf8');
+  second=start(['-TestProfile',profile]);const reopened=await second.ready,next=new URL(reopened),newHeaders={'X-CNC-Token':next.searchParams.get('token')};assert.notEqual(next.origin,uri.origin);assert.deepEqual(await (await fetch(next.origin+'/api/load',{headers:newHeaders})).json(),workspace);assert.equal(await fs.readFile(path.join(profile,'users.json'),'utf8'),registry);for(let i=0;i<20&&first.proc.exitCode==null;i++)await pause(100);assert.notEqual(first.proc.exitCode,null);
+  const reuse=start(['-TestProfile',profile]);try{assert.equal(await reuse.ready,reopened)}finally{reuse.proc.kill()}
+  third=start(['-TestProfile',profile,'-RestartExisting']);const manual=new URL(await third.ready);assert.notEqual(manual.origin,next.origin);assert.deepEqual(await (await fetch(manual.origin+'/api/load',{headers:{'X-CNC-Token':manual.searchParams.get('token')}})).json(),workspace);assert.equal(await fs.readFile(path.join(profile,'users.json'),'utf8'),registry);
+  console.log('Reinicio: atualizacao de versao, reinicio manual, reabertura e dados preservados em perfil temporario.');
+ }finally{first.proc.kill();second?.proc.kill();third?.proc.kill()}
+}
+main().catch(e=>{console.error(e);process.exitCode=1});

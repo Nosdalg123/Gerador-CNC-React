@@ -1,4 +1,10 @@
-# Trilha de código — React 3.1.21
+# Trilha de código — React 3.1.24
+
+Geometria configurável: `tool-geometry-fields.mjs` define os campos por tipo e valida dimensões. `Tools.jsx` atualiza o croqui ao digitar. `core.js:simTool` transporta `insertWidth`, `insertLength`, `shankThickness`, `mount`; `sim.js:toolShape` aplica dimensões e espelhos com polígono anti-horário. `tool-drawing.mjs:configuredParts` monta a haste, cabeça e inserto com a mesma referência. `toolsetup.js:defaultTip` sugere a ponta compatível com a montagem, mantendo o ajuste explícito da programação. `Simulation.jsx` oferece 400×. Regressões: `tool-geometry.test.cjs`, `test-tool-geometry.cjs`; relatório `RELATORIO-GEOMETRIA-SUPORTE-3.1.24.md`.
+
+Animação das ferramentas: `sim.js:toolShape` define o polígono físico. `tool-drawing.mjs:simulationToolParts` compartilha esse polígono com `ToolDrawing.jsx` e `Simulation.jsx`, sem o espelhamento ilustrativo do cadastro. O worker retorna `toolMissing` quando uma ferramenta de corte não tem associação; `Program.jsx` mostra o T pendente e não apresenta uma cena padrão incorreta. Regressões: `tool-animation.test.cjs`, `test-tool-animation.cjs`; relatório `RELATORIO-SIMULACAO-FERRAMENTAS-3.1.23.md`.
+
+Simulação responsiva: `Program.jsx` → `use-worker-job.mjs` → `public/engine/simulation-worker.js`. O worker lê o programa, monta a cena e produz diagnósticos; outro worker mantém o motor de material e responde aos destinos mais recentes. A interface descarta respostas de entradas anteriores. `Simulation.jsx` desenha quadros sem executar `analyze`/`seek` na thread da interface. Associação e montagem: `toolsetup.js` → `tool-setup.mjs` → `domain.mjs`, `Generator.jsx`, `Program.jsx`. Banco sem T obrigatório; posição, corretor, raio e ponta pertencem ao trabalho. `sim.js:toolShape` usa a ponta do corretor; `progsim.js:montarCena` conserva o percurso programado para comparação. G73: `ciclo73` pula P/Q após o desbaste; `core.js:psLado` aplica o mesmo comportamento. Ensaios: `simulation-corrections.test.cjs`, `test-simulation-corrections.cjs`; relatório `RELATORIO-SIMULACAO-FERRAMENTAS-3.1.23.md`.
 
 Cilindragem protegida: `cad-sides.mjs:prepareCadSides` conserva o maior raio do perfil completo em cadRadiusLimit na cópia recortada. `cadprofile.js:safeMachiningPath` mantém o prefixo acessível e substitui a região após a primeira queda radial por cilindragem no maior Ø até o comprimento selecionado. `core.js:psContorno` compila essa cópia; `psLado` usa o mesmo contorno no desbaste, acabamento e simulador. O desenho salvo permanece integral. Regressões: `tests/cad-machining-safety.test.cjs`, `scripts/test-cad-machining-safety.cjs`. Relatório: `RELATORIO-CILINDRAGEM-PROTEGIDA-3.1.17.md`.
 
@@ -18,7 +24,7 @@ Leia `MAPA-CODIGO.md` e este arquivo antes de editar. `PROJECT_INDEX.json` cont�
 | Gerar programa | `src/components/Generator.jsx` → `src/domain.mjs:generate` | `CNC.GERADORES`, ferramentas, desenho selecionado, configurações |
 | Desenho manual por elementos | `src/components/Drawing.jsx` → `PieceBuilder.jsx`, `src/piece-elements.mjs` | Paleta/croquis em `src/assets/element-drawings.mjs`; arrays `trechos1/2`, `internos1/2`; IDs e campos extras preservados |
 | Raios e chanfros de cones | `core.js:psCantosPerfil`, `psCurvaCanto`, `psContornoComCones` | Tangência em Z/raio; macros 600+ externas e 800+ internas; validadores de arestas, sobreposição e canais |
-| Ferramentas | `src/components/Tools.jsx` | T, tipo, parâmetros de corte e geometria; campos adicionais preservados |
+| Ferramentas | `src/components/Tools.jsx` | Identificação, tipo, geometria, montagem física e dados de corte; T definido na programação; campos adicionais preservados |
 | Interpretar TXT | `src/components/Program.jsx` | `CNCProg.interpretar`, `montarCena`, `CNCDiag.diagnosticar` |
 | Remover material | `src/components/Simulation.jsx` | `CNCSim.Sim`, seek, grades de material e placa, alertas |
 | PDF local | `src/components/PdfImport.jsx` | pdf.js local → cotas → reconhecimento → linhas vetoriais → orientação → perfil |

@@ -462,9 +462,11 @@
 
     function ciclo73(w, i) { // G73: repete o contorno P..Q deslocado (desbaste paralelo ao perfil). 1o bloco: U/W = afastamento TOTAL (raio e Z), R = numero de cortes
       var par = st.c73;
-      if (!par) { aviso(i, 'G73 sem o bloco G73 U W R antes: usei 1 corte sem afastamento.', 'sempar73'); par = { di: 0, dk: 0, d: 1 }; }
+      if(w.D!=null||w.I!=null||w.K!=null)par={di:w.I||0,dk:w.K||0,d:w.D};
+      if (!par) { erro(i, 'G73: informe o primeiro bloco U/W/R ou o formato I/K/D. Não foi simulado um corte único substituto.', 'cicloProf'); return; }
+      if(!Number.isInteger(par.d)||par.d<1||par.d>3000){erro(i,'G73: a quantidade de passes deve ser um inteiro de 1 a 3000.','cicloProf');return;}
       var iP = acha(Math.round(w.P), i), iQ = iP < 0 ? -1 : acha(Math.round(w.Q), iP);
-      if (iP < 0 || iQ < 0) { erro(i, 'G73: não achei o bloco N' + (iP < 0 ? Math.round(w.P) : Math.round(w.Q)) + ' do contorno.', 'cicloSemContorno'); return; }
+      if (iP < 0 || iQ < 0 || iQ<iP) { erro(i, 'G73: confira os blocos P e Q e a ordem do contorno.', 'cicloSemContorno'); return; }
       checaContorno(iP, i, 'G73');
       var cap = capturaPerfil(iP, iQ, i), f = w.F != null ? w.F : st.f, du = w.U != null ? w.U : 0, dw = w.W != null ? w.W : 0, d = par.d, lab = 'DESBASTE G73';
       if (!(f > 0)) f = st.f;
@@ -476,13 +478,17 @@
       if (dirX > 0) nota(i, 'ext'); else { nota(i, 'int'); var fi73 = st.tool && ferr[st.tool]; if (fi73) fi73.ops.intXA = fi73.ops.intXA == null ? xA : Math.min(fi73.ops.intXA, xA); }
       var di = Math.abs(par.di) * dirX, dk = par.dk;
       for (j = 1; j <= d; j++) {
+        var firstMove=moves.length;
         var fr_j = d > 1 ? (d - j) / (d - 1) : 1, sr = du / 2 + di * fr_j, sz = dw + dk * fr_j; // deslocamento do perfil neste corte: no raio e em Z (o ultimo fica so com o sobremetal de acabamento)
         cap.forEach(function (p) {
           if (p.t === 'r') rapido(p.x + 2 * sr, p.z + sz, i, lab); else avanco(p.x + 2 * sr, p.z + sz, i, lab, null, fr);
         });
         rapido(xA, cap[cap.length - 1].z + sz, i, lab);
         rapido(xA, zA, i, lab);
+        for(var passMove=firstMove;passMove<moves.length;passMove++){moves[passMove].pass=j;moves[passMove].passes=d;}
       }
+      // P..Q define a geometria do ciclo; não é um passe de acabamento implícito.
+      return iQ>i?iQ+1:null;
     }
 
     function ciclo74(w, i) { // G74: passes em X (P) com avanco longo em Z ate Z (Q = bicada em Z; sem X = furacao com bicada no eixo)
@@ -681,8 +687,8 @@
               else ciclo71(w, i, cic); // como nos programas da casa, os blocos N(P)..N(Q) seguintes rodam depois em movimento normal
               break;
             case 73:
-              if (w.P == null && w.Q == null) st.c73 = { di: w.U != null ? w.U : 0, dk: w.W != null ? w.W : 0, d: w.R != null ? Math.max(1, Math.round(w.R)) : 1 };
-              else ciclo73(w, i);
+              if (w.P == null && w.Q == null) st.c73 = { di: w.U != null ? w.U : 0, dk: w.W != null ? w.W : 0, d: w.R==null?undefined:Math.round(w.R) };
+              else {var next73=ciclo73(w,i);if(next73!=null)return next73;}
               break;
             case 74: case 75:
               if (!temCoord(w) && w.R != null) { st.cRe = w.R; break; }
@@ -940,7 +946,7 @@
       outline: [], hStock: 0,
       foco: { z0: Math.min(F.z0, -livre), z1: Math.max(F.z1, sobre + 5), r0: F.r0, r1: Math.max(F.r1, 5) },
       maq: maq, semPerfil: true,
-      path: comp.path, compAvisos: comp.avisos, compensada: true, start: { x: res.start.x, z: res.start.z }, tools: tools
+      path: comp.path, programmedPath:res.moves, compAvisos: comp.avisos, compensada: true, start: { x: res.start.x, z: res.start.z }, tools: tools
     };
   }
 
@@ -948,7 +954,7 @@
   // (cena.tools). A cena original nao e alterada; cena que ja vem compensada (modulo Simulacao) ou sem compensacao volta como veio.
   function comCompensacao(cena) {
     if (!cena || cena.compensada || !cena.path || !cena.path.some(function (m) { return m.comp; })) return cena;
-    return Object.assign({}, cena, { path: compensar(cena.path, cena.start, cena.tools).path, compensada: true });
+    var result=compensar(cena.path,cena.start,cena.tools);return Object.assign({}, cena, { path: result.path, programmedPath:cena.path, compAvisos:result.avisos, compensada: true });
   }
 
   // Programa do Gerador: o percurso vem do core.js (sem o texto decodificado). Le o mesmo codigo e devolve a cena com o texto de cada linha

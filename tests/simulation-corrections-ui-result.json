@@ -1,0 +1,11 @@
+{
+  "switchMs": 21,
+  "heartbeat": {
+    "last": 2188.800000000745,
+    "max": 74.40000000223517,
+    "count": 29
+  },
+  "errors": [],
+  "independentToolMapping": true,
+  "staleAnalysisCancelled": true
+}

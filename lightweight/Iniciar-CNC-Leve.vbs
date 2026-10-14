@@ -15,4 +15,5 @@ command = """" & files.BuildPath(shell.ExpandEnvironmentStrings("%SystemRoot%"),
 If WScript.Arguments.Named.Exists("teste") Then
   command = command & " -UiTest -NoBrowser -TestProfile """ & WScript.Arguments.Named.Item("teste") & """"
 End If
+If WScript.Arguments.Named.Exists("reiniciar") Then command = command & " -RestartExisting"
 shell.Run command, 0, False

@@ -1,4 +1,20 @@
-TORNO CNC 3.1.21 - VERSAO LEVE OFFLINE
+TORNO CNC 3.1.24 - VERSAO LEVE OFFLINE
+
+3.1.24: velocidade 400x no simulador.
+Geometria e suporte: medidas do inserto/canal, espessura da haste,
+quatro posicoes fisicas e angulo kappa, com desenho atualizado ao digitar.
+
+3.1.23: croqui do programa e animacao usam o mesmo inserto e corretor.
+Associe as geometrias pendentes antes de simular.
+Laranja: corte; cinza: suporte ilustrativo; cruz: referencia programada.
+Ao abrir uma revisao mais nova, o servidor CNC anterior e reiniciado.
+Os mesmos dados locais sao carregados. Feche a janela antiga.
+Reiniciar-CNC-Leve.cmd tambem permite reiniciar a sessao manualmente.
+
+3.1.22: leitura e analise da simulacao em segundo plano.
+Banco por geometria; posicao e corretor definidos na programacao.
+G41/G42: raio e ponta do corretor, com comparacao de trajetorias.
+G73: passes e sobremetal preservados ate o G70 explicito.
 
 3.1.15: etapa 3 do DXF mostra os dois lados e cria o lado 2 invertido.
 As duas caixas de seleção ficam separadas. Salve ambos os perfis completos.
