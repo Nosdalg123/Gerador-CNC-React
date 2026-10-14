@@ -92,7 +92,11 @@ setInterval(()=>request('/api/alive').catch(()=>{}),15000);
         }
       }
       $res.ContentLength64=$bytes.Length;$res.OutputStream.Write($bytes,0,$bytes.Length)
-    }catch{$res.StatusCode=400;$bytes=$utf8.GetBytes($_.Exception.Message);$res.ContentType='text/plain; charset=utf-8';$res.ContentLength64=$bytes.Length;$res.OutputStream.Write($bytes,0,$bytes.Length)}finally{$res.Close()}
+    }catch{
+      $requestError=$_.Exception.Message
+      # A janela pode fechar durante uma resposta; essa desconexao nao encerra o servidor.
+      try{$res.StatusCode=400;$bytes=$utf8.GetBytes($requestError);$res.ContentType='text/plain; charset=utf-8';$res.ContentLength64=$bytes.Length;$res.OutputStream.Write($bytes,0,$bytes.Length)}catch{}
+    }finally{$res.Close()}
   }
 }catch{
   if($UiTest){throw}

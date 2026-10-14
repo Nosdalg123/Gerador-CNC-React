@@ -1,4 +1,6 @@
-# Trilha de código — React 3.1.21
+# Trilha de código — React 3.1.22
+
+Simulação responsiva: `Program.jsx` → `use-worker-job.mjs` → `public/engine/simulation-worker.js`. O worker lê o programa, monta a cena e produz diagnósticos; outro worker mantém o motor de material e responde aos destinos mais recentes. A interface descarta respostas de entradas anteriores. `Simulation.jsx` desenha quadros sem executar `analyze`/`seek` na thread da interface. Associação e montagem: `toolsetup.js` → `tool-setup.mjs` → `domain.mjs`, `Generator.jsx`, `Program.jsx`. Banco sem T obrigatório; posição, corretor, raio e ponta pertencem ao trabalho. `sim.js:toolShape` usa a ponta do corretor; `progsim.js:montarCena` conserva o percurso programado para comparação. G73: `ciclo73` pula P/Q após o desbaste; `core.js:psLado` aplica o mesmo comportamento. Ensaios: `simulation-corrections.test.cjs`, `test-simulation-corrections.cjs`; relatório `RELATORIO-SIMULACAO-FERRAMENTAS-3.1.22.md`.
 
 Cilindragem protegida: `cad-sides.mjs:prepareCadSides` conserva o maior raio do perfil completo em cadRadiusLimit na cópia recortada. `cadprofile.js:safeMachiningPath` mantém o prefixo acessível e substitui a região após a primeira queda radial por cilindragem no maior Ø até o comprimento selecionado. `core.js:psContorno` compila essa cópia; `psLado` usa o mesmo contorno no desbaste, acabamento e simulador. O desenho salvo permanece integral. Regressões: `tests/cad-machining-safety.test.cjs`, `scripts/test-cad-machining-safety.cjs`. Relatório: `RELATORIO-CILINDRAGEM-PROTEGIDA-3.1.17.md`.
 

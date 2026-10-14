@@ -64,6 +64,9 @@
         if (nose) nose = [nose[0], -nose[1]];
       }
     }
+    // Referência do corretor: vetor centro -> ponta imaginária (Fanuc/Haas 1..9).
+    var directions={1:[-1,-1],2:[1,-1],3:[1,1],4:[-1,1],5:[-1,0],6:[0,-1],7:[1,0],8:[0,1],9:[0,0]};
+    if(nose&&directions[tool.tip]){var offset=directions[tool.tip],radius=Number(tool.raio),target=[offset[0]*radius,offset[1]*radius];pts=pts.map(function(p){return [p[0]+target[0]-nose[0],p[1]+target[1]-nose[1]];});nose=target;}
     // arestas
     var edges = [], zmin = 1e9, zmax = -1e9, rmin = 1e9, rmax = -1e9;
     for (i = 0; i < pts.length; i++) {
@@ -169,7 +172,7 @@
         rpm = self.rpmAt((pos.x + m.x) / 2, m.spin || tool); // m.spin: G96/G97 e S do proprio programa (modulo Simulacao)
         dur = len / Math.max(1e-6, (m.f || 0.1) * rpm / 60);
       }
-      segs.push({ x0: pos.x, z0: pos.z, x1: m.x, z1: m.z, len: len, t0: t, dur: dur, type: m.t, line: m.line, tool: m.tool, label: m.label || '', f: m.f || 0, rpm: rpm, dec: m.dec || '' });
+      segs.push({ x0: pos.x, z0: pos.z, x1: m.x, z1: m.z, len: len, t0: t, dur: dur, type: m.t, line: m.line, tool: m.tool, label: m.label || '', f: m.f || 0, rpm: rpm, dec: m.dec || '',pass:m.pass,passes:m.passes });
       t += dur; pos = { x: m.x, z: m.z };
     });
     this.segs = segs; this.total = t;
@@ -177,8 +180,8 @@
     var groups = [];
     segs.forEach(function (s, idx) {
       var g = groups[groups.length - 1];
-      if (g && g.line === s.line) { g.t1 = s.t0 + s.dur; g.last = idx; }
-      else groups.push({ line: s.line, t0: s.t0, t1: s.t0 + s.dur, first: idx, last: idx });
+      if (g && g.line === s.line&&g.pass===s.pass) { g.t1 = s.t0 + s.dur; g.last = idx; }
+      else groups.push({ line: s.line,pass:s.pass, t0: s.t0, t1: s.t0 + s.dur, first: idx, last: idx });
     });
     this.groups = groups;
     this.reset();
@@ -211,7 +214,7 @@
   // percorre [t0,t1] chamando fn(seg, x, z) a cada passo
   Sim.prototype._walk = function (t0, t1, fn) {
     var segs = this.segs;
-    for (var i = 0; i < segs.length; i++) {
+    for (var i = Math.max(0,this.posAt(t0).seg||0); i < segs.length; i++) {
       var s = segs[i], e = s.t0 + s.dur;
       if (e <= t0) continue;
       if (s.t0 >= t1) break;
@@ -260,7 +263,7 @@
 
   Sim.prototype.state = function () {
     var p = this.posAt(this.t), s = p.s;
-    return { t: this.t, x: p.x, z: p.z, seg: p.seg, line: s ? s.line : -1, type: s ? s.type : 'r', tool: s ? s.tool : 'a', label: s ? s.label : '', f: s ? s.f : 0, rpm: s ? s.rpm : 0, dec: s ? s.dec : '' };
+    return { t: this.t, x: p.x, z: p.z, seg: p.seg, line: s ? s.line : -1, type: s ? s.type : 'r', tool: s ? s.tool : 'a', label: s ? s.label : '', f: s ? s.f : 0, rpm: s ? s.rpm : 0, dec: s ? s.dec : '',pass:s?s.pass:null,passes:s?s.passes:null };
   };
 
   // analise completa: tempos e alertas

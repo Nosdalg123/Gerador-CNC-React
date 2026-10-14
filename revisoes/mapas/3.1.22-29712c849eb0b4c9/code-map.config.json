@@ -1,0 +1,759 @@
+{
+  "schemaVersion": 1,
+  "concepts": [
+    {
+      "id": "simulacao-responsiva-montagem",
+      "label": "Simulação responsiva, montagem por trabalho e compensação do corretor",
+      "terms": ["travamento", "programa grande", "colar programa", "worker", "responsividade", "posicao", "corretor", "ponta do corretor", "g73", "sobremetal", "g41", "g42"],
+      "files": ["src/components/Program.jsx", "src/components/Simulation.jsx", "src/use-worker-job.mjs", "public/engine/simulation-worker.js", "public/engine/toolsetup.js", "src/tool-setup.mjs", "src/domain.mjs", "src/components/Generator.jsx", "public/engine/progsim.js", "public/engine/sim.js", "public/engine/core.js", "tests/simulation-corrections.test.cjs", "scripts/test-simulation-corrections.cjs"],
+      "symbols": ["Program", "Simulation", "useWorkerJob", "programGeometry", "slotSetup", "composeCode", "ciclo73", "compensar", "toolShape"]
+    },
+    {
+      "id": "elementos",
+      "label": "Montar peças por elementos e arredondar quinas",
+      "terms": [
+        "elemento",
+        "elementos",
+        "montar peca",
+        "peca montada",
+        "paleta",
+        "croqui",
+        "cilindro",
+        "cone",
+        "raio",
+        "quina",
+        "canto",
+        "chanfro",
+        "tangencia",
+        "perfil externo",
+        "perfil interno"
+      ],
+      "files": [
+        "src/components/Drawing.jsx",
+        "src/components/PieceBuilder.jsx",
+        "src/piece-elements.mjs",
+        "src/assets/element-drawings.mjs",
+        "src/domain.mjs",
+        "public/engine/core.js"
+      ],
+      "symbols": [
+        "PieceBuilder",
+        "newElement",
+        "applyElement",
+        "psCurvaCanto",
+        "psCantosPerfil",
+        "psContornoComCones"
+      ]
+    },
+    {
+      "id": "cotas",
+      "label": "Desenhos cotados e medidas",
+      "terms": [
+        "cota",
+        "medida",
+        "dimensao",
+        "croqui",
+        "espina",
+        "porta matriz",
+        "porta-matriz",
+        "desenho",
+        "desenho da peca"
+      ],
+      "files": [
+        "src/components/DimensionedDrawing.jsx",
+        "src/assets/dimensioned-drawings.json",
+        "src/components/Generator.jsx",
+        "src/domain.mjs"
+      ],
+      "symbols": [
+        "DimensionedDrawing",
+        "numericFields",
+        "generate"
+      ]
+    },
+    {
+      "id": "autenticacao",
+      "label": "Autenticação, sessão e permissões locais",
+      "terms": [
+        "autenticacao",
+        "login",
+        "logout",
+        "usuario",
+        "senha",
+        "sessao",
+        "permissao",
+        "acesso",
+        "entrar",
+        "sair"
+      ],
+      "files": [
+        "src/App.jsx",
+        "src/main.jsx",
+        "index.html",
+        "scripts/test-ui.cjs",
+        "scripts/test-cad.cjs",
+        "scripts/test-parity-ui.cjs"
+      ],
+      "symbols": [
+        "App",
+        "can",
+        "navigate",
+        "useDrawing"
+      ]
+    },
+    {
+      "id": "dados",
+      "label": "Preservar e recuperar dados",
+      "terms": [
+        "nao perder",
+        "nao apagar",
+        "preservar",
+        "guardar",
+        "salvar",
+        "dados",
+        "backup",
+        "persistencia",
+        "mesclar",
+        "recuperar",
+        "gravacao"
+      ],
+      "files": [
+        "src/data.mjs",
+        "src/App.jsx",
+        "src/components/Backup.jsx",
+        "lightweight/Servidor-CNC.ps1"
+      ],
+      "symbols": [
+        "mergeWorkspace",
+        "parseTransfer",
+        "initialWorkspace",
+        "saveBrowser"
+      ]
+    },
+    {
+      "id": "geracao",
+      "label": "Gerar programa CNC",
+      "terms": [
+        "gerar",
+        "programacao",
+        "gcode",
+        "g-code",
+        "fanuc",
+        "programa",
+        "usinagem",
+        "ciclo",
+        "g71",
+        "g72",
+        "g76"
+      ],
+      "files": [
+        "src/components/Generator.jsx",
+        "src/domain.mjs",
+        "public/engine/core.js"
+      ],
+      "symbols": [
+        "generate",
+        "psLado"
+      ]
+    },
+    {
+      "id": "simulacao",
+      "label": "Simular corte, colisão e percurso",
+      "terms": [
+        "simular",
+        "simulacao",
+        "simulador",
+        "enquadramento",
+        "camera",
+        "interno profundo",
+        "fora da tela",
+        "percurso",
+        "movimento",
+        "colisao",
+        "castanha",
+        "material",
+        "pastilha",
+        "interpretar",
+        "ler programa"
+      ],
+      "files": [
+        "src/components/Simulation.jsx",
+        "src/simulation-view.mjs",
+        "tests/simulation-view.test.cjs",
+        "scripts/test-simulation-view.cjs",
+        "src/components/Program.jsx",
+        "public/engine/sim.js",
+        "public/engine/progsim.js",
+        "public/engine/diagnostico.js"
+      ],
+      "symbols": [
+        "Simulation",
+        "simulationViewport",
+        "interpretar",
+        "montarCena",
+        "Sim",
+        "diagnosticar"
+      ]
+    },
+    {
+      "id": "pdf",
+      "label": "Importar e revisar desenho PDF",
+      "terms": [
+        "pdf",
+        "documento",
+        "pagina",
+        "recorte",
+        "orientacao",
+        "vista",
+        "face z0",
+        "confirmacao",
+        "zoom"
+      ],
+      "files": [
+        "src/components/PdfImport.jsx",
+        "src/pdf-state.mjs",
+        "public/engine/pdfdimensions.js",
+        "public/engine/pdfvector.js",
+        "public/engine/pdfprofile.js",
+        "public/engine/pdforientation.js"
+      ],
+      "symbols": [
+        "PdfImport"
+      ]
+    },
+    {
+      "id": "cad",
+      "label": "Editar, importar e revisar CAD DXF",
+      "terms": [
+        "dxf",
+        "cad",
+        "dwg",
+        "rascunho",
+        "estender",
+        "extensao",
+        "linha",
+        "arco",
+        "perfil incompleto",
+        "revisao completa",
+        "reconstrucao vetorial",
+        "quebrar",
+        "quebra",
+        "eixo central",
+        "conectar",
+        "duplicada",
+        "sobreposta",
+        "limpeza automatica",
+        "apagar por retangulo",
+        "retangulo deslocado",
+        "mouse",
+        "cursor",
+        "coordenadas",
+        "margens svg"
+      ],
+      "files": [
+        "src/components/CadImport.jsx",
+        "src/components/Drawing.jsx",
+        "public/engine/dxfimport.js",
+        "public/engine/dxfedit.js",
+        "public/engine/dxfcore.js",
+        "public/engine/dxfprofile.js",
+        "public/engine/dxfgeometry.js",
+        "src/assets/cad-panel.html",
+        "tests/dxf-geometry.test.cjs",
+        "scripts/test-dxf-operations.cjs",
+        "scripts/test-cad-pointer.cjs"
+      ],
+      "symbols": [
+        "CadImport",
+        "Drawing",
+        "breakSegment",
+        "extendLine",
+        "extendToNext",
+        "connectLines",
+        "dedupeGeometry",
+        "geometryDelta",
+        "restoreGeometry",
+        "viewPoint",
+        "dragOverlay",
+        "zoomCamera"
+      ]
+    },
+    {
+      "id": "ferramentas",
+      "label": "Banco, giro e formato das ferramentas",
+      "terms": [
+        "ferramenta",
+        "broca",
+        "mandrilamento",
+        "inserto",
+        "suporte",
+        "giro",
+        "rpm",
+        "vc",
+        "incremento",
+        "t0101",
+        "rosca externa",
+        "haste vertical",
+        "inserto assentado",
+        "nome da ferramenta"
+      ],
+      "files": [
+        "src/components/Tools.jsx",
+        "src/components/ToolDrawing.jsx",
+        "src/assets/tool-drawing.mjs",
+        "src/domain.mjs",
+        "public/engine/seed.js"
+      ],
+      "symbols": [
+        "programTool",
+        "programOrientation",
+        "ToolDrawing",
+        "svgFerr",
+        "vistaFerr"
+      ]
+    },
+    {
+      "id": "leve",
+      "label": "Executar e distribuir a versão leve",
+      "terms": [
+        "leve",
+        "edge",
+        "janela",
+        "abrir",
+        "iniciar",
+        "servidor",
+        "offline",
+        "empacotar",
+        "distribuir",
+        "zip",
+        "executavel"
+      ],
+      "files": [
+        "lightweight/Servidor-CNC.ps1",
+        "lightweight/Iniciar-CNC-Leve.cmd",
+        "scripts/package-light.cjs",
+        "scripts/test-light.cjs",
+        "package.json"
+      ],
+      "symbols": [
+        "Open-CNC"
+      ]
+    },
+    {
+      "id": "mapa",
+      "label": "Consultar, conferir e atualizar o mapa",
+      "terms": [
+        "graphify",
+        "grafo",
+        "mapa",
+        "indice",
+        "chamadas",
+        "dependencia",
+        "impacto",
+        "revisao",
+        "semantica",
+        "atualizacao automatica"
+      ],
+      "files": [
+        "scripts/code-map.cjs",
+        "scripts/query-map.cjs",
+        "scripts/watch-map.cjs",
+        "scripts/index.cjs",
+        "code-map.config.json",
+        "TRILHA-REACT.md",
+        "AGENTS.md"
+      ],
+      "symbols": [
+        "refreshMap",
+        "checkMap",
+        "queryMap"
+      ]
+    },
+    {
+      "id": "meia-secao-cad",
+      "label": "Meia seção superior CAD nativa, zoom e movimentação",
+      "terms": [
+        "meia secao",
+        "metade superior",
+        "inferior",
+        "tracejado",
+        "zoom",
+        "mover desenho",
+        "pan",
+        "cadeia unica",
+        "perfil valido",
+        "cad nativo",
+        "arco circular"
+      ],
+      "files": [
+        "public/engine/cadprofile.js",
+        "public/engine/dxfturn.js",
+        "public/engine/dxfprofile.js",
+        "public/engine/dxfaudit.js",
+        "public/engine/dxfimport.js",
+        "public/engine/core.js",
+        "src/domain.mjs",
+        "src/components/Drawing.jsx",
+        "src/assets/cad-panel.html"
+      ],
+      "symbols": [
+        "build",
+        "validate",
+        "compile",
+        "analyze",
+        "zoomCamera",
+        "openSavedContour",
+        "drawingPreview",
+        "psContorno"
+      ]
+    },
+    {
+      "id": "disco-conexoes",
+      "label": "Disco 7: folga tangente, ajuste de conexões e salvamento",
+      "terms": [
+        "disco",
+        "disco 7",
+        "folga",
+        "tangente",
+        "conexao",
+        "ajustar conexoes",
+        "salvamento",
+        "tolerancia",
+        "0,003064"
+      ],
+      "files": [
+        "public/engine/dxfgeometry.js",
+        "public/engine/dxfturn.js",
+        "public/engine/dxfprofile.js",
+        "public/engine/dxfaudit.js",
+        "public/engine/dxfimport.js",
+        "src/assets/cad-panel.html",
+        "tests/dxf-repair.test.cjs",
+        "scripts/test-disco-real.cjs"
+      ],
+      "symbols": [
+        "repairEndpoints",
+        "build",
+        "connectivity",
+        "check",
+        "applyGeometry",
+        "markEdited"
+      ]
+    },
+    {
+      "id": "etapas-cad",
+      "label": "Etapas CAD, seleção de cadeias e ligação de falhas",
+      "terms": [
+        "etapa",
+        "etapas",
+        "entrada dxf",
+        "salvar desenho",
+        "botao",
+        "botoes",
+        "cadeia",
+        "cadeias",
+        "selecao",
+        "ligar falhas",
+        "falha",
+        "correcao automatica",
+        "desfazer",
+        "ajuda",
+        "mover com mouse",
+        "0,2"
+      ],
+      "files": [
+        "src/assets/cad-panel.html",
+        "src/assets/cad.css",
+        "src/components/CadImport.jsx",
+        "public/engine/dxfimport.js",
+        "public/engine/dxfgeometry.js",
+        "public/engine/dxfprofile.js",
+        "scripts/test-cad-stages.cjs",
+        "scripts/cad-test-flow.cjs",
+        "tests/dxf-repair.test.cjs"
+      ],
+      "symbols": [
+        "setStep",
+        "updateSteps",
+        "setMode",
+        "drawChains",
+        "endpointConnections",
+        "linkGaps",
+        "repairEndpoints",
+        "svg",
+        "markEdited",
+        "makeDraft",
+        "openDraft"
+      ]
+    },
+    {
+      "id": "maquina-ferramentas",
+      "terms": [
+        "maquina",
+        "fanuc",
+        "siemens",
+        "comando ativo",
+        "popup",
+        "editar ferramenta",
+        "rosca interna",
+        "suporte",
+        "inserto",
+        "rosca externa",
+        "haste vertical",
+        "inserto assentado",
+        "nome da ferramenta"
+      ],
+      "files": [
+        "src/App.jsx",
+        "src/components/MachineSelector.jsx",
+        "src/components/Tools.jsx",
+        "src/components/ToolDrawing.jsx",
+        "src/assets/tool-drawing.mjs",
+        "src/style.css",
+        "scripts/test-machine-tools.cjs",
+        "tests/tool-layout.test.cjs"
+      ],
+      "symbols": [
+        "MachineSelector",
+        "Tools",
+        "ToolDrawing",
+        "pecasFerr",
+        "svgFerr",
+        "vistaFerr"
+      ],
+      "label": "Selecionar máquina e editar ferramentas por grupos"
+    },
+    {
+      "id": "conexoes-arcos",
+      "files": [
+        "public/engine/dxfgeometry.js",
+        "public/engine/dxfimport.js",
+        "public/engine/dxfprofile.js",
+        "src/assets/cad-panel.html",
+        "tests/dxf-arc-connections.test.cjs",
+        "scripts/test-dxf-arc-connections.cjs"
+      ],
+      "symbols": [
+        "connectLines",
+        "connectStraight",
+        "arcEndpoint",
+        "extendToMeeting",
+        "supportMeetings",
+        "sameCircleMeeting",
+        "bridgeEntity",
+        "bridgeSafe",
+        "linkGaps",
+        "repairEndpoints",
+        "applyGeometry"
+      ],
+      "label": "Conectar arcos e retas e ligar falhas circulares",
+      "terms": [
+        "conectar arco",
+        "arco arco",
+        "arco reta",
+        "conectar linhas",
+        "ligar falhas",
+        "ligacao curta",
+        "ponte",
+        "intersecao circular",
+        "angulos"
+      ]
+    },
+    {
+      "id": "cad-dois-lados",
+      "label": "CAD com lado 2 invertido e aviso de conexão",
+      "terms": [
+        "lado 2",
+        "inverter lado",
+        "virar peca",
+        "dois lados",
+        "primeiro lado",
+        "limite de usinagem",
+        "marcador verde",
+        "circulo",
+        "aviso 3 segundos",
+        "seta",
+        "comprimento no gerador",
+        "miniatura",
+        "previa lado 2",
+        "salvar ambos"
+      ],
+      "files": [
+        "src/cad-sides.mjs",
+        "src/components/Drawing.jsx",
+        "src/components/Generator.jsx",
+        "src/components/CadImport.jsx",
+        "src/domain.mjs",
+        "public/engine/dxfimport.js",
+        "public/engine/dxfprofile.js",
+        "src/assets/cad.css",
+        "tests/cad-sides.test.cjs",
+        "scripts/test-cad-dual.cjs",
+        "src/cad-document.mjs",
+        "src/data.mjs",
+        "RELATORIO-CAD-LADOS-GERADOR-3.1.15.md"
+      ],
+      "symbols": [
+        "reverseCadPath",
+        "clipCadPath",
+        "createOppositeCadSide",
+        "prepareCadSides",
+        "showCorrectionNotice",
+        "positionCorrectionNotice",
+        "inspectCorrection",
+        "openSavedContour",
+        "cadDocument",
+        "cadMachiningLimits",
+        "saveData",
+        "renderSaveSides"
+      ]
+    },
+    {
+      "id": "preparacao-cad",
+      "label": "Preparação CAD, face Z0 e pendências antes de salvar",
+      "terms": [
+        "etapa 2",
+        "etapa 3",
+        "preparacao",
+        "pendencia",
+        "face z0",
+        "bloqueio",
+        "salvar desenho",
+        "como corrigir"
+      ],
+      "files": [
+        "src/assets/cad-panel.html",
+        "public/engine/dxfimport.js",
+        "public/engine/dxfaudit.js",
+        "scripts/test-cad-stages.cjs",
+        "RELATORIO-PREPARACAO-CAD-3.1.14.md"
+      ],
+      "symbols": [
+        "setStep",
+        "checkPreparation",
+        "showPreparation",
+        "preparation"
+      ]
+    },
+    {
+      "id": "cad-seguranca-percurso",
+      "label": "Comprimentos independentes e bloqueio de rampas e frestas no CAD",
+      "terms": [
+        "colisao",
+        "fresta",
+        "rampa",
+        "acabamento",
+        "faceamento",
+        "sombra",
+        "comprimentos independentes",
+        "castanha",
+        "limite",
+        "sobra central",
+        "saida rapida",
+        "cilindragem protegida",
+        "maior diâmetro",
+        "envelope"
+      ],
+      "files": [
+        "public/engine/cadprofile.js",
+        "public/engine/core.js",
+        "src/cad-sides.mjs",
+        "src/components/Generator.jsx",
+        "tests/cad-machining-safety.test.cjs",
+        "scripts/test-cad-machining-safety.cjs",
+        "RELATORIO-SEGURANCA-CAD-3.1.16.md",
+        "RELATORIO-CILINDRAGEM-PROTEGIDA-3.1.17.md"
+      ],
+      "symbols": [
+        "machiningSafety",
+        "psLado",
+        "compile",
+        "clipCadPath",
+        "prepareCadSides",
+        "safeMachiningPath"
+      ]
+    },
+    {
+      "id": "tempos-abertura-icone",
+      "label": "Tempos em minutos, abertura sem terminal e ícone do torno",
+      "terms": [
+        "tempo",
+        "minutos",
+        "corte",
+        "rápido",
+        "terminal",
+        "oculto",
+        "ícone",
+        "atalho"
+      ],
+      "files": [
+        "src/components/Simulation.jsx",
+        "lightweight/Iniciar-CNC-Leve.vbs",
+        "lightweight/Iniciar-CNC-Leve.cmd",
+        "scripts/package-light.cjs",
+        "public/assets/torno-cnc.svg",
+        "public/assets/torno-cnc-fonte.txt",
+        "scripts/export-icon.cjs",
+        "RELATORIO-MINUTOS-ABERTURA-ICONE-3.1.18.md"
+      ],
+      "symbols": [
+        "Simulation"
+      ]
+    },
+    {
+      "id": "marca-autoria",
+      "label": "Marca de autoria no canto inferior direito",
+      "terms": [
+        "Gladson",
+        "Bernardo",
+        "desenvolvido por",
+        "autoria",
+        "assinatura",
+        "canto inferior direito"
+      ],
+      "files": [
+        "src/App.jsx",
+        "src/style.css",
+        "scripts/test-machine-tools.cjs",
+        "RELATORIO-AUTORIA-3.1.19.md"
+      ],
+      "symbols": [
+        "App"
+      ]
+    },
+    {
+      "id": "usuarios-permissoes-tempo",
+      "label": "Usuários, permissões por módulo e tempo acumulado de uso",
+      "terms": [
+        "usuario",
+        "usuário",
+        "admin",
+        "senha",
+        "permissão",
+        "permissao",
+        "limite de uso",
+        "tempo acumulado",
+        "cadastro",
+        "login",
+        "users.json"
+      ],
+      "files": [
+        "src/App.jsx",
+        "src/users.mjs",
+        "src/components/Users.jsx",
+        "lightweight/Usuarios-CNC.ps1",
+        "lightweight/Servidor-CNC.ps1",
+        "scripts/test-users.cjs",
+        "tests/users.test.cjs"
+      ],
+      "symbols": [
+        "access",
+        "Users",
+        "Invoke-UserAccess",
+        "Tick-User",
+        "validateUser",
+        "passwordHash"
+      ]
+    }
+  ]
+}

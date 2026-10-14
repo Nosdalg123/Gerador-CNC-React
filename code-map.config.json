@@ -2,6 +2,13 @@
   "schemaVersion": 1,
   "concepts": [
     {
+      "id": "simulacao-responsiva-montagem",
+      "label": "Simulação responsiva, montagem por trabalho e compensação do corretor",
+      "terms": ["travamento", "programa grande", "colar programa", "worker", "responsividade", "posicao", "corretor", "ponta do corretor", "g73", "sobremetal", "g41", "g42"],
+      "files": ["src/components/Program.jsx", "src/components/Simulation.jsx", "src/use-worker-job.mjs", "public/engine/simulation-worker.js", "public/engine/toolsetup.js", "src/tool-setup.mjs", "src/domain.mjs", "src/components/Generator.jsx", "public/engine/progsim.js", "public/engine/sim.js", "public/engine/core.js", "tests/simulation-corrections.test.cjs", "scripts/test-simulation-corrections.cjs"],
+      "symbols": ["Program", "Simulation", "useWorkerJob", "programGeometry", "slotSetup", "composeCode", "ciclo73", "compensar", "toolShape"]
+    },
+    {
       "id": "elementos",
       "label": "Montar peças por elementos e arredondar quinas",
       "terms": [

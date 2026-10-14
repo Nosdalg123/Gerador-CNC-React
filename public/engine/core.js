@@ -134,8 +134,8 @@
     if (kind === 'canal' || kind === 'canalext' || kind === 'canalint') return { kind: kind, largura: Number(tool.largura) || 4.5, vc: Number(tool.vc), rpm: Number(tool.rpm), modo: tool.modo || 'G96' };
     if (kind === 'rosca' || kind === 'roscaint') return { kind: kind, vc: 0, rpm: Number(tool.rpm), modo: 'G97' };
     if (kind === 'broca') return { kind: 'broca', largura: Number(tool.diametro) || 10, vc: Number(tool.vc), rpm: Number(tool.rpm), modo: tool.modo || 'G97' };
-    if (kind === 'interna') return { kind: 'interna', ang: Number(tool.angulo) || 80, raio: Number(tool.raio) || 0, ap: Number(tool.apSuporte) || 0, vc: Number(tool.vc), rpm: Number(tool.rpm), modo: tool.modo || 'G96' };
-    return { kind: 'rombo', ang: Number(tool.angulo) || 80, raio: Number(tool.raio) || 0, ap: Number(tool.apSuporte) || 0, vc: Number(tool.vc), rpm: Number(tool.rpm), modo: tool.modo || 'G96' };
+    if (kind === 'interna') return { kind: 'interna', ang: Number(tool.angulo) || 80, raio: Number(tool.raio) || 0, tip:tool.tip, ap: Number(tool.apSuporte) || 0, vc: Number(tool.vc), rpm: Number(tool.rpm), modo: tool.modo || 'G96' };
+    return { kind: 'rombo', ang: Number(tool.angulo) || 80, raio: Number(tool.raio) || 0, tip:tool.tip, ap: Number(tool.apSuporte) || 0, vc: Number(tool.vc), rpm: Number(tool.rpm), modo: tool.modo || 'G96' };
   }
 
   function arcPoints(zc, rc, R, th0, th1, n) {
@@ -1999,6 +1999,7 @@
   function cyc73(pb, ct, o) {
     var line = o.line, T = o.tool, lab = 'DESBASTE G73', j, zc;
     for (j = 1; j <= o.d; j++) {
+      var firstMove=pb.moves.length;
       var fr = o.d > 1 ? (o.d - j) / (o.d - 1) : 1, sr = o.du / 2 + o.di * fr, sz = o.dw + o.dk * fr; // deslocamento do perfil neste corte (raio, Z)
       zc = o.zA;
       ct.moves.forEach(function (m) {
@@ -2010,6 +2011,7 @@
       });
       pb.rapid(o.xA, zc + sz, line, lab, T);
       pb.rapid(o.xA, o.zA, line, lab, T);
+      for(var passMove=firstMove;passMove<pb.moves.length;passMove++){pb.moves[passMove].pass=j;pb.moves[passMove].passes=o.d;}
     }
   }
 
@@ -2397,7 +2399,7 @@
         });
       };
       ct.moves.forEach(function (m, ix) { P(o.comp && ix === ct.moves.length - 1 ? m.code.replace(/^(N\d+)/, '$1G40') : m.code, m.key); }); // com compensacao o ultimo bloco (saida do contorno) cancela com G40
-      runC(av, null, 'CONTORNO');
+      if(sentE!=='G73')runC(av, null, 'CONTORNO');
       P('');
       P('G0Z1', 'g0z1b'); pb.rapid(pb.pos.x, 1, 'g0z1b', 'RETORNO', 'a');
       P('X#1', 'g0x1b'); pb.rapid(o.dBruto, 1, 'g0x1b', 'RETORNO', 'a');

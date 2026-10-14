@@ -1,4 +1,9 @@
-TORNO CNC 3.1.21 - VERSAO LEVE OFFLINE
+TORNO CNC 3.1.22 - VERSAO LEVE OFFLINE
+
+3.1.22: leitura e analise da simulacao em segundo plano.
+Banco por geometria; posicao e corretor definidos na programacao.
+G41/G42: raio e ponta do corretor, com comparacao de trajetorias.
+G73: passes e sobremetal preservados ate o G70 explicito.
 
 3.1.15: etapa 3 do DXF mostra os dois lados e cria o lado 2 invertido.
 As duas caixas de seleção ficam separadas. Salve ambos os perfis completos.
