@@ -1,0 +1,54 @@
+const {spawn}=require('node:child_process'),{chromium,expect}=require('@playwright/test'),assert=require('node:assert/strict'),fs=require('node:fs/promises'),path=require('node:path');
+const delay=ms=>new Promise(r=>setTimeout(r,ms));
+async function main(){
+ let server=spawn('powershell.exe',['-NoProfile','-ExecutionPolicy','Bypass','-File','release/CNC-Torno-Leve/Servidor-CNC.ps1','-UiTest','-NoBrowser'],{windowsHide:true});let output='',browser;
+ server.stderr.on('data',b=>process.stderr.write(b));
+ try{
+  const url=await new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(Error('Servidor de usuários não iniciou')),15000);server.stdout.on('data',b=>{output+=b;const m=output.match(/http:\/\/127\.0\.0\.1:\d+\/\?token=[a-f0-9]+/);if(m){clearTimeout(timer);resolve(m[0])}});server.once('exit',c=>{clearTimeout(timer);reject(Error('Servidor terminou: '+c))});server.once('error',reject)});
+  let base=new URL(url),token=base.searchParams.get('token');
+  const raw=(action,data={},session='')=>fetch(base.origin+'/api/access/'+action,{method:'POST',headers:{'X-CNC-Token':token,'X-CNC-Session':session,'Content-Type':'application/json'},body:JSON.stringify(data)});
+  const call=async(...args)=>{const r=await raw(...args);if(!r.ok)throw Error(await r.text());return r.json()};
+  assert.equal((await raw('login',{username:'admin',password:'errada'})).status,400);
+  const admin=await call('login',{username:'ADMIN',password:'admin'}),list=await call('users',{},admin.session);
+  assert.deepEqual(list.map(u=>u.username),['admin','simu','desenho']);assert.ok(list.every(u=>u.limitSeconds===null&&!u.hash&&!u.salt));
+  assert.equal((await raw('users')).status,400);
+  browser=await chromium.launch({channel:'msedge',headless:true});const page=await browser.newPage({viewport:{width:1366,height:900}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
+  await page.goto(url);await page.getByLabel('Senha',{exact:true}).fill('admin');await page.getByRole('button',{name:'Entrar',exact:true}).click();await page.getByRole('button',{name:/Configurações$/}).click();
+  await expect(page.getByRole('table',{name:'Usuários cadastrados'})).toContainText('simu');
+  await page.getByLabel('Nome de usuário',{exact:true}).fill('operador');await page.getByLabel('Senha do novo usuário').fill('senha123');await page.getByLabel('Simulação',{exact:true}).check();await page.getByLabel('Configurações',{exact:true}).check();await page.getByLabel('Uso ilimitado').uncheck();await page.getByLabel('Limite total de uso (minutos)').fill('1');await page.getByRole('button',{name:'Cadastrar usuário',exact:true}).click();
+  await expect(page.getByRole('table',{name:'Usuários cadastrados'})).toContainText('operador');await page.locator('.users-settings').scrollIntoViewIfNeeded();await page.screenshot({path:'tests/usuarios-configuracoes.png',fullPage:true});
+  const operator=(await call('users',{},admin.session)).find(u=>u.username==='operador');assert.deepEqual(operator.views,['sim','cfg']);assert.equal(operator.limitSeconds,60);
+  assert.equal((await raw('save',{username:'Operador',password:'outra',views:['sim'],create:true},admin.session)).status,400);
+  assert.equal((await raw('save',{username:'invalido',password:'teste',views:[],create:true},admin.session)).status,400);
+  const profile=await (await fetch(base.origin+'/api/path',{headers:{'X-CNC-Token':token}})).json(),registry=JSON.parse(await fs.readFile(path.join(profile,'users.json'),'utf8'));
+  assert.equal(registry.users.find(u=>u.username==='operador').scheme,'pbkdf2');assert.ok(!JSON.stringify(registry).includes('senha123'));
+  await page.getByRole('button',{name:'Sair (admin)',exact:true}).click();await page.getByLabel('Usuário',{exact:true}).fill('operador');await page.getByLabel('Senha',{exact:true}).fill('senha123');await page.getByRole('button',{name:'Entrar',exact:true}).click();
+  await expect(page.locator('.sidebar nav button')).toHaveCount(2);await page.getByRole('button',{name:/Configurações$/}).click();await expect(page.getByRole('heading',{name:'Usuários',exact:true})).toHaveCount(0);
+  const session=await page.evaluate(()=>sessionStorage.getItem('cnc.session.v1'));
+  assert.equal((await raw('users',{},session)).status,400);assert.equal((await raw('save',{username:'admin',password:'hack',views:['sim']},session)).status,400);
+  await delay(1200);await page.reload();await expect(page.locator('.sidebar')).toBeVisible();
+  const used1=(await call('users',{},admin.session)).find(u=>u.username==='operador').usedSeconds;assert.ok(used1>=1);
+  await page.getByRole('button',{name:'Sair (operador)',exact:true}).click();await expect(page.locator('.login-screen')).toBeVisible();
+  const stopped=(await call('users',{},admin.session)).find(u=>u.username==='operador').usedSeconds;await delay(1200);assert.equal((await call('users',{},admin.session)).find(u=>u.username==='operador').usedSeconds,stopped);
+  await page.getByLabel('Usuário',{exact:true}).fill('operador');await page.getByLabel('Senha',{exact:true}).fill('senha123');await page.getByRole('button',{name:'Entrar',exact:true}).click();await expect(page.locator('.sidebar')).toBeVisible();await delay(1200);
+  const used2=(await call('pulse',{},await page.evaluate(()=>sessionStorage.getItem('cnc.session.v1')))).user.usedSeconds;assert.ok(used2>stopped);
+  await call('save',{username:'operador',views:['sim'],limitSeconds:used2+2,create:false},admin.session);
+  await expect(page.locator('.login-screen')).toBeVisible({timeout:8000});await expect(page.locator('.login-screen')).toContainText('Tempo de uso esgotado');
+  assert.equal((await raw('login',{username:'operador',password:'senha123'})).status,400);
+  await call('save',{username:'operador',password:'nova123',views:['sim'],limitSeconds:null,resetUsage:true,create:false},admin.session);
+  assert.equal((await raw('login',{username:'operador',password:'senha123'})).status,400);
+  const first=await call('login',{username:'operador',password:'nova123'}),second=await call('login',{username:'operador',password:'nova123'});
+  await delay(1100);const a=(await call('pulse',{},first.session)).user.usedSeconds,b=(await call('pulse',{},second.session)).user.usedSeconds;assert.ok(a>=1&&b-a<.5,'Duas janelas não duplicam o tempo do usuário');
+  await call('logout',{},first.session);await call('logout',{},second.session);
+  const protectedAdmin=(await call('save',{username:'admin',views:[],limitSeconds:1,create:false},admin.session)).find(u=>u.username==='admin');assert.equal(protectedAdmin.limitSeconds,null);assert.equal(protectedAdmin.views.length,8);
+  assert.deepEqual(errors,[]);
+  await browser.close();browser=null;server.kill();await new Promise(resolve=>server.once('exit',resolve));
+  server=spawn('powershell.exe',['-NoProfile','-ExecutionPolicy','Bypass','-File','release/CNC-Torno-Leve/Servidor-CNC.ps1','-UiTest','-NoBrowser','-TestProfile',profile],{windowsHide:true});server.stderr.on('data',b=>process.stderr.write(b));
+  const reopened=await new Promise((resolve,reject)=>{let out='';const timer=setTimeout(()=>reject(Error('Reabertura não iniciou')),15000);server.stdout.on('data',b=>{out+=b;const m=out.match(/http:\/\/127\.0\.0\.1:\d+\/\?token=[a-f0-9]+/);if(m){clearTimeout(timer);resolve(m[0])}});server.once('exit',c=>{clearTimeout(timer);reject(Error('Reabertura terminou: '+c))})});
+  base=new URL(reopened);token=base.searchParams.get('token');const restored=await call('login',{username:'operador',password:'nova123'});assert.ok(restored.user.usedSeconds>=b);assert.deepEqual(restored.user.views,['sim']);assert.equal(restored.user.limitSeconds,null);
+  const rawRegistry=await fs.readFile(path.join(profile,'users.json'),'utf8'),external=JSON.parse(rawRegistry);external.externalMarker='preservar';await fs.writeFile(path.join(profile,'users.json'),JSON.stringify(external));assert.equal((await raw('pulse',{},restored.session)).status,400);assert.equal(JSON.parse(await fs.readFile(path.join(profile,'users.json'),'utf8')).externalMarker,'preservar');
+  await fs.writeFile('tests/users-result.json',JSON.stringify({legacyUsers:true,adminOnlyManagement:true,create:true,duplicateRejected:true,passwordHash:true,modulePermissions:true,reload:true,accumulatedSessions:true,logoutStopsTime:true,quotaExpiry:true,quotaRenewal:true,passwordChange:true,multipleWindowsWithoutDoubleCounting:true,adminProtected:true,registrySurvivesRestart:true,externalRegistryPreserved:true,profile},null,2));
+  console.log('Usuários: cadastro, permissões, senha, sessões acumuladas, expiração, renovação e proteção do administrador aprovados.');
+ }finally{if(browser)await browser.close();server.kill()}
+}
+main().catch(e=>{console.error(e);process.exitCode=1});

@@ -32,14 +32,16 @@ try {
   }
   $file=Join-Path $profile 'workspace.json'
   $script:expected=if([IO.File]::Exists($file)){[IO.File]::ReadAllText($file)}else{$null}
+  . (Join-Path $PSScriptRoot 'Usuarios-CNC.ps1')
+  Initialize-Users $profile
   if($Port -eq 0){$probe=New-Object Net.Sockets.TcpListener([Net.IPAddress]::Loopback,0);$probe.Start();$Port=$probe.LocalEndpoint.Port;$probe.Stop()}
   $origin='http://127.0.0.1:'+ $Port
   $token=[Guid]::NewGuid().ToString('N')+[Guid]::NewGuid().ToString('N')
   $listener=New-Object Net.HttpListener;$listener.Prefixes.Add($origin+'/');$listener.Start()
   $bridge=@"
 const token='$token';
-async function request(path,data){const r=await fetch(path,{method:data===undefined?'GET':'POST',headers:{'X-CNC-Token':token,'Content-Type':'application/json'},...(data===undefined?{}:{body:JSON.stringify(data)})});if(!r.ok)throw new Error(await r.text());return r.json()}
-globalThis.desktop={loadWorkspace:()=>request('/api/load'),saveWorkspace:data=>request('/api/save',data),dataPath:()=>request('/api/path')};
+async function request(path,data,session='',keepalive=false){const r=await fetch(path,{method:data===undefined?'GET':'POST',headers:{'X-CNC-Token':token,'X-CNC-Session':session,'Content-Type':'application/json'},keepalive,...(data===undefined?{}:{body:JSON.stringify(data)})});if(!r.ok)throw new Error(await r.text());return r.json()}
+globalThis.desktop={loadWorkspace:()=>request('/api/load'),saveWorkspace:data=>request('/api/save',data),dataPath:()=>request('/api/path'),access:(action,data,session,keepalive)=>request('/api/access/'+action,data,session,keepalive)};
 setInterval(()=>request('/api/alive').catch(()=>{}),15000);
 "@
   $url=$origin+'/?token='+$token
@@ -56,7 +58,7 @@ setInterval(()=>request('/api/alive').catch(()=>{}),15000);
       if($route.StartsWith('/api/')){
         if($req.Headers['X-CNC-Token'] -ne $token -or ($req.Headers['Origin'] -and $req.Headers['Origin'] -ne $origin)){throw 'Origem nao autorizada.'}
         $res.ContentType='application/json; charset=utf-8'
-        switch($route){
+        if($route.StartsWith('/api/access/')){$body=Invoke-UserAccess ($route.Substring(12)) $req}else{switch($route){
           '/api/load' {if($req.HttpMethod -ne 'GET'){throw 'Metodo invalido.'};$body=if($null -eq $script:expected){'null'}else{$parsed=$script:expected|ConvertFrom-Json;if($parsed.format -ne 'cnc-workspace' -or $null -eq $parsed.tools -or $null -eq $parsed.drawings){throw 'Dados existentes invalidos; nao foram substituidos.'};$script:expected}}
           '/api/path' {$body=ConvertTo-Json -InputObject $profile -Compress}
           '/api/alive' {$body='true'}
@@ -72,7 +74,7 @@ setInterval(()=>request('/api/alive').catch(()=>{}),15000);
             $script:expected=$text;$body='true'
           }
           default {throw 'Rota desconhecida.'}
-        }
+        }}
         $bytes=$utf8.GetBytes($body)
       }elseif($route -eq '/bridge.js'){
         if($req.QueryString['token'] -ne $token){throw 'Sessao invalida.'};$res.ContentType='text/javascript; charset=utf-8';$bytes=$utf8.GetBytes($bridge)

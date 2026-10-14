@@ -1,4 +1,4 @@
-# Trilha de código — React 3.1.20
+# Trilha de código — React 3.1.21
 
 Cilindragem protegida: `cad-sides.mjs:prepareCadSides` conserva o maior raio do perfil completo em cadRadiusLimit na cópia recortada. `cadprofile.js:safeMachiningPath` mantém o prefixo acessível e substitui a região após a primeira queda radial por cilindragem no maior Ø até o comprimento selecionado. `core.js:psContorno` compila essa cópia; `psLado` usa o mesmo contorno no desbaste, acabamento e simulador. O desenho salvo permanece integral. Regressões: `tests/cad-machining-safety.test.cjs`, `scripts/test-cad-machining-safety.cjs`. Relatório: `RELATORIO-CILINDRAGEM-PROTEGIDA-3.1.17.md`.
 
@@ -192,3 +192,5 @@ Consulta: `pnpm mapa:query --query "simulador interno profundo enquadramento"`; 
 3.1.19: `App.jsx` renderiza `.autoria` no app; `style.css` fixa a marca no canto inferior direito. A referência recuperada está em `base-github-v2.15.0/Gerador/index.html`. Teste: `scripts/test-machine-tools.cjs`. Relatório: `RELATORIO-AUTORIA-3.1.19.md`.
 
 3.1.20: GIF fornecido pelo usuário em public/assets/programas.gif, animação em App.jsx com preferência por movimento reduzido; style.css limita a 36 px. export-icon.cjs exporta sete resoluções do primeiro quadro PNG para o atalho; index.html usa favicon estático. Relatório: RELATORIO-ICONE-PROGRAMAS-3.1.20.md.
+
+3.1.21: Configurações → Users.jsx (somente admin) → users.mjs:access → bridge do Servidor-CNC.ps1 → Usuarios-CNC.ps1:Invoke-UserAccess. Cadastro separado em users.json, permissões por módulo, PBKDF2 para senhas novas e tempo acumulado por usuário. Tick-User soma a união das sessões; pause/logout interrompem a contagem. App.jsx confere permissões ao renderizar e trocar de módulo; pulso verifica limite. Fallback no navegador usa cadastro local separado. Testes: tests/users.test.cjs e scripts/test-users.cjs.

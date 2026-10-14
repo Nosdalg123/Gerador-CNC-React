@@ -1,0 +1,9 @@
+# Usuários, permissões e tempo de uso — 3.1.21
+
+Configurações do admin inclui todos os usuários existentes, cadastro e edição de senha, seleção dos oito módulos e limite total em minutos (digitável; ilimitado por padrão). Mostra tempo utilizado e situação. O administrador pode ampliar/remover o limite ou zerar o consumo ao salvar. Admin mantém todos os módulos e uso ilimitado para preservar a administração.
+
+Contagem: tempo real conectado ao aplicativo, somado entre sessões, inclusive com o sistema minimizado. Logout e fechamento normal interrompem a contagem. Recarregar mantém o login e o consumo. Janelas simultâneas do mesmo usuário não duplicam os segundos. Pulso verifica o limite a cada segundo e encerra a sessão quando esgotado. Após fechamento abrupto/suspensão, a lacuna considerada é limitada a 90 segundos para não contar indefinidamente uma sessão abandonada. Esta é uma restrição local; o proprietário do computador ainda pode alterar arquivos diretamente.
+
+Na distribuição leve, Usuarios-CNC.ps1 mantém users.json separado do workspace, no mesmo perfil Windows do aplicativo. Senhas antigas permanecem compatíveis; novas usam PBKDF2 SHA-256 com salt aleatório e 210.000 iterações. API de cadastro exige sessão admin. Escrita atômica, cópia users.json.previous e proteção contra alteração externa. Credenciais não são retornadas à interface, nem incluídas em backups de desenhos; importações não mudam acesso ou consumo. No navegador isolado, users.mjs usa armazenamento separado na origem local.
+
+Base anterior preservada em G:/deletar/gerador-cnc-react-v3 e na entrega 3.1.20 do Google Drive. Cópia de desenvolvimento da revisão: G:/GPT/gerador-cnc-react-v3. Testes: 105 unitários, integração específica de usuários e suíte completa da versão leve em perfis temporários; nenhum banco real é usado pelos testes.

@@ -713,6 +713,40 @@
       "symbols": [
         "App"
       ]
+    },
+    {
+      "id": "usuarios-permissoes-tempo",
+      "label": "Usuários, permissões por módulo e tempo acumulado de uso",
+      "terms": [
+        "usuario",
+        "usuário",
+        "admin",
+        "senha",
+        "permissão",
+        "permissao",
+        "limite de uso",
+        "tempo acumulado",
+        "cadastro",
+        "login",
+        "users.json"
+      ],
+      "files": [
+        "src/App.jsx",
+        "src/users.mjs",
+        "src/components/Users.jsx",
+        "lightweight/Usuarios-CNC.ps1",
+        "lightweight/Servidor-CNC.ps1",
+        "scripts/test-users.cjs",
+        "tests/users.test.cjs"
+      ],
+      "symbols": [
+        "access",
+        "Users",
+        "Invoke-UserAccess",
+        "Tick-User",
+        "validateUser",
+        "passwordHash"
+      ]
     }
   ]
 }

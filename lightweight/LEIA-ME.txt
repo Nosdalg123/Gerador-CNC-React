@@ -1,4 +1,4 @@
-TORNO CNC 3.1.19 - VERSAO LEVE OFFLINE
+TORNO CNC 3.1.21 - VERSAO LEVE OFFLINE
 
 3.1.15: etapa 3 do DXF mostra os dois lados e cria o lado 2 invertido.
 As duas caixas de seleção ficam separadas. Salve ambos os perfis completos.
@@ -106,3 +106,5 @@ para a pasta atual ao abrir, inclusive após mover ou extrair o programa.
 Iniciar-CNC-Leve.cmd permanece disponível por compatibilidade.
 
 3.1.19: restaurada a marca "Desenvolvido por Gladson Bernardo" no canto inferior direito.
+
+3.1.21: admin > Configuracoes > Usuarios: cadastro, senha, modulos e limite total de uso em minutos. Padrao ilimitado; tempo conectado acumulado. Cadastro separado em users.json no perfil local.

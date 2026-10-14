@@ -1,6 +1,6 @@
-# Mapa do código — versão 3.1.20
+# Mapa do código — versão 3.1.21
 
-Revisão: `2d1a3158150b6d88e6864d62824d0c583826936e41ab9092c4d4e0ac0dc815e7`. 151 arquivos, 2694 símbolos, 5636 chamadas resolvidas e 115 relações JSX.
+Revisão: `a58c145a44bbaee13ee48b93e6d934e488fa8a54e35051917949c668e918600f`. 157 arquivos, 2805 símbolos, 5737 chamadas resolvidas e 121 relações JSX.
 
 Leia AGENTS.md e TRILHA-REACT.md antes de qualquer revisão. O índice tem hashes e faixas de linhas; GRAFO-CODIGO.json contém relações e evidências.
 
@@ -17,7 +17,7 @@ Consultas atualizam o mapa antes de responder. Dev/build/package também atualiz
 
 ## Limites e evidência
 
-EXTRACTED: referência resolvida pelo AST/escopo. INFERRED: alias global ou associação de conceito revisada. AMBIGUOUS: mais de um destino. 9430 chamadas externas/dinâmicas não foram resolvidas e estão registradas. Callbacks e funções anônimas têm nós próprios. Resolução estática não prova execução.
+EXTRACTED: referência resolvida pelo AST/escopo. INFERRED: alias global ou associação de conceito revisada. AMBIGUOUS: mais de um destino. 9824 chamadas externas/dinâmicas não foram resolvidas e estão registradas. Callbacks e funções anônimas têm nós próprios. Resolução estática não prova execução.
 
 A busca por assunto usa vocabulário de CNC e texto local, sem LLM ou embeddings. Não interpreta imagens/PDFs como documentação semântica. PowerShell tem inventário e declaração de função, sem grafo completo de comandos. Não há promessa de redução de tokens medida.
 
@@ -44,3 +44,4 @@ A busca por assunto usa vocabulário de CNC e texto local, sem LLM ou embeddings
 - **Comprimentos independentes e bloqueio de rampas e frestas no CAD**: `public/engine/cadprofile.js`, `public/engine/core.js`, `src/cad-sides.mjs`, `src/components/Generator.jsx`, `tests/cad-machining-safety.test.cjs`, `scripts/test-cad-machining-safety.cjs`, `RELATORIO-SEGURANCA-CAD-3.1.16.md`, `RELATORIO-CILINDRAGEM-PROTEGIDA-3.1.17.md`
 - **Tempos em minutos, abertura sem terminal e ícone do torno**: `src/components/Simulation.jsx`, `lightweight/Iniciar-CNC-Leve.vbs`, `lightweight/Iniciar-CNC-Leve.cmd`, `scripts/package-light.cjs`, `public/assets/torno-cnc.svg`, `public/assets/torno-cnc-fonte.txt`, `scripts/export-icon.cjs`, `RELATORIO-MINUTOS-ABERTURA-ICONE-3.1.18.md`
 - **Marca de autoria no canto inferior direito**: `src/App.jsx`, `src/style.css`, `scripts/test-machine-tools.cjs`, `RELATORIO-AUTORIA-3.1.19.md`
+- **Usuários, permissões por módulo e tempo acumulado de uso**: `src/App.jsx`, `src/users.mjs`, `src/components/Users.jsx`, `lightweight/Usuarios-CNC.ps1`, `lightweight/Servidor-CNC.ps1`, `scripts/test-users.cjs`, `tests/users.test.cjs`
