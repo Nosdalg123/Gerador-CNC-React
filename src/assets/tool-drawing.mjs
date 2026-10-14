@@ -1,4 +1,5 @@
-// Geometria original da base GitHub 2.15.0; funções puras.
+import '../../public/engine/sim.js';
+// Croquis do banco e montagem física usada na animação.
   function rect(z0, r0, z1, r1) { return [[z0, r0], [z1, r0], [z1, r1], [z0, r1]]; }
   function espelhaR(pts) { return pts.map(function (p) { return [p[0], -p[1]]; }); }
   function pecasFerr(f) {
@@ -60,8 +61,13 @@
     if (f.kind === 'roscaint') { pc.ins=espelhaR(pc.ins);pc.hold=espelhaR(pc.hold);if(pc.furo)pc.furo=[pc.furo[0],-pc.furo[1],pc.furo[2]]; }
     return pc;
   }
-  function svgFerr(f) {
-    var pc = vistaFerr(f);
+  function simulationToolParts(f) {
+    const pc=pecasFerr(f),shape=globalThis.CNCSim.toolShape(f),natural=globalThis.CNCSim.toolShape({...f,tip:undefined});
+    const delta=shape.nose&&natural.nose?shape.nose.map((n,i)=>n-natural.nose[i]):[0,0],shift=p=>[p[0]+delta[0],p[1]+delta[1]];
+    return {...pc,ins:shape.pts,hold:pc.hold.map(shift),furo:pc.furo?[...shift(pc.furo),pc.furo[2]]:null};
+  }
+  function svgFerr(f,{physical=false}={}) {
+    var pc = physical?simulationToolParts(f):vistaFerr(f);
     var all = pc.ins.concat(pc.hold, [[0, 0]]), zmin = 1e9, zmax = -1e9, rmin = 1e9, rmax = -1e9;
     all.forEach(function (p) { zmin = Math.min(zmin, p[0]); zmax = Math.max(zmax, p[0]); rmin = Math.min(rmin, p[1]); rmax = Math.max(rmax, p[1]); });
     var W = 260, H = f.kind === 'rosca' ? 190 : 150, mx = 14, mt = 20, mb = 24, bw = Math.max(zmax - zmin, 1), bh = Math.max(rmax - rmin, 1);
@@ -69,13 +75,13 @@
     function X(z) { return px + (z - zmin) * sc; }
     function Y(r) { return H - mb - (H - mt - mb - bh * sc) / 2 - (r - rmin) * sc; }
     function poly(pts, cls) { return '<polygon class="' + cls + '" points="' + pts.map(function (p) { return X(p[0]).toFixed(1) + ',' + Y(p[1]).toFixed(1); }).join(' ') + '"/>'; }
-    var tx = X(0), ty = Y(0), o = '<svg class="ps-svg" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Inserto e suporte da ferramenta' + (f.kind === 'roscaint' ? ', vista inferior da barra de rosca interna' : f.kind === 'rosca' ? ', suporte vertical de rosca externa' : '') + '">';
+    var tx = X(0), ty = Y(0), o = '<svg class="ps-svg" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Inserto e suporte da ferramenta' + (physical?', montagem no plano XZ da simulação':f.kind === 'roscaint' ? ', vista inferior da barra de rosca interna' : f.kind === 'rosca' ? ', suporte vertical de rosca externa' : '') + '">';
     if (f.kind === 'broca') o += '<line class="eixo" x1="2" x2="' + (W - 2) + '" y1="' + ty.toFixed(1) + '" y2="' + ty.toFixed(1) + '"/><text class="m" x="' + (W - 4) + '" y="' + (ty - 4).toFixed(1) + '" text-anchor="end">eixo da peça</text>';
     o += poly(pc.hold, 'h') + poly(pc.ins, 'f');
     if (pc.ombro) o += '<path class="ombro" d="M' + X(pc.ombro[0][0]).toFixed(1) + ' ' + Y(pc.ombro[0][1]).toFixed(1) + 'L' + X(pc.ombro[1][0]).toFixed(1) + ' ' + Y(pc.ombro[1][1]).toFixed(1) + '"/>';
     if (pc.furo) o += '<circle class="furo" cx="' + X(pc.furo[0]).toFixed(1) + '" cy="' + Y(pc.furo[1]).toFixed(1) + '" r="' + (pc.furo[2] * sc).toFixed(1) + '"/>';
     o += '<path class="tip" d="M' + (tx - 6).toFixed(1) + ' ' + ty.toFixed(1) + 'H' + (tx + 6).toFixed(1) + 'M' + tx.toFixed(1) + ' ' + (ty - 6).toFixed(1) + 'V' + (ty + 6).toFixed(1) + '"/>';
-    o += '<text class="m" x="4" y="12">← peça / placa</text><text class="m" x="' + (W - 4) + '" y="12" text-anchor="end">' + (f.kind === 'roscaint' ? 'vista inferior · +Z →' : '+Z →   ↑ +X') + '</text>';
+    o += '<text class="m" x="4" y="12">← peça / placa</text><text class="m" x="' + (W - 4) + '" y="12" text-anchor="end">' + (!physical&&f.kind === 'roscaint' ? 'vista inferior · +Z →' : '+Z →   ↑ +X') + '</text>';
     o += '<rect class="f" x="6" y="' + (H - 15) + '" width="10" height="8"/><text x="20" y="' + (H - 8) + '">' + (f.kind === 'broca' ? 'corpo da broca' : 'inserto') + '</text>';
     o += '<rect class="h" x="' + (f.kind === 'broca' ? 100 : 76) + '" y="' + (H - 15) + '" width="10" height="8"/><text x="' + (f.kind === 'broca' ? 114 : 90) + '" y="' + (H - 8) + '">' + (f.kind === 'broca' ? 'haste' : 'suporte (haste)') + '</text>';
     o += '<path class="tip" d="M' + (W - 70) + ' ' + (H - 11) + 'h8M' + (W - 66) + ' ' + (H - 15) + 'v8"/><text x="' + (W - 58) + '" y="' + (H - 8) + '">ponta</text>';
@@ -83,4 +89,4 @@
   }
 
 
-export {svgFerr,pecasFerr,vistaFerr};
+export {svgFerr,pecasFerr,vistaFerr,simulationToolParts};

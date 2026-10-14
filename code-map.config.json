@@ -2,6 +2,13 @@
   "schemaVersion": 1,
   "concepts": [
     {
+      "id": "animacao-insertos",
+      "label": "Animação, montagem e posição dos insertos no simulador",
+      "terms": ["animação", "animacao", "inserto", "insertos", "posição da ferramenta", "suporte", "orientação", "mandrilamento", "t0606", "geometria não associada"],
+      "files": ["src/components/Simulation.jsx", "src/assets/tool-drawing.mjs", "src/components/ToolDrawing.jsx", "public/engine/sim.js", "public/engine/simulation-worker.js", "src/components/Program.jsx", "public/engine/toolsetup.js", "tests/tool-animation.test.cjs", "scripts/test-tool-animation.cjs"],
+      "symbols": ["draw", "toolShape", "toolPoly", "simulationToolParts", "svgFerr", "programGeometry"]
+    },
+    {
       "id": "simulacao-responsiva-montagem",
       "label": "Simulação responsiva, montagem por trabalho e compensação do corretor",
       "terms": ["travamento", "programa grande", "colar programa", "worker", "responsividade", "posicao", "corretor", "ponta do corretor", "g73", "sobremetal", "g41", "g42"],

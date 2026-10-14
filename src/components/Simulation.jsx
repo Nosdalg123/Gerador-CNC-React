@@ -3,6 +3,7 @@ import { Sim,Diag } from '../domain.mjs';
 import useWorkerJob from '../use-worker-job.mjs';
 import { Messages,Card } from './Common.jsx';
 import {simulationViewport} from '../simulation-view.mjs';
+import {simulationToolParts} from '../assets/tool-drawing.mjs';
 const fmt=n=>Number(n||0).toLocaleString('pt-BR',{maximumFractionDigits:2});
 function draw(canvas,sim,showPath,zoom,compare){
   const ctx=canvas.getContext('2d'),W=1000,H=460;canvas.width=W;canvas.height=H;ctx.fillStyle='#111d2a';ctx.fillRect(0,0,W,H);
@@ -14,9 +15,12 @@ function draw(canvas,sim,showPath,zoom,compare){
   poly(sc.protect||sc.outline,'#60adff',[4,4]);for(const hole of sc.holes||[])poly(hole,'#60adff',[4,4]);
   if(showPath)sim.segs.forEach(seg=>poly([[seg.z0,seg.x0/2],[seg.z1,seg.x1/2]],seg.type==='r'?'#598076':'#dd9953',seg.type==='r'?[2,3]:[]));
   if(compare&&sc.programmedPath){let previous=[sc.start.z,sc.start.x/2];for(const move of sc.programmedPath){const next=[move.z,move.x/2];if(move.comp)poly([previous,next],'#a0cfff',[5,4]);previous=next;}}
-  const state=sim.state(),tip=sim.toolPoly(state.tool,state.x,state.z);if(tip.length){ctx.fillStyle='#fb6b25';ctx.beginPath();tip.forEach(([z,r],i)=>i?ctx.lineTo(sx(z),sy(r)):ctx.moveTo(sx(z),sy(r)));ctx.closePath();ctx.fill();}
+  const state=sim.state(),tip=sim.toolPoly(state.tool,state.x,state.z),tool=sc.tools[state.tool];
+  const fill=(points,color)=>{ctx.fillStyle=color;ctx.beginPath();points.forEach(([z,r],i)=>i?ctx.lineTo(sx(z),sy(r)):ctx.moveTo(sx(z),sy(r)));ctx.closePath();ctx.fill();};
+  if(tip.length&&tool){const parts=simulationToolParts(tool),world=p=>[state.z+p[0],state.x/2+p[1]];fill(parts.hold.map(world),'rgba(132,153,177,.4)');poly(parts.hold.map(world),'#8296ab');fill(tip,'#fb6b25');poly(tip,'#ffe1cc');const nose=sim.shapes[state.tool]?.nose;if(nose){ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(sx(state.z+nose[0]),sy(state.x/2+nose[1]),2,0,Math.PI*2);ctx.fill();}}
   ctx.strokeStyle='#f8c77e';ctx.beginPath();ctx.moveTo(sx(state.z)-7,sy(state.x/2));ctx.lineTo(sx(state.z)+7,sy(state.x/2));ctx.moveTo(sx(state.z),sy(state.x/2)-7);ctx.lineTo(sx(state.z),sy(state.x/2)+7);ctx.stroke();
-  ctx.fillStyle='#d2e0ed';ctx.font='14px sans-serif';ctx.fillText('X ↑ (diâmetro) · Z → · meia seção',16,23);ctx.fillText('malha 0,5 mm',W-130,H-12);
+  const visible=tip.length&&Math.max(...tip.map(p=>sx(p[0])))>=0&&Math.min(...tip.map(p=>sx(p[0])))<=W&&Math.max(...tip.map(p=>sy(p[1])))>=0&&Math.min(...tip.map(p=>sy(p[1])))<=H;
+  ctx.fillStyle='#d2e0ed';ctx.font='14px sans-serif';ctx.fillText('X ↑ (diâmetro) · Z → · meia seção',16,23);ctx.fillText('T'+state.tool+(visible?'':' · fora da área visível'),W-230,23);ctx.fillText('malha 0,5 mm',W-130,H-12);
 }
 export default function Simulation({scene,code='',generated=false}) {
   const canvas=useRef(null),[time,setTime]=useState(0),[playing,setPlaying]=useState(false),[speed,setSpeed]=useState(10),[path,setPath]=useState(false),[zoom,setZoom]=useState(1),[compare,setCompare]=useState(false);
@@ -39,6 +43,7 @@ export default function Simulation({scene,code='',generated=false}) {
   <div className="readout"><span>X {fmt(state.x)}</span><span>Z {fmt(state.z)}</span><span>T {state.tool}</span><span>{fmt(job.frame.time/60)} / {fmt(sim.total/60)} min</span><span>{fmt(state.rpm)} RPM · F {fmt(state.f)}</span></div>
   <div className="decoded"><small>Linha {state.line+1} · {state.label}{state.pass?' · Passe '+state.pass+' / '+state.passes:''}</small><code>{code.split('\n')[state.line]||''}</code><strong>{state.dec}</strong></div>
   <div className="metrics"><span>Corte <b>{fmt(analysis.tCut/60)} min</b></span><span>Rápido <b>{fmt(analysis.tRapid/60)} min</b></span><span>Sobra <b>{fmt(analysis.sobraArea)} mm²</b></span></div>
-  <p className="muted">Tempo estimado; não inclui troca de ferramenta e aceleração. {scene.semPerfil?'Programa sem perfil final para comparação. ':''}Haste e porta-ferramenta não são simulados.</p>
+  <p className="muted">Laranja: parte de corte. Cinza: suporte ilustrativo. Cruz: referência programada; ponto branco: centro do raio. Remoção e alertas consideram somente a parte de corte.</p>
+  <p className="muted">Tempo estimado; não inclui troca de ferramenta e aceleração. {scene.semPerfil?'Programa sem perfil final para comparação. ':''}</p>
   <Card title={'Alertas · '+analysis.alerts.length}>{analysis.alerts.length?analysis.alerts.map((a,i)=>{const item=Diag.deAlerta(a);return <details key={i} className="diagnostic"><summary><button onClick={e=>{e.preventDefault();setPlaying(false);setTime(a.t)}}>Ir ao ponto</button> {a.text}</summary>{item?.causa&&<p>{item.causa}</p>}{item?.solucao?.map((t,j)=><p key={j}>{t}</p>)}</details>}):<p className="muted">Nenhum alerta detectado nas condições configuradas.</p>}</Card></div>;
 }

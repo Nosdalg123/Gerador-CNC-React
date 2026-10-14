@@ -2,9 +2,9 @@
    Coordenadas do percurso: X = diametro, Z = eixo. Internamente: (z, r) com r = X/2 em mm.
    Material = grade de celulas; a pastilha remove celulas durante os movimentos de corte. */
 (function (root, factory) {
-  if (typeof module === 'object' && module.exports) module.exports = factory();
-  else root.CNCSim = factory();
-})(typeof self !== 'undefined' ? self : this, function () {
+  var api=factory();root.CNCSim=api;
+  if (typeof module === 'object' && module.exports) module.exports = api;
+})(globalThis, function () {
   var DEG = Math.PI / 180;
   var MARGEM = 0.03; // mm: tolerancia p/ encostar sem contar como colisao
 

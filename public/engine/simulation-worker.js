@@ -11,6 +11,7 @@ onmessage=({data})=>{
    const vars=JSON.parse(input.variables||'{}');
    if(!vars||Array.isArray(vars)||typeof vars!=='object'||Object.entries(vars).some(([key,value])=>!/^\d+$/.test(key)||typeof value!=='number'||!Number.isFinite(value)))throw Error('Informe as variáveis como um objeto JSON de números finitos.');
    const result=CNCProg.interpretar(input.text||'',{maq:input.maq,variaveis:vars});let scene=null;
+   const toolMissing=result.ferramentas.filter(f=>f.nCorte>0&&!CNCToolSetup.programGeometry(input.state,input.tools,f)).map(f=>({code:f.codigo,type:f.sug.tipo}));
    if(!result.erros.length&&!result.truncado&&result.moves.length){
     progress('Conferindo ferramentas e compensação…');
     const ferr=Object.fromEntries(result.todasFerr.map(f=>{const tool=CNCToolSetup.programGeometry(input.state,input.tools,f);return [f.codigo,{tool,orient:CNCToolSetup.programOrientation(input.state,f,tool)}];}));
@@ -18,7 +19,7 @@ onmessage=({data})=>{
    }
    const diagnostics=CNCDiag.diagnosticar(result,input.text||'',{extras:scene?.compAvisos||[]});
    const compensationMissing=scene?.compAvisos?.filter(a=>/não tem raio|sem compensação/.test(a.texto));
-   postMessage({result,scene:compensationMissing?.length?null:scene,diagnostics,compensationMissing});
+   postMessage({result,scene:compensationMissing?.length||toolMissing.length?null:scene,diagnostics,compensationMissing,toolMissing});
   }else if(kind==='simulation'){
    progress('Preparando a remoção de material…');
    const scene=input.generated?CNCProg.comDecodificado(CNCProg.comCompensacao(input.scene),input.code,input.scene.maq):input.scene;
