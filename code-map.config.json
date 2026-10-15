@@ -2,6 +2,47 @@
   "schemaVersion": 1,
   "concepts": [
     {
+      "id": "assento-suporte-tpadrao",
+      "label": "Inserto no suporte: centro/esquerda/direita, externo vertical e T padrão",
+      "terms": [
+        "assento",
+        "centro",
+        "esquerda",
+        "direita",
+        "suporte vertical",
+        "externo vertical",
+        "codigo padrao",
+        "número padrão",
+        "numero padrao",
+        "0404",
+        "t padrao"
+      ],
+      "files": [
+        "src/components/Tools.jsx",
+        "src/tool-geometry-fields.mjs",
+        "src/assets/tool-drawing.mjs",
+        "src/components/Generator.jsx",
+        "src/components/Program.jsx",
+        "src/domain.mjs",
+        "src/tool-setup.mjs",
+        "public/engine/toolsetup.js",
+        "public/engine/core.js",
+        "public/engine/sim.js",
+        "tests/holder-seat-standard-code.test.cjs",
+        "scripts/test-holder-seat.cjs"
+      ],
+      "symbols": [
+        "configuredParts",
+        "simTool",
+        "configurableCut",
+        "standardCode",
+        "slotSetup",
+        "programTool",
+        "validateToolGeometry",
+        "Tools"
+      ]
+    },
+    {
       "id": "canal-bedame-macros",
       "label": "Canal com raio, bedame e limite de colchetes FANUC",
       "terms": [

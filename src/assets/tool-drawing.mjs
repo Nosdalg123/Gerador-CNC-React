@@ -69,11 +69,19 @@ import '../../public/engine/sim.js';
   }
   function hull(points){const sorted=points.toSorted((a,b)=>a[0]-b[0]||a[1]-b[1]),cross=(a,b,c)=>(b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0]),half=items=>{const out=[];for(const p of items){while(out.length>1&&cross(out.at(-2),out.at(-1),p)<=0)out.pop();out.push(p)}return out};return half(sorted).slice(0,-1).concat(half(sorted.toReversed()).slice(0,-1));}
   function configuredParts(f){
-    const Sim=globalThis.CNCSim,canonical={...f,mount:'auto',tip:undefined},base=Sim.toolShape(canonical),actual=Sim.toolShape(f),mount=Sim.mounting(f),internal=['interna','canalint','roscaint'].includes(f.kind),radial=['canalext','rosca'].includes(f.kind),thickness=Number(f.shankThickness)>0?Number(f.shankThickness):f.kind==='broca'?(f.largura||10)*.85:internal?12:16;
+    const Sim=globalThis.CNCSim,canonical={...f,mount:f.mount==null?undefined:'auto',tip:undefined},base=Sim.toolShape(canonical),actual=Sim.toolShape(f),mount=Sim.mounting(f),internal=['interna','canalint','roscaint'].includes(f.kind),radial=['canalext','rosca'].includes(f.kind),thickness=Number(f.shankThickness)>0?Number(f.shankThickness):f.kind==='broca'?(f.largura||10)*.85:internal?12:16;
     const [zmin,zmax,rmin,rmax]=base.bb,cz=(zmin+zmax)/2,cr=(rmin+rmax)/2;let shaft,hold;
     if(f.kind==='broca'){shaft=rect(38,0,78,thickness/2);hold=shaft;}
     else{
-      const kap=Number(f.ap),theta=Number.isFinite(kap)&&kap>0&&!['rombo','interna'].includes(f.kind)?(90-kap)*Math.PI/180:0,axis=radial?[Math.sin(theta),Math.cos(theta)]:[Math.cos(theta),(internal?-1:1)*Math.sin(theta)],normal=[-axis[1],axis[0]],origin=radial?[f.kind==='rosca'?(zmax-zmin)/2+thickness/4:cz,Math.max(2,rmax*.55)]:[Math.max(3,zmax*.65),f.kind==='canal'?cr:(internal?-1:1)*(thickness/2+1)],length=internal?70:55;
+      const vertical=f.kind==='rombo'&&f.holderOrientation==='vertical',kap=Number(f.ap),theta=Number.isFinite(kap)&&kap>0&&!['rombo','interna'].includes(f.kind)?(90-kap)*Math.PI/180:0,axis=vertical?[0,1]:radial?[Math.sin(theta),Math.cos(theta)]:[Math.cos(theta),(internal?-1:1)*Math.sin(theta)],normal=[-axis[1],axis[0]],origin=vertical?[cz,Math.max(2,rmax*.55)]:radial?[f.kind==='rosca'?(zmax-zmin)/2+thickness/4:cz,Math.max(2,rmax*.55)]:[Math.max(3,zmax*.65),f.kind==='canal'?cr:(internal?-1:1)*(thickness/2+1)],length=internal?70:55;
+      if(['centro','esquerda','direita'].includes(f.insertSeat)){
+        // Alinha a haste sob o inserto: a ponta programada e o polígono de corte ficam fixos.
+        // Na haste vertical, esquerda/direita acompanham a tela, inclusive após espelhamento.
+        const cross=normal.slice(),flip=Math.abs(axis[1])>Math.abs(axis[0])?cross[0]*mount.z>0:cross[1]*mount.r<0;
+        if(flip){cross[0]*=-1;cross[1]*=-1;}
+        const side=f.insertSeat==='esquerda'?1:f.insertSeat==='direita'?-1:0,shift=(cz-origin[0])*cross[0]+(cr-origin[1])*cross[1]-side*thickness/2;
+        origin[0]+=shift*cross[0];origin[1]+=shift*cross[1];
+      }
       const point=(distance,side)=>[origin[0]+axis[0]*distance+normal[0]*side,origin[1]+axis[1]*distance+normal[1]*side];shaft=[point(0,-thickness/2),point(length,-thickness/2),point(length,thickness/2),point(0,thickness/2)];
       const maxDistance=Math.max(...base.pts.map(p=>Math.hypot(...p))),seat=base.pts.filter(p=>Math.hypot(...p)>maxDistance*.4),pad=Math.max(.01,Math.min(zmax-zmin,rmax-rmin)/10);hold=hull(seat.concat(shaft,rect(cz-pad,cr-pad,cz+pad,cr+pad)));
     }
@@ -91,7 +99,7 @@ import '../../public/engine/sim.js';
     function Y(r) { return H - mb - (H - mt - mb - bh * sc) / 2 - (r - rmin) * sc; }
     function poly(pts, cls) { return '<polygon class="' + cls + '" points="' + pts.map(function (p) { return X(p[0]).toFixed(1) + ',' + Y(p[1]).toFixed(1); }).join(' ') + '"/>'; }
     var mountLabel=['inferior_esquerdo','inferior_direito','superior_esquerdo','superior_direito'].includes(f.mount)?f.mount:'auto';
-    var tx = X(0), ty = Y(0), o = '<svg class="ps-svg" data-mount="'+mountLabel+'" data-shank-thickness="'+(Number(pc.thickness)||'')+'" data-insert-width="'+(Number(f.insertWidth)||'')+'" data-kappa="'+(Number(f.ap)||'')+'" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Inserto e suporte da ferramenta' + (physical?', montagem no plano XZ da simulação':f.kind === 'roscaint' ? ', vista inferior da barra de rosca interna' : f.kind === 'rosca' ? ', suporte vertical de rosca externa' : '') + '">';
+    var tx = X(0), ty = Y(0), o = '<svg class="ps-svg" data-mount="'+mountLabel+'" data-insert-seat="'+(['centro','esquerda','direita'].includes(f.insertSeat)?f.insertSeat:'auto')+'" data-holder-orientation="'+(['horizontal','vertical'].includes(f.holderOrientation)?f.holderOrientation:'auto')+'" data-shank-thickness="'+(Number(pc.thickness)||'')+'" data-insert-width="'+(Number(f.insertWidth)||'')+'" data-kappa="'+(Number(f.ap)||'')+'" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Inserto e suporte da ferramenta' + (physical?', montagem no plano XZ da simulação':f.kind === 'roscaint' ? ', vista inferior da barra de rosca interna' : f.kind === 'rosca' ? ', suporte vertical de rosca externa' : '') + '">';
     if (f.kind === 'broca') o += '<line class="eixo" x1="2" x2="' + (W - 2) + '" y1="' + ty.toFixed(1) + '" y2="' + ty.toFixed(1) + '"/><text class="m" x="' + (W - 4) + '" y="' + (ty - 4).toFixed(1) + '" text-anchor="end">eixo da peça</text>';
     o += poly(pc.hold, 'h') + poly(pc.ins, 'f');
     if (pc.ombro) o += '<path class="ombro" d="M' + X(pc.ombro[0][0]).toFixed(1) + ' ' + Y(pc.ombro[0][1]).toFixed(1) + 'L' + X(pc.ombro[1][0]).toFixed(1) + ' ' + Y(pc.ombro[1][1]).toFixed(1) + '"/>';

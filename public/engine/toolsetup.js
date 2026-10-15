@@ -8,9 +8,13 @@
   return String(position).padStart(2,'0')+String(offset).padStart(2,'0');
  }
  function defaultTip(tool){var tips={inferior_esquerdo:3,inferior_direito:4,superior_esquerdo:2,superior_direito:1},position=tool&&tool.posicaoInserto;return Object.hasOwn(tips,position)?tips[position]:(tool&&tool.tipo==='interna'?2:3);}
- function slotSetup(form,type,slot,index,tool){return Object.assign({position:String(index+1),offset:String(index+1),tip:String(defaultTip(tool))},form.toolSetupByTipo&&form.toolSetupByTipo[type]&&form.toolSetupByTipo[type][slot]||{});}
+ // Apenas o novo padrão explícito é usado. O T legado continua preservado como dado histórico.
+ function standardCode(tool){var code=String(tool&&tool.tPadrao||'');return /^[0-9]{4}$/.test(code)&&Number(code.slice(0,2))>0&&Number(code.slice(2))>0?splitCode(code):null;}
+ function slotSetup(form,type,slot,index,tool){var code=standardCode(tool);return Object.assign({position:code?code.position:String(index+1),offset:code?code.offset:String(index+1),tip:String(defaultTip(tool))},form.toolSetupByTipo&&form.toolSetupByTipo[type]&&form.toolSetupByTipo[type][slot]||{});}
  function programTool(state,tools,reference){
   if(Object.prototype.hasOwnProperty.call(state.ferr||{},reference.codigo))return tools.find(function(t){return t.id===state.ferr[reference.codigo];});
+  var byCode=tools.filter(function(t){var code=standardCode(t);return code&&code.code===reference.codigo;});
+  if(byCode.length){var typed=byCode.filter(function(t){return t.tipo===(reference.sug&&reference.sug.tipo);});return typed.length===1?typed[0]:byCode.length===1?byCode[0]:undefined;}
   var matches=tools.filter(function(t){return t.tipo===(reference.sug&&reference.sug.tipo);});
   return matches.length===1?matches[0]:undefined;
  }
@@ -25,5 +29,5 @@
   copy.t=reference.codigo;
   return copy;
  }
- return {splitCode:splitCode,composeCode:composeCode,slotSetup:slotSetup,defaultTip:defaultTip,programTool:programTool,programOrientation:programOrientation,programGeometry:programGeometry};
+ return {splitCode:splitCode,composeCode:composeCode,standardCode:standardCode,slotSetup:slotSetup,defaultTip:defaultTip,programTool:programTool,programOrientation:programOrientation,programGeometry:programGeometry};
 });

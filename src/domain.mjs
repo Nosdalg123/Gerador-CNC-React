@@ -1,5 +1,6 @@
 import {prepareCadSides} from './cad-sides.mjs';
 import {slotSetup,composeCode} from './tool-setup.mjs';
+import {validateToolGeometry} from './tool-geometry-fields.mjs';
 export {programTool,programOrientation,programGeometry} from './tool-setup.mjs';
 export const CNC=globalThis.CNC, Prog=globalThis.CNCProg, Sim=globalThis.CNCSim, Diag=globalThis.CNCDiag;
 export function fieldsFor(type,stored={}) {return Object.fromEntries(CNC.GERADORES[type].campos.map(c=>[c.id,stored[c.id]??(Array.isArray(c.def)?structuredClone(c.def):c.def)]));}
@@ -21,7 +22,7 @@ export function generate(form,drawings,tools) {
   f.pressao=form.pressao||'';
   const selection=form.toolByTipo?.[type]||{},selected={};
   for(const [index,slot] of g.ferramentas.entries()){let t=tools.find(x=>x.id===selection[slot.id]);if(!t&&!Object.hasOwn(selection,slot.id))t=tools.find(x=>slot.tipos.includes(x.tipo));
-    if(t){const setup=slotSetup(form,type,slot.id,index,t);try{t={...t,t:composeCode(setup.position,setup.offset),tip:Number(setup.tip)}}catch(error){if(!slot.usado||slot.usado(f))return {erros:[slot.papel+': '+error.message],avisos:[]};}}
+    if(t){const invalid=validateToolGeometry(t);if(invalid&&(!slot.usado||slot.usado(f)))return {erros:[slot.papel+': '+invalid],avisos:[]};const setup=slotSetup(form,type,slot.id,index,t);try{t={...t,t:composeCode(setup.position,setup.offset),tip:Number(setup.tip)}}catch(error){if(!slot.usado||slot.usado(f))return {erros:[slot.papel+': '+error.message],avisos:[]};}}
     selected[slot.id]=slot.id==='t1'&&t?{...t,...Object.fromEntries(Object.entries(form.over?.[type]||{}).filter(([,v])=>v!==''&&Number.isFinite(Number(v))).map(([k,v])=>[k,Number(v)]))}:t;}
   try{const result=g.gerar(f,selected,{maq:form.maq,autor:form.autor||'FERRAMENTARIA',data:form.dataManual||CNC.mesAno(),...(form.nomeManual&&form.nome?{nome:form.nome}:{})});
     if(dualCad&&firstCad==='2')for(const key of ['erros','avisos'])if(result[key])result[key]=result[key].map(m=>m.replace(/([Ll]ado )([12])/g,(_,prefix,n)=>prefix+(3-Number(n))));

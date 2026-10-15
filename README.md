@@ -1,4 +1,4 @@
-Revisão atual: **3.1.25** — canal com raio parcial/total, bedame e verificação dos colchetes FANUC. Veja `RELATORIO-CANAL-BEDAME-MACROS-3.1.25.md`.
+Revisão atual: **3.1.26** — inserto no centro/esquerda/direita do suporte, desbaste externo vertical e T padrão no cadastro. Veja `RELATORIO-ASSENTO-SUPORTE-TPADRAO-3.1.26.md`.
 
 # TORNO CNC — 3.1.24 · versão leve
 

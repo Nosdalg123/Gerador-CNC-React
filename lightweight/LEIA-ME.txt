@@ -1,4 +1,9 @@
-TORNO CNC 3.1.25 - VERSAO LEVE OFFLINE
+TORNO CNC 3.1.26 - VERSAO LEVE OFFLINE
+
+3.1.26: inserto no centro/esquerda/direita da haste; suporte externo
+na horizontal ou vertical, no croqui e na animacao.
+Numero T padrao no cadastro (ex.: 0404), sem substituir a montagem
+ja salva no trabalho. Campos novos ficam em Ferramentas > Editar/Nova.
 
 3.1.25: canal com raio nas quinas ou raio total; bedame para corte.
 Disponiveis nas tres orientacoes e quatro montagens fisicas.

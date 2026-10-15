@@ -209,3 +209,11 @@ Consulta: `pnpm mapa:query --query "simulador interno profundo enquadramento"`; 
 - `core.js:psContornoComCones`: deltas em #500..#503 antes da tangência, sem expansão repetida. `conferirColchetes` verifica cinco níveis, incluindo funções; `progsim.js` recusa excesso/desbalanceamento antes dos movimentos. Casos de regressão externos/internos com até dois níveis.
 - `watch-map.cjs`: verificação periódica para unidades virtuais sem eventos de arquivo; `pnpm-workspace.yaml` usa hoisted. Graphify oficial local em `.tools`, fora da fonte ativa.
 - 127 testes unitários, motores históricos e testes Edge específicos aprovados. Ensaios usam dados temporários. Relatório: `RELATORIO-CANAL-BEDAME-MACROS-3.1.25.md`. Backup em pasta `../backups/react-3.1.24-antes-canal-bedame-macros-20261015`; sem compactação.
+
+
+## Assento no suporte, externo vertical e T padrão · 3.1.26
+
+- `Tools.jsx`, `tool-geometry-fields.mjs`: inserto no centro/esquerda/direita da haste, orientação horizontal/vertical do externo e campo T padrão opcional de quatro dígitos. Usuário corrigiu o pedido para externo, no croqui e na animação.
+- `tool-drawing.mjs:configuredParts`: mesmo suporte no cadastro e na animação; esquerda/direita mantidas na tela nas quatro montagens. Corte, referência e espessura preservados. `sim.js:configurableCut` conserva a geometria antiga ao ajustar apenas o suporte.
+- `toolsetup.js:standardCode`, `slotSetup`, `programTool`: T0404 sugerido no Gerador e associação inequívoca na Simulação; montagem e associação explícitas do trabalho prevalecem. T histórico preservado sem migração automática.
+- 133 testes unitários e Edge específico aprovados, incluindo salvar/reabrir, T0404/T0912, suporte vertical externo e animação em execução. Relatório: `RELATORIO-ASSENTO-SUPORTE-TPADRAO-3.1.26.md`. Backup: `../backups/react-3.1.25-antes-assento-suporte-tpadrao-20261015`; sem compactação.

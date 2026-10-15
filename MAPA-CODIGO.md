@@ -1,6 +1,6 @@
-# Mapa do código — versão 3.1.25
+# Mapa do código — versão 3.1.26
 
-Revisão: `1d983eaa9c1d93e065b06ca7c5b2f8290e18f4434c39b607376dca405d2659fb`. 177 arquivos, 3028 símbolos, 5924 chamadas resolvidas e 131 relações JSX.
+Revisão: `056c20a6c223148da7960c2242383cd70b1eaaf3a778fcf55cffcd92b16e3484`. 180 arquivos, 3065 símbolos, 5957 chamadas resolvidas e 134 relações JSX.
 
 Leia AGENTS.md e TRILHA-REACT.md antes de qualquer revisão. O índice tem hashes e faixas de linhas; GRAFO-CODIGO.json contém relações e evidências.
 
@@ -17,12 +17,13 @@ Consultas atualizam o mapa antes de responder. Dev/build/package também atualiz
 
 ## Limites e evidência
 
-EXTRACTED: referência resolvida pelo AST/escopo. INFERRED: alias global ou associação de conceito revisada. AMBIGUOUS: mais de um destino. 11043 chamadas externas/dinâmicas não foram resolvidas e estão registradas. Callbacks e funções anônimas têm nós próprios. Resolução estática não prova execução.
+EXTRACTED: referência resolvida pelo AST/escopo. INFERRED: alias global ou associação de conceito revisada. AMBIGUOUS: mais de um destino. 11342 chamadas externas/dinâmicas não foram resolvidas e estão registradas. Callbacks e funções anônimas têm nós próprios. Resolução estática não prova execução.
 
 A busca por assunto usa vocabulário de CNC e texto local, sem LLM ou embeddings. Não interpreta imagens/PDFs como documentação semântica. PowerShell tem inventário e declaração de função, sem grafo completo de comandos. Não há promessa de redução de tokens medida.
 
 ## Assuntos
 
+- **Inserto no suporte: centro/esquerda/direita, externo vertical e T padrão**: `src/components/Tools.jsx`, `src/tool-geometry-fields.mjs`, `src/assets/tool-drawing.mjs`, `src/components/Generator.jsx`, `src/components/Program.jsx`, `src/domain.mjs`, `src/tool-setup.mjs`, `public/engine/toolsetup.js`, `public/engine/core.js`, `public/engine/sim.js`, `tests/holder-seat-standard-code.test.cjs`, `scripts/test-holder-seat.cjs`
 - **Canal com raio, bedame e limite de colchetes FANUC**: `src/components/Tools.jsx`, `src/tool-geometry-fields.mjs`, `src/components/ToolDrawing.jsx`, `src/components/Program.jsx`, `public/engine/core.js`, `public/engine/sim.js`, `public/engine/progsim.js`, `public/engine/toolsetup.js`, `tests/groove-bedame-macros.test.cjs`, `scripts/test-groove-bedame.cjs`
 - **Geometria e suporte configuráveis: inserto, haste, montagem física e κ**: `src/components/Tools.jsx`, `src/tool-geometry-fields.mjs`, `src/assets/tool-drawing.mjs`, `public/engine/core.js`, `public/engine/sim.js`, `public/engine/toolsetup.js`, `src/components/Simulation.jsx`, `tests/tool-geometry.test.cjs`, `scripts/test-tool-geometry.cjs`
 - **Animação, montagem e posição dos insertos no simulador**: `src/components/Simulation.jsx`, `src/assets/tool-drawing.mjs`, `src/components/ToolDrawing.jsx`, `public/engine/sim.js`, `public/engine/simulation-worker.js`, `src/components/Program.jsx`, `public/engine/toolsetup.js`, `tests/tool-animation.test.cjs`, `scripts/test-tool-animation.cjs`
