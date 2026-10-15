@@ -2,41 +2,64 @@
    Coordenadas do percurso: X = diametro, Z = eixo. Internamente: (z, r) com r = X/2 em mm.
    Material = grade de celulas; a pastilha remove celulas durante os movimentos de corte. */
 (function (root, factory) {
-  if (typeof module === 'object' && module.exports) module.exports = factory();
-  else root.CNCSim = factory();
-})(typeof self !== 'undefined' ? self : this, function () {
+  var api=factory();root.CNCSim=api;
+  if (typeof module === 'object' && module.exports) module.exports = api;
+})(globalThis, function () {
   var DEG = Math.PI / 180;
   var MARGEM = 0.03; // mm: tolerancia p/ encostar sem contar como colisao
+  function mounting(tool){
+    var internal=['interna','canalint','roscaint'].includes(tool.kind),nativeR=internal?-1:1;
+    var positions={inferior_esquerdo:[1,1,3],inferior_direito:[-1,1,4],superior_esquerdo:[1,-1,2],superior_direito:[-1,-1,1]},position=tool.kind!=='broca'&&Object.hasOwn(positions,tool.mount)?positions[tool.mount]:null;
+    return {z:position?position[0]:1,r:position?position[1]/nativeR:1,tip:position?position[2]:(internal?2:3)};
+  }
+  function configurableTool(tool){return tool.mount!=null||Number(tool.raioPerfil)>0||['insertWidth','insertLength','shankThickness'].some(k=>Number(tool[k])>0);}
+  function positive(value,fallback){return Number(value)>0?Number(value):fallback;}
+
+  // Aresta frontal arredondada; a referência continua no canto teórico, sem deslocar o percurso.
+  function grooveProfile(width,length,radius,kind){
+    if(!Number.isFinite(radius)||radius<0||radius>width/2||radius>length)throw Error('Raio do perfil de corte incompatível com a largura ou comprimento do inserto.');
+    var pts=[],add=function(u,v){var p=[u,v],last=pts[pts.length-1];if(!last||Math.hypot(p[0]-last[0],p[1]-last[1])>1e-9)pts.push(p);};
+    if(radius===0)pts=[[0,0],[width,0],[width,length],[0,length]];
+    else{
+      add(radius,0);add(width-radius,0);
+      for(var i=1;i<=16;i++){var a=-Math.PI/2+i*Math.PI/32;add(width-radius+radius*Math.cos(a),radius+radius*Math.sin(a));}
+      add(width,length);add(0,length);add(0,radius);
+      for(var j=1;j<16;j++){var b=Math.PI+j*Math.PI/32;add(radius+radius*Math.cos(b),radius+radius*Math.sin(b));}
+    }
+    if(kind==='canal')return pts.map(p=>[p[1],p[0]]).reverse();
+    if(kind==='canalint')return pts.map(p=>[p[0]-width,-p[1]]).reverse();
+    return pts.map(p=>[p[0]-width,p[1]]);
+  }
 
   /* ---------- geometria da ferramenta (poligono convexo, anti-horario) ---------- */
   // Ponto de referencia (0,0) = ponta programada. Eixos: [z, r].
   function toolShape(tool) {
     var pts = [], i, nose = null; // nose = centro do raio de ponta em relacao a ponta de referencia [z, r] (para G41/G42)
     if (tool.kind === 'canal') {
-      var w = Math.max(0.5, Number(tool.largura) || 4.5), L = 12;
+      var w = Math.max(configurableTool(tool) ? 0.01 : 0.5, Number(tool.largura) || 4.5), L = positive(tool.insertLength,12);
       // canto interno (lado do centro) = ponto programado; largura cresce para fora (+r)
-      pts = [[0, 0], [L, 0], [L, w], [0, w]];
+      pts = Number(tool.raioPerfil)>0?grooveProfile(w,L,Number(tool.raioPerfil),'canal'):[[0, 0], [L, 0], [L, w], [0, w]];
     } else if (tool.kind === 'canalext') {
       // canal externo (radial): largura em Z, corpo para fora (+r); ponto programado = canto da ponta do lado da face (+z)
-      var we = Math.max(0.5, Number(tool.largura) || 4.5), Le = 14;
-      pts = [[-we, 0], [0, 0], [0, Le], [-we, Le]];
+      var we = Math.max(configurableTool(tool) ? 0.01 : 0.5, Number(tool.largura) || 4.5), Le = positive(tool.insertLength,14);
+      pts = Number(tool.raioPerfil)>0?grooveProfile(we,Le,Number(tool.raioPerfil),'canalext'):[[-we, 0], [0, 0], [0, Le], [-we, Le]];
     } else if (tool.kind === 'canalint') {
       // canal interno (radial): a barra fica dentro do furo (lado do eixo, -r) e a pastilha corta para fora (+r); ponto programado = canto da ponta do lado da face (+z)
-      var wi = Math.max(0.5, Number(tool.largura) || 4.5), Li = 8;
-      pts = [[-wi, 0], [-wi, -Li], [0, -Li], [0, 0]];
+      var wi = Math.max(configurableTool(tool) ? 0.01 : 0.5, Number(tool.largura) || 4.5), Li = positive(tool.insertLength,8);
+      pts = Number(tool.raioPerfil)>0?grooveProfile(wi,Li,Number(tool.raioPerfil),'canalint'):[[-wi, 0], [-wi, -Li], [0, -Li], [0, 0]];
     } else if (tool.kind === 'rosca' || tool.kind === 'roscaint') {
       // ferramenta de rosca 60 graus: ponta em V; externa fica fora (+r) com a ponta para o eixo, interna dentro (-r) com a ponta para fora
-      var hr = 8, ar = hr * Math.tan(30 * DEG);
+      var threadAngle=positive(tool.ang,60)/2*DEG,hr=Number(tool.insertWidth)>0?Number(tool.insertWidth)/(2*Math.tan(threadAngle)):8,ar=hr*Math.tan(threadAngle);
       pts = tool.kind === 'rosca' ? [[0, 0], [ar, hr], [-ar, hr]] : [[0, 0], [-ar, -hr], [ar, -hr]];
     } else if (tool.kind === 'broca') {
       // broca (furacao no eixo): ponta programada = centro da ponta; o corpo cobre de r = 0 ate o raio da broca e recua em +z
-      var rd = Math.max(0.5, (Number(tool.largura) || 10) / 2), Ld = 40;
+      var rd = configurableTool(tool)?positive(tool.largura,10)/2:Math.max(0.5,(Number(tool.largura)||10)/2), Ld = 40;
       pts = [[0, 0], [Ld, 0], [Ld, rd], [0, rd]];
     } else {
-      var a = (Number(tool.ang) || 80) * DEG, rn = Math.max(0, Number(tool.raio) || 0), Lb = 12;
+      var a = (Number(tool.ang) || 80) * DEG, rn = Math.max(0, Number(tool.raio) || 0), Lb = Number(tool.insertWidth)>0?Number(tool.insertWidth)/Math.sin(a):12,configured=configurableTool(tool);
       // suporte (angulo de posicao kappa): o inserto gira phi = 180 - kappa - ponta; a aresta de tras sobe para +Z
       // e deixa de cortar alem de um perfil que desce em direcao a placa. Sem kappa: aresta de tras reta (phi = 0)
-      var kap = Number(tool.ap) || 0, phi = kap > 0 ? Math.max(0, Math.min(60, 180 - kap - (Number(tool.ang) || 80))) * DEG : 0;
+      var kap = Number(tool.ap) || 0, phi = kap > 0 ? (configured?180-kap-(Number(tool.ang)||80):Math.max(0,Math.min(60,180-kap-(Number(tool.ang)||80)))) * DEG : 0;
       var u1 = [Math.cos(phi), Math.sin(phi)], u2 = [Math.cos(a + phi), Math.sin(a + phi)], C = null;
       var E1 = [Lb * u1[0], Lb * u1[1]], E2 = [Lb * u2[0], Lb * u2[1]];
       var far = [E1[0] + E2[0], E1[1] + E2[1]];
@@ -49,7 +72,7 @@
           var th = th2 + (th1 - th2) * i / n;
           pts.push([C[0] + rn * Math.cos(th), C[1] + rn * Math.sin(th)]);
         }
-      } else pts.push([0, 0]);
+      } else {pts.push([0, 0]);if(configured)C=[0,0];}
       pts.push(E1, far, E2);
       // referencia = canto do inserto real (zerado encostando na face e no Ø), nao o canto virtual:
       // sem compensacao de raio (G41/G42) o raio de ponta so deixa a sobra do canto, nao uma camada na face
@@ -64,6 +87,11 @@
         if (nose) nose = [nose[0], -nose[1]];
       }
     }
+    var mount=mounting(tool);if(mount.z!==1||mount.r!==1){pts=pts.map(p=>[p[0]*mount.z,p[1]*mount.r]);if(mount.z*mount.r<0)pts.reverse();if(nose)nose=[nose[0]*mount.z,nose[1]*mount.r];}
+    // Referência do corretor: vetor centro -> ponta imaginária (Fanuc/Haas 1..9).
+    var directions={1:[-1,-1],2:[1,-1],3:[1,1],4:[-1,1],5:[-1,0],6:[0,-1],7:[1,0],8:[0,1],9:[0,0]};
+    var tip=tool.tip||(configurableTool(tool)?mount.tip:null);
+    if(nose&&directions[tip]){var offset=directions[tip],radius=Number(tool.raio)||0,target=[offset[0]*radius,offset[1]*radius];pts=pts.map(function(p){return [p[0]+target[0]-nose[0],p[1]+target[1]-nose[1]];});nose=target;}
     // arestas
     var edges = [], zmin = 1e9, zmax = -1e9, rmin = 1e9, rmax = -1e9;
     for (i = 0; i < pts.length; i++) {
@@ -169,7 +197,7 @@
         rpm = self.rpmAt((pos.x + m.x) / 2, m.spin || tool); // m.spin: G96/G97 e S do proprio programa (modulo Simulacao)
         dur = len / Math.max(1e-6, (m.f || 0.1) * rpm / 60);
       }
-      segs.push({ x0: pos.x, z0: pos.z, x1: m.x, z1: m.z, len: len, t0: t, dur: dur, type: m.t, line: m.line, tool: m.tool, label: m.label || '', f: m.f || 0, rpm: rpm, dec: m.dec || '' });
+      segs.push({ x0: pos.x, z0: pos.z, x1: m.x, z1: m.z, len: len, t0: t, dur: dur, type: m.t, line: m.line, tool: m.tool, label: m.label || '', f: m.f || 0, rpm: rpm, dec: m.dec || '',pass:m.pass,passes:m.passes });
       t += dur; pos = { x: m.x, z: m.z };
     });
     this.segs = segs; this.total = t;
@@ -177,8 +205,8 @@
     var groups = [];
     segs.forEach(function (s, idx) {
       var g = groups[groups.length - 1];
-      if (g && g.line === s.line) { g.t1 = s.t0 + s.dur; g.last = idx; }
-      else groups.push({ line: s.line, t0: s.t0, t1: s.t0 + s.dur, first: idx, last: idx });
+      if (g && g.line === s.line&&g.pass===s.pass) { g.t1 = s.t0 + s.dur; g.last = idx; }
+      else groups.push({ line: s.line,pass:s.pass, t0: s.t0, t1: s.t0 + s.dur, first: idx, last: idx });
     });
     this.groups = groups;
     this.reset();
@@ -211,7 +239,7 @@
   // percorre [t0,t1] chamando fn(seg, x, z) a cada passo
   Sim.prototype._walk = function (t0, t1, fn) {
     var segs = this.segs;
-    for (var i = 0; i < segs.length; i++) {
+    for (var i = Math.max(0,this.posAt(t0).seg||0); i < segs.length; i++) {
       var s = segs[i], e = s.t0 + s.dur;
       if (e <= t0) continue;
       if (s.t0 >= t1) break;
@@ -260,7 +288,7 @@
 
   Sim.prototype.state = function () {
     var p = this.posAt(this.t), s = p.s;
-    return { t: this.t, x: p.x, z: p.z, seg: p.seg, line: s ? s.line : -1, type: s ? s.type : 'r', tool: s ? s.tool : 'a', label: s ? s.label : '', f: s ? s.f : 0, rpm: s ? s.rpm : 0, dec: s ? s.dec : '' };
+    return { t: this.t, x: p.x, z: p.z, seg: p.seg, line: s ? s.line : -1, type: s ? s.type : 'r', tool: s ? s.tool : 'a', label: s ? s.label : '', f: s ? s.f : 0, rpm: s ? s.rpm : 0, dec: s ? s.dec : '',pass:s?s.pass:null,passes:s?s.passes:null };
   };
 
   // analise completa: tempos e alertas
@@ -333,7 +361,7 @@
     return sh.pts.map(function (p) { return [z + p[0], x / 2 + p[1]]; });
   };
 
-  return { Sim: Sim, toolShape: toolShape, inPoly: inPoly };
+  return { Sim: Sim, toolShape: toolShape, inPoly: inPoly, mounting:mounting, configurableTool:configurableTool };
 });
 
 

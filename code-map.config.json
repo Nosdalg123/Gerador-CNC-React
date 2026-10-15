@@ -2,6 +2,161 @@
   "schemaVersion": 1,
   "concepts": [
     {
+      "id": "canal-bedame-macros",
+      "label": "Canal com raio, bedame e limite de colchetes FANUC",
+      "terms": [
+        "bedame",
+        "corte material",
+        "raio total",
+        "raio nas quinas",
+        "perfil de corte",
+        "colchetes",
+        "aninhamento",
+        "macro",
+        "tangencia",
+        "0118"
+      ],
+      "files": [
+        "src/components/Tools.jsx",
+        "src/tool-geometry-fields.mjs",
+        "src/components/ToolDrawing.jsx",
+        "src/components/Program.jsx",
+        "public/engine/core.js",
+        "public/engine/sim.js",
+        "public/engine/progsim.js",
+        "public/engine/toolsetup.js",
+        "tests/groove-bedame-macros.test.cjs",
+        "scripts/test-groove-bedame.cjs"
+      ],
+      "symbols": [
+        "grooveProfile",
+        "simTool",
+        "toolShape",
+        "conferirColchetes",
+        "psContornoComCones",
+        "programOrientation",
+        "Tools"
+      ]
+    },
+    {
+      "id": "geometria-suporte-configuravel",
+      "label": "Geometria e suporte configuráveis: inserto, haste, montagem física e κ",
+      "terms": [
+        "geometria e suporte",
+        "largura do inserto",
+        "espessura da haste",
+        "bastão",
+        "bastao",
+        "kappa",
+        "κ",
+        "posição do inserto",
+        "posicao do inserto",
+        "400x",
+        "400×"
+      ],
+      "files": [
+        "src/components/Tools.jsx",
+        "src/tool-geometry-fields.mjs",
+        "src/assets/tool-drawing.mjs",
+        "public/engine/core.js",
+        "public/engine/sim.js",
+        "public/engine/toolsetup.js",
+        "src/components/Simulation.jsx",
+        "tests/tool-geometry.test.cjs",
+        "scripts/test-tool-geometry.cjs"
+      ],
+      "symbols": [
+        "Tools",
+        "geometryKeys",
+        "validateToolGeometry",
+        "configuredParts",
+        "simTool",
+        "toolShape",
+        "mounting",
+        "defaultTip",
+        "Simulation"
+      ]
+    },
+    {
+      "id": "animacao-insertos",
+      "label": "Animação, montagem e posição dos insertos no simulador",
+      "terms": [
+        "animação",
+        "animacao",
+        "inserto",
+        "insertos",
+        "posição da ferramenta",
+        "suporte",
+        "orientação",
+        "mandrilamento",
+        "t0606",
+        "geometria não associada"
+      ],
+      "files": [
+        "src/components/Simulation.jsx",
+        "src/assets/tool-drawing.mjs",
+        "src/components/ToolDrawing.jsx",
+        "public/engine/sim.js",
+        "public/engine/simulation-worker.js",
+        "src/components/Program.jsx",
+        "public/engine/toolsetup.js",
+        "tests/tool-animation.test.cjs",
+        "scripts/test-tool-animation.cjs"
+      ],
+      "symbols": [
+        "draw",
+        "toolShape",
+        "toolPoly",
+        "simulationToolParts",
+        "svgFerr",
+        "programGeometry"
+      ]
+    },
+    {
+      "id": "simulacao-responsiva-montagem",
+      "label": "Simulação responsiva, montagem por trabalho e compensação do corretor",
+      "terms": [
+        "travamento",
+        "programa grande",
+        "colar programa",
+        "worker",
+        "responsividade",
+        "posicao",
+        "corretor",
+        "ponta do corretor",
+        "g73",
+        "sobremetal",
+        "g41",
+        "g42"
+      ],
+      "files": [
+        "src/components/Program.jsx",
+        "src/components/Simulation.jsx",
+        "src/use-worker-job.mjs",
+        "public/engine/simulation-worker.js",
+        "public/engine/toolsetup.js",
+        "src/tool-setup.mjs",
+        "src/domain.mjs",
+        "src/components/Generator.jsx",
+        "public/engine/progsim.js",
+        "public/engine/sim.js",
+        "public/engine/core.js",
+        "tests/simulation-corrections.test.cjs",
+        "scripts/test-simulation-corrections.cjs"
+      ],
+      "symbols": [
+        "Program",
+        "Simulation",
+        "useWorkerJob",
+        "programGeometry",
+        "slotSetup",
+        "composeCode",
+        "ciclo73",
+        "compensar",
+        "toolShape"
+      ]
+    },
+    {
       "id": "elementos",
       "label": "Montar peças por elementos e arredondar quinas",
       "terms": [

@@ -1,4 +1,5 @@
-// Geometria original da base GitHub 2.15.0; funções puras.
+import '../../public/engine/sim.js';
+// Croquis do banco e montagem física usada na animação.
   function rect(z0, r0, z1, r1) { return [[z0, r0], [z1, r0], [z1, r1], [z0, r1]]; }
   function espelhaR(pts) { return pts.map(function (p) { return [p[0], -p[1]]; }); }
   function pecasFerr(f) {
@@ -60,8 +61,28 @@
     if (f.kind === 'roscaint') { pc.ins=espelhaR(pc.ins);pc.hold=espelhaR(pc.hold);if(pc.furo)pc.furo=[pc.furo[0],-pc.furo[1],pc.furo[2]]; }
     return pc;
   }
-  function svgFerr(f) {
-    var pc = vistaFerr(f);
+  function simulationToolParts(f) {
+    if(globalThis.CNCSim.configurableTool(f))return configuredParts(f);
+    const pc=pecasFerr(f),shape=globalThis.CNCSim.toolShape(f),natural=globalThis.CNCSim.toolShape({...f,tip:undefined});
+    const delta=shape.nose&&natural.nose?shape.nose.map((n,i)=>n-natural.nose[i]):[0,0],shift=p=>[p[0]+delta[0],p[1]+delta[1]];
+    return {...pc,ins:shape.pts,hold:pc.hold.map(shift),furo:pc.furo?[...shift(pc.furo),pc.furo[2]]:null};
+  }
+  function hull(points){const sorted=points.toSorted((a,b)=>a[0]-b[0]||a[1]-b[1]),cross=(a,b,c)=>(b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0]),half=items=>{const out=[];for(const p of items){while(out.length>1&&cross(out.at(-2),out.at(-1),p)<=0)out.pop();out.push(p)}return out};return half(sorted).slice(0,-1).concat(half(sorted.toReversed()).slice(0,-1));}
+  function configuredParts(f){
+    const Sim=globalThis.CNCSim,canonical={...f,mount:'auto',tip:undefined},base=Sim.toolShape(canonical),actual=Sim.toolShape(f),mount=Sim.mounting(f),internal=['interna','canalint','roscaint'].includes(f.kind),radial=['canalext','rosca'].includes(f.kind),thickness=Number(f.shankThickness)>0?Number(f.shankThickness):f.kind==='broca'?(f.largura||10)*.85:internal?12:16;
+    const [zmin,zmax,rmin,rmax]=base.bb,cz=(zmin+zmax)/2,cr=(rmin+rmax)/2;let shaft,hold;
+    if(f.kind==='broca'){shaft=rect(38,0,78,thickness/2);hold=shaft;}
+    else{
+      const kap=Number(f.ap),theta=Number.isFinite(kap)&&kap>0&&!['rombo','interna'].includes(f.kind)?(90-kap)*Math.PI/180:0,axis=radial?[Math.sin(theta),Math.cos(theta)]:[Math.cos(theta),(internal?-1:1)*Math.sin(theta)],normal=[-axis[1],axis[0]],origin=radial?[f.kind==='rosca'?(zmax-zmin)/2+thickness/4:cz,Math.max(2,rmax*.55)]:[Math.max(3,zmax*.65),f.kind==='canal'?cr:(internal?-1:1)*(thickness/2+1)],length=internal?70:55;
+      const point=(distance,side)=>[origin[0]+axis[0]*distance+normal[0]*side,origin[1]+axis[1]*distance+normal[1]*side];shaft=[point(0,-thickness/2),point(length,-thickness/2),point(length,thickness/2),point(0,thickness/2)];
+      const maxDistance=Math.max(...base.pts.map(p=>Math.hypot(...p))),seat=base.pts.filter(p=>Math.hypot(...p)>maxDistance*.4),pad=Math.max(.01,Math.min(zmax-zmin,rmax-rmin)/10);hold=hull(seat.concat(shaft,rect(cz-pad,cr-pad,cz+pad,cr+pad)));
+    }
+    const baseNose=base.nose?[base.nose[0]*mount.z,base.nose[1]*mount.r]:[0,0],delta=actual.nose?actual.nose.map((n,i)=>n-baseNose[i]):[0,0],pose=p=>[p[0]*mount.z+delta[0],p[1]*mount.r+delta[1]],furo=f.kind==='broca'?null:[...pose([cz,cr]),Math.min(1.7,(zmax-zmin)/8,(rmax-rmin)/8)];
+    return {ins:actual.pts,hold:hold.map(pose),furo,shaft:shaft.map(pose),thickness};
+  }
+  function svgFerr(f,{physical=false}={}) {
+    physical=physical||globalThis.CNCSim.configurableTool(f);
+    var pc = physical?simulationToolParts(f):vistaFerr(f);
     var all = pc.ins.concat(pc.hold, [[0, 0]]), zmin = 1e9, zmax = -1e9, rmin = 1e9, rmax = -1e9;
     all.forEach(function (p) { zmin = Math.min(zmin, p[0]); zmax = Math.max(zmax, p[0]); rmin = Math.min(rmin, p[1]); rmax = Math.max(rmax, p[1]); });
     var W = 260, H = f.kind === 'rosca' ? 190 : 150, mx = 14, mt = 20, mb = 24, bw = Math.max(zmax - zmin, 1), bh = Math.max(rmax - rmin, 1);
@@ -69,13 +90,14 @@
     function X(z) { return px + (z - zmin) * sc; }
     function Y(r) { return H - mb - (H - mt - mb - bh * sc) / 2 - (r - rmin) * sc; }
     function poly(pts, cls) { return '<polygon class="' + cls + '" points="' + pts.map(function (p) { return X(p[0]).toFixed(1) + ',' + Y(p[1]).toFixed(1); }).join(' ') + '"/>'; }
-    var tx = X(0), ty = Y(0), o = '<svg class="ps-svg" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Inserto e suporte da ferramenta' + (f.kind === 'roscaint' ? ', vista inferior da barra de rosca interna' : f.kind === 'rosca' ? ', suporte vertical de rosca externa' : '') + '">';
+    var mountLabel=['inferior_esquerdo','inferior_direito','superior_esquerdo','superior_direito'].includes(f.mount)?f.mount:'auto';
+    var tx = X(0), ty = Y(0), o = '<svg class="ps-svg" data-mount="'+mountLabel+'" data-shank-thickness="'+(Number(pc.thickness)||'')+'" data-insert-width="'+(Number(f.insertWidth)||'')+'" data-kappa="'+(Number(f.ap)||'')+'" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Inserto e suporte da ferramenta' + (physical?', montagem no plano XZ da simulação':f.kind === 'roscaint' ? ', vista inferior da barra de rosca interna' : f.kind === 'rosca' ? ', suporte vertical de rosca externa' : '') + '">';
     if (f.kind === 'broca') o += '<line class="eixo" x1="2" x2="' + (W - 2) + '" y1="' + ty.toFixed(1) + '" y2="' + ty.toFixed(1) + '"/><text class="m" x="' + (W - 4) + '" y="' + (ty - 4).toFixed(1) + '" text-anchor="end">eixo da peça</text>';
     o += poly(pc.hold, 'h') + poly(pc.ins, 'f');
     if (pc.ombro) o += '<path class="ombro" d="M' + X(pc.ombro[0][0]).toFixed(1) + ' ' + Y(pc.ombro[0][1]).toFixed(1) + 'L' + X(pc.ombro[1][0]).toFixed(1) + ' ' + Y(pc.ombro[1][1]).toFixed(1) + '"/>';
     if (pc.furo) o += '<circle class="furo" cx="' + X(pc.furo[0]).toFixed(1) + '" cy="' + Y(pc.furo[1]).toFixed(1) + '" r="' + (pc.furo[2] * sc).toFixed(1) + '"/>';
     o += '<path class="tip" d="M' + (tx - 6).toFixed(1) + ' ' + ty.toFixed(1) + 'H' + (tx + 6).toFixed(1) + 'M' + tx.toFixed(1) + ' ' + (ty - 6).toFixed(1) + 'V' + (ty + 6).toFixed(1) + '"/>';
-    o += '<text class="m" x="4" y="12">← peça / placa</text><text class="m" x="' + (W - 4) + '" y="12" text-anchor="end">' + (f.kind === 'roscaint' ? 'vista inferior · +Z →' : '+Z →   ↑ +X') + '</text>';
+    o += '<text class="m" x="4" y="12">← peça / placa</text><text class="m" x="' + (W - 4) + '" y="12" text-anchor="end">' + (!physical&&f.kind === 'roscaint' ? 'vista inferior · +Z →' : '+Z →   ↑ +X') + '</text>';
     o += '<rect class="f" x="6" y="' + (H - 15) + '" width="10" height="8"/><text x="20" y="' + (H - 8) + '">' + (f.kind === 'broca' ? 'corpo da broca' : 'inserto') + '</text>';
     o += '<rect class="h" x="' + (f.kind === 'broca' ? 100 : 76) + '" y="' + (H - 15) + '" width="10" height="8"/><text x="' + (f.kind === 'broca' ? 114 : 90) + '" y="' + (H - 8) + '">' + (f.kind === 'broca' ? 'haste' : 'suporte (haste)') + '</text>';
     o += '<path class="tip" d="M' + (W - 70) + ' ' + (H - 11) + 'h8M' + (W - 66) + ' ' + (H - 15) + 'v8"/><text x="' + (W - 58) + '" y="' + (H - 8) + '">ponta</text>';
@@ -83,4 +105,4 @@
   }
 
 
-export {svgFerr,pecasFerr,vistaFerr};
+export {svgFerr,pecasFerr,vistaFerr,simulationToolParts};

@@ -1,4 +1,8 @@
-# TORNO CNC — 3.1.21 · versão leve
+Revisão atual: **3.1.25** — canal com raio parcial/total, bedame e verificação dos colchetes FANUC. Veja `RELATORIO-CANAL-BEDAME-MACROS-3.1.25.md`.
+
+# TORNO CNC — 3.1.24 · versão leve
+
+Simulador com velocidade 400×. Em Geometria e suporte, ajuste a largura do inserto, a largura de corte do canal, o comprimento do inserto de canal, a espessura/Ø da haste e a posição física de montagem. κ atualiza o inserto e o suporte no desenho. As medidas e a montagem também acompanham a ferramenta no programa e na animação. Relatório: `RELATORIO-GEOMETRIA-SUPORTE-3.1.24.md`.
 
 Admin → Configurações → Usuários: cadastre usuários, edite senhas, selecione os módulos e defina um limite total digitável em minutos. O padrão é ilimitado; o tempo conectado acumula entre sessões e encerra o acesso ao esgotar. Cadastro separado dos desenhos em users.json. Relatório: `RELATORIO-USUARIOS-3.1.21.md`.
 
@@ -10,7 +14,7 @@ O CAD DXF gera a prévia do lado 2 invertido na etapa 3 e mostra botões com min
 
 Na etapa **2 · Editar desenho**, escolha **Face Z0 voltada à ferramenta** e confira o comprimento. A etapa 3 exige o perfil preparado; se houver pendências, o editor lista o problema e como corrigi-lo. Rascunhos incompletos podem ser conservados na etapa 2. Detalhes em `RELATORIO-PREPARACAO-CAD-3.1.14.md`.
 
-Repositório: [Nosdalg123/Gerador-CNC-React](https://github.com/Nosdalg123/Gerador-CNC-React). O pacote pronto fica em `distribuicoes/CNC-Torno-Leve-3.1.21.zip`: baixe, extraia toda a pasta e execute `Iniciar-CNC-Leve.vbs`. O mapa atual fica na raiz e acompanha o pacote; mapas históricos estão disponíveis em `revisoes/mapas-arquivados/*.zip`, com os manifestos originais. Para consultá-los, extraia o ZIP da revisão desejada. Os dados de trabalho permanecem no computador do usuário.
+Repositório: [Nosdalg123/Gerador-CNC-React](https://github.com/Nosdalg123/Gerador-CNC-React). O pacote pronto fica em `distribuicoes/CNC-Torno-Leve-3.1.24.zip`: baixe, extraia toda a pasta e execute `Iniciar-CNC-Leve.vbs`. O mapa atual fica na raiz e acompanha o pacote; mapas históricos estão disponíveis em `revisoes/mapas-arquivados/*.zip`, com os manifestos originais. Para consultá-los, extraia o ZIP da revisão desejada. Os dados de trabalho permanecem no computador do usuário.
 
 O simulador enquadra a peça completa e as cavidades internas, inclusive quando o interno é mais profundo que o perfil externo. A vista permanece fixa durante a troca de ferramenta; **Ajustar** restaura o enquadramento completo e o zoom mantém o centro da peça. Relatório: `RELATORIO-SIMULADOR-INTERNO-3.1.13.md`.
 

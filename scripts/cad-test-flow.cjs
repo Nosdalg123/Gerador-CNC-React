@@ -1,6 +1,7 @@
 // Cada ação de um teste legado navega pela aba visível antes de usar o controle.
 // Não escreve estado do editor nem dispara os handlers de navegação diretamente.
 function wrap(page,locator){return new Proxy(locator,{get(target,name){
+ if(name==='constructor')return target.constructor;
  if(['click','fill','check','uncheck','selectOption','setInputFiles','dispatchEvent','screenshot','scrollIntoViewIfNeeded'].includes(name))return async(...args)=>{
   const step=await target.evaluate(el=>el.closest('[data-dxf-step]')?.hidden?Number(el.closest('[data-dxf-step]').dataset.dxfStep):0);
   if(step)await page.locator('.dxf-steps [data-dxf-go="'+step+'"]').click();

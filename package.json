@@ -1,6 +1,6 @@
 {
   "name": "gerador-cnc-react",
-  "version": "3.1.21",
+  "version": "3.1.25",
   "private": true,
   "description": "Gerador CNC Torno — React e distribuição leve local",
   "main": "electron/main.cjs",

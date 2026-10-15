@@ -39,6 +39,21 @@
   var DEFAULT_MAQ = { xMax: 400, zMax: 400, rapido: 20000, grip: 25, chuckD: 260 };
 
   /* ---------- montagem do programa a partir de uma lista de variaveis ---------- */
+  // FANUC B-64607EN/01, alarme 0118: máximo de 5 níveis, contando funções.
+  function conferirColchetes(texto) {
+    var max=0;
+    String(texto).split(/\r?\n/).forEach(function(line,index){
+      var depth=0,comment=0;
+      for(var i=0;i<line.length;i++){
+        var c=line[i];if(c==='('){comment++;continue;}if(c===')'&&comment){comment--;continue;}if(comment)continue;if(c===';')break;
+        if(c==='['){depth++;max=Math.max(max,depth);if(depth>5)throw Error('Linha '+(index+1)+': colchetes excedem 5 níveis, incluindo funções (FANUC 0118).');}
+        if(c===']'&&--depth<0)throw Error('Linha '+(index+1)+': colchete ] sem abertura.');
+      }
+      if(depth)throw Error('Linha '+(index+1)+': falta fechar colchete ].');
+    });
+    return max;
+  }
+  function programaCNC(lines){var code=lines.join('\n');conferirColchetes(code);return code;}
   // def: {sec, n, val (numero) | expr (string) | raw (texto), c (comentario), efeito (dicionario)}
   function blocoVariaveis(defs) {
     var lines = [], sec = null;
@@ -131,11 +146,16 @@
   }
 
   function simTool(tool, kind) {
-    if (kind === 'canal' || kind === 'canalext' || kind === 'canalint') return { kind: kind, largura: Number(tool.largura) || 4.5, vc: Number(tool.vc), rpm: Number(tool.rpm), modo: tool.modo || 'G96' };
-    if (kind === 'rosca' || kind === 'roscaint') return { kind: kind, vc: 0, rpm: Number(tool.rpm), modo: 'G97' };
-    if (kind === 'broca') return { kind: 'broca', largura: Number(tool.diametro) || 10, vc: Number(tool.vc), rpm: Number(tool.rpm), modo: tool.modo || 'G97' };
-    if (kind === 'interna') return { kind: 'interna', ang: Number(tool.angulo) || 80, raio: Number(tool.raio) || 0, ap: Number(tool.apSuporte) || 0, vc: Number(tool.vc), rpm: Number(tool.rpm), modo: tool.modo || 'G96' };
-    return { kind: 'rombo', ang: Number(tool.angulo) || 80, raio: Number(tool.raio) || 0, ap: Number(tool.apSuporte) || 0, vc: Number(tool.vc), rpm: Number(tool.rpm), modo: tool.modo || 'G96' };
+    function assembly(shape){var keys={larguraInserto:'insertWidth',comprimentoInserto:'insertLength',espessuraHaste:'shankThickness'};Object.keys(keys).forEach(function(key){if(tool[key]!==''&&tool[key]!=null)shape[keys[key]]=Number(tool[key]);});if(tool.posicaoInserto)shape.mount=tool.posicaoInserto;if(shape.mount!=null||shape.insertWidth||shape.insertLength||shape.shankThickness){if(tool.apSuporte!==''&&tool.apSuporte!=null)shape.ap=Number(tool.apSuporte);if(kind==='rosca'||kind==='roscaint')shape.ang=Number(tool.angulo)||60;}return shape;}
+    if (kind === 'canal' || kind === 'canalext' || kind === 'canalint') {
+      var width=Number(tool.largura)||4.5,profile=tool.perfilCorte||'reto',radius=profile==='total'?width/2:profile==='raio'?Number(tool.raioCorte):0,length=Number(tool.comprimentoInserto)||({canal:12,canalext:14,canalint:8}[kind]);
+      if(!['reto','raio','total'].includes(profile)||!Number.isFinite(radius)||radius<0||(profile==='raio'&&!(radius>0))||radius>width/2||radius>length)throw Error('Confira o raio do perfil de corte: deve caber na largura e no comprimento do inserto.');
+      return assembly({kind:kind,largura:width,raioPerfil:radius,perfilCorte:profile,vc:Number(tool.vc),rpm:Number(tool.rpm),modo:tool.modo||'G96'});
+    }
+    if (kind === 'rosca' || kind === 'roscaint') return assembly({ kind: kind, vc: 0, rpm: Number(tool.rpm), modo: 'G97' });
+    if (kind === 'broca') return assembly({ kind: 'broca', largura: Number(tool.diametro) || 10, vc: Number(tool.vc), rpm: Number(tool.rpm), modo: tool.modo || 'G97' });
+    if (kind === 'interna') return assembly({ kind: 'interna', ang: Number(tool.angulo) || 80, raio: Number(tool.raio) || 0, tip:tool.tip, ap: Number(tool.apSuporte) || 0, vc: Number(tool.vc), rpm: Number(tool.rpm), modo: tool.modo || 'G96' });
+    return assembly({ kind: 'rombo', ang: Number(tool.angulo) || 80, raio: Number(tool.raio) || 0, tip:tool.tip, ap: Number(tool.apSuporte) || 0, vc: Number(tool.vc), rpm: Number(tool.rpm), modo: tool.modo || 'G96' });
   }
 
   function arcPoints(zc, rc, R, th0, th1, n) {
@@ -492,7 +512,7 @@
       est.push((raio ? 'O raio de quina R' + fmt(n.raio) + ' é feito em G3, com aproximação em Z0 a F' + fmt(av) + '. ' : 'Sem raio de quina (raio = 0). ')
         + textoAcab(acabF, acabT, av) + ' Ao terminar, a ferramenta recua ao ponto de troca (G28U0, Z' + fmt(z136) + '), desliga o refrigerante e finaliza com M30.');
 
-      return { erros: [], avisos: avisos, code: L.join('\n'), estrategia: est, dicionario: dicionario(defs), nome: nomeArquivo(mt.nome) + '.txt', cena: cena };
+      return { erros: [], avisos: avisos, code: programaCNC(L), estrategia: est, dicionario: dicionario(defs), nome: nomeArquivo(mt.nome) + '.txt', cena: cena };
     }
   };
 
@@ -503,7 +523,7 @@
     refPrograma: 'MATRIZ.TUBULAR.ENCAIXE.txt',
     ferramentas: [
       { id: 't1', papel: 'Faceamento / torneamento externo', tipos: ['externa', 'faceamento'] },
-      { id: 't2', papel: 'Ferramenta de encaixe (canal frontal)', tipos: ['encaixe'] }
+      { id: 't2', papel: 'Ferramenta de encaixe (canal frontal)', tipos: ['encaixe', 'bedame'] }
     ],
     campos: [
       { grupo: 'Bloco bruto', id: 'dBruto', label: 'Ø bruto', unit: 'mm', def: 230, hint: 'Diâmetro do bloco bruto (já com sobremetal)' },
@@ -552,7 +572,7 @@
         if (sobreZ === 0) avisos.push('Sobremetal em Z é zero: o faceamento corta direto em Z0.');
       }
       validarTool(t1, 't1', 'Ferramenta de faceamento/torneamento', ['externa', 'faceamento'], erros, avisos);
-      validarTool(t2, 't2', 'Ferramenta de encaixe', ['encaixe'], erros, avisos);
+      validarTool(t2, 't2', 'Ferramenta de encaixe', ['encaixe', 'bedame'], erros, avisos);
       if (t2) {
         if (!(Number(t2.largura) > 0)) erros.push('Ferramenta de encaixe sem largura do canal (cadastre no banco).');
         if (!(Number(t2.incCanal) > 0)) erros.push('Ferramenta de encaixe sem incremento de corte do encaixe (cadastre no banco).');
@@ -706,7 +726,7 @@
       est.push('Depois a ferramenta de encaixe T' + T2 + ' (' + t2.nome + ', canal de ' + fmt(w) + ' mm) faz o rebaixo central em ' + plural(layers.length + 1, 'camada', 'camadas') + ': cada camada desce em rampa (F' + fmt(f22) + ') enquanto o Ø cai ' + fmt(n.passoEnc) + ' mm, e depois corta até o centro (X0, F' + fmt(f52) + '). A profundidade cresce ' + fmt(inc) + ' mm por camada até ' + fmt(n.prof) + ' mm; a última camada é uma descida reta em Ø' + fmt(x19f) + '.');
       est.push('O Ø de início do encaixe (Ø' + fmt(n.dEnc) + ') e o passo (' + fmt(n.passoEnc) + ' mm) são entradas do programa. O laço (N100…N200) altera #18, #19 e #14, por isso o programa deve ser reiniciado pelo começo. Ao final a ferramenta sobe, vai ao ponto de troca (Z' + fmt(z130) + ') e o programa termina em M30.');
 
-      return { erros: [], avisos: avisos, code: L.join('\n'), estrategia: est, dicionario: dicionario(defs), nome: nomeArquivo(mt.nome) + '.txt', cena: cena };
+      return { erros: [], avisos: avisos, code: programaCNC(L), estrategia: est, dicionario: dicionario(defs), nome: nomeArquivo(mt.nome) + '.txt', cena: cena };
     }
   };
 
@@ -916,7 +936,7 @@
       est.push('O rebaixo ao redor da cabeça (Ø' + fmt(n.dCab) + ' x ' + fmt(n.lCab) + ' mm) é desbastado por mergulhos axiais: a cada passe o diâmetro cai ' + fmt(x998) + ' mm (' + fmt(incX) + ' mm no raio) em ' + plural(loops, 'passe', 'passes') + ' do Ø' + fmt(n.dFinal - x998) + ' até perto da cabeça, mais um último mergulho em Ø' + fmt(x138) + '. Cada mergulho desce rápido (F' + fmt(Number(tool.avDesb)) + ') até Z' + fmt(z141) + ' e termina devagar (F' + fmt(n.avFinal) + ') até Z' + fmt(z140) + ', deixando ' + fmt(acabT) + ' mm no Ø da cabeça e ' + fmt(acabF) + ' mm em Z para o acabamento.');
       est.push('O acabamento usa o ciclo G70 (F' + fmt(avF) + ') sobre o contorno N1–N2: ' + (n.rPonta > 0 ? 'raio R' + fmt(n.rPonta) : 'quina viva (sem raio)') + ' na ponta da cabeça, ombro em Z' + fmt(z27) + ', ' + (n.rOmbro > 0 ? 'raio R' + fmt(n.rOmbro) : 'quina viva (sem raio)') + ' no ombro e Ø externo. Como no programa da casa, o contorno fica depois da chamada do G70 e por isso é executado uma segunda vez em movimento normal (um repasse). Para repetir só o acabamento, coloque GOTO80 no começo do programa. Ao terminar, vai ao ponto de troca (Z' + fmt(z130) + ') e finaliza com M30.');
 
-      return { erros: [], avisos: avisos, code: L.join('\n'), estrategia: est, dicionario: dicionario(defs), nome: nomeArquivo(mt.nome) + '.txt', cena: cena };
+      return { erros: [], avisos: avisos, code: programaCNC(L), estrategia: est, dicionario: dicionario(defs), nome: nomeArquivo(mt.nome) + '.txt', cena: cena };
     }
   };
 
@@ -1100,7 +1120,7 @@
       est.push('Faceamento em G75 (passes de ' + fmt(incF) + ' mm até Z' + fmt(acabF) + ') e torneamento do Ø externo até Ø' + fmt(dODr) + ' por ' + fmt(n.lUsin) + ' mm em G74 (passes de ' + fmt(incT) + ' mm no raio). Depois o encaixe é desbastado em G74 de Ø' + fmt(direct ? dEncR : x137) + ' até Ø' + fmt(dEncR) + ' por ' + fmt(n.lEnc) + ' mm (' + (direct ? 'passe único, pois o rebaixo é menor que dois incrementos' : 'começando um incremento abaixo do Ø externo, para não gastar passe no ar') + ').');
       est.push('O contorno do encaixe é feito em uma passada: raio R' + fmt(n.rFace) + ' na face, cilindro Ø' + fmt(dEncF) + ' até Z' + fmt(n.lEnc) + ', ombro até Ø' + fmt(x108) + ' e raio R' + fmt(n.rEnc) + ' até o Ø externo. ' + textoAcab(acabF, acabT, avA) + ' Ao terminar vai ao ponto de troca (Z' + fmt(z130) + ') e finaliza com M30.');
 
-      return { erros: [], avisos: avisos, code: L.join('\n'), estrategia: est, dicionario: dicionario(defs), nome: nomeArquivo(mt.nome) + '.txt', cena: cena };
+      return { erros: [], avisos: avisos, code: programaCNC(L), estrategia: est, dicionario: dicionario(defs), nome: nomeArquivo(mt.nome) + '.txt', cena: cena };
     }
   };
 
@@ -1352,9 +1372,11 @@
         pieces[tag.j][tag.where === 'ini' ? 'trimIni' : 'trimFim'] = Math.abs(onPiece[0] - B.p[0]);
       });
       var base = (opt.internal ? 800 : 600) + 8 * serial++, refs = Array.from({ length: 8 }, function (_, k) { return '#' + (base + k); });
-      var dz0 = '[' + B.zs + '-[' + A.zs + ']]', dr0 = '[[' + B.xs + ']-[' + A.xs + ']]/2';
-      var dz1 = '[' + C.zs + '-[' + B.zs + ']]', dr1 = '[[' + C.xs + ']-[' + B.xs + ']]/2';
-      var expressions = ['SQRT[' + dz0 + '*' + dz0 + '+[' + dr0 + ']*[' + dr0 + ']]', 'SQRT[' + dz1 + '*' + dz1 + '+[' + dr1 + ']*[' + dr1 + ']]', '[' + dz0 + '*' + dz1 + '+[' + dr0 + ']*[' + dr1 + ']]/[' + refs[0] + '*' + refs[1] + ']', mark.t === 'chanfro' ? mark.sym : mark.sym + '*SQRT[[1-' + refs[2] + ']/[1+' + refs[2] + ']]', B.zs + '-' + refs[3] + '*' + dz0 + '/' + refs[0], B.xs + '-2*' + refs[3] + '*[' + dr0 + ']/' + refs[0], B.zs + '+' + refs[3] + '*' + dz1 + '/' + refs[1], B.xs + '+2*' + refs[3] + '*[' + dr1 + ']/' + refs[1]];
+      // #500..#503 são auxiliares transitórias, refeitas para cada canto (externo e interno).
+      // Evita expandir cotas/somas várias vezes dentro de SQRT e ultrapassar o limite FANUC.
+      [B.zs+'-['+A.zs+']','['+B.xs+'-['+A.xs+']]/2',C.zs+'-['+B.zs+']','['+C.xs+'-['+B.xs+']]/2'].forEach(function(expr,k){out.calcs.push({sec:'CALCULOS',n:500+k,expr:expr,c:'CANTO '+serial+' DELTA '+['Z ANTERIOR','R ANTERIOR','Z SEGUINTE','R SEGUINTE'][k],efeito:'Auxiliar transitória de tangência; recalculada para cada canto.'});});
+      var dz0='#500',dr0='#501',dz1='#502',dr1='#503';
+      var expressions = ['SQRT[#500*#500+#501*#501]', 'SQRT[#502*#502+#503*#503]', '[#500*#502+#501*#503]/[' + refs[0] + '*' + refs[1] + ']', mark.t === 'chanfro' ? mark.sym : mark.sym + '*SQRT[[1-' + refs[2] + ']/[1+' + refs[2] + ']]', B.zs + '-' + refs[3] + '*' + dz0 + '/' + refs[0], B.xs + '-2*' + refs[3] + '*' + dr0 + '/' + refs[0], B.zs + '+' + refs[3] + '*' + dz1 + '/' + refs[1], B.xs + '+2*' + refs[3] + '*' + dr1 + '/' + refs[1]];
       var labels = ['ARESTA ANTERIOR', 'ARESTA SEGUINTE', 'COS ENTRE ARESTAS', 'RECUO TANGENTE', 'Z INICIO', 'X INICIO', 'Z FIM', 'X FIM'];
       expressions.forEach(function (expression, k) { out.calcs.push({ sec: 'CALCULOS', n: base + k, expr: expression, c: 'CANTO ' + serial + ' ' + labels[k], efeito: 'Tangência calculada pelas cotas e pelo raio; não editar este cálculo.' }); });
       B.fromSym = { z: refs[4], x: refs[5] }; B.toSym = { z: refs[6], x: refs[7] };
@@ -1999,6 +2021,7 @@
   function cyc73(pb, ct, o) {
     var line = o.line, T = o.tool, lab = 'DESBASTE G73', j, zc;
     for (j = 1; j <= o.d; j++) {
+      var firstMove=pb.moves.length;
       var fr = o.d > 1 ? (o.d - j) / (o.d - 1) : 1, sr = o.du / 2 + o.di * fr, sz = o.dw + o.dk * fr; // deslocamento do perfil neste corte (raio, Z)
       zc = o.zA;
       ct.moves.forEach(function (m) {
@@ -2010,6 +2033,7 @@
       });
       pb.rapid(o.xA, zc + sz, line, lab, T);
       pb.rapid(o.xA, o.zA, line, lab, T);
+      for(var passMove=firstMove;passMove<pb.moves.length;passMove++){pb.moves[passMove].pass=j;pb.moves[passMove].passes=o.d;}
     }
   }
 
@@ -2167,7 +2191,7 @@
       }
     }
     if (temCanal) {
-      validarTool(t2, 't2', 'Ferramenta de canal', ['encaixe'], erros, avisos);
+      validarTool(t2, 't2', 'Ferramenta de canal', ['encaixe', 'bedame'], erros, avisos);
       if (t2) {
         if (!(Number(t2.largura) > 0)) erros.push(rot + 'Ferramenta de canal sem largura (cadastre no banco).');
         if (!(Number(t2.incCanal) > 0)) erros.push(rot + 'Ferramenta de canal sem incremento de corte (cadastre no banco).');
@@ -2175,7 +2199,7 @@
     }
     var temCanalI = !!(ci && ci.ok && ci.canais.length > 0);
     if (temCanalI) {
-      validarTool(t5, 't5', 'Ferramenta de canal interno', ['encaixe'], erros, avisos);
+      validarTool(t5, 't5', 'Ferramenta de canal interno', ['encaixe', 'bedame'], erros, avisos);
       if (t5) {
         if (!(Number(t5.largura) > 0)) erros.push(rot + 'Ferramenta de canal interno sem largura (cadastre no banco).');
         if (!(Number(t5.incCanal) > 0)) erros.push(rot + 'Ferramenta de canal interno sem incremento de corte (cadastre no banco).');
@@ -2397,7 +2421,7 @@
         });
       };
       ct.moves.forEach(function (m, ix) { P(o.comp && ix === ct.moves.length - 1 ? m.code.replace(/^(N\d+)/, '$1G40') : m.code, m.key); }); // com compensacao o ultimo bloco (saida do contorno) cancela com G40
-      runC(av, null, 'CONTORNO');
+      if(sentE!=='G73')runC(av, null, 'CONTORNO');
       P('');
       P('G0Z1', 'g0z1b'); pb.rapid(pb.pos.x, 1, 'g0z1b', 'RETORNO', 'a');
       P('X#1', 'g0x1b'); pb.rapid(o.dBruto, 1, 'g0x1b', 'RETORNO', 'a');
@@ -2695,7 +2719,7 @@
     if (temRoscaI) est.push('Rosca interna: depois do mandrilamento, a ferramenta T' + T7 + ' (' + t7.nome + ') faz ' + txtRosca(rosI, true) + ' em G76 (RPM fixo ' + fmt(t7.rpm) + '), entrando pelo furo (X do furo − 4) e subindo até o Ø nominal. O simulador mostra o percurso e o tempo, mas não desenha o filete.');
     est.push('Ao terminar, a ferramenta recua ao ponto de troca (G28U0, Z' + fmt(z15) + '), desliga o refrigerante e finaliza com M30.');
 
-    return { erros: [], avisos: avisos, code: L.join('\n'), estrategia: est, dicionario: dicionario(defs), nome: nomeArquivo(mt.nome) + '.txt', cena: cena,
+    return { erros: [], avisos: avisos, code: programaCNC(L), estrategia: est, dicionario: dicionario(defs), nome: nomeArquivo(mt.nome) + '.txt', cena: cena,
       _geo: { pts: lado1Pts, zEnd: ct.zEnd, canais: canais, cav: cavOwn } };
   }
 
@@ -2708,10 +2732,10 @@
     max: PS_MAX,
     ferramentas: [
       { id: 't1', papel: 'Faceamento / torneamento externo (G71 e G70)', tipos: ['externa', 'faceamento'] },
-      { id: 't2', papel: 'Ferramenta de canal', tipos: ['encaixe'], opcional: true, usado: function (f) { return psUsos(f).canal; } },
+      { id: 't2', papel: 'Ferramenta de canal', tipos: ['encaixe', 'bedame'], opcional: true, usado: function (f) { return psUsos(f).canal; } },
       { id: 't3', papel: 'Broca de furação', tipos: ['furacao'], opcional: true, usado: function (f) { return psUsos(f).furo; } },
       { id: 't4', papel: 'Barra de mandrilamento interno', tipos: ['interna'], opcional: true, usado: function (f) { return psUsos(f).mand; } },
-      { id: 't5', papel: 'Ferramenta de canal interno', tipos: ['encaixe'], opcional: true, usado: function (f) { return psUsos(f).canalI; } },
+      { id: 't5', papel: 'Ferramenta de canal interno', tipos: ['encaixe', 'bedame'], opcional: true, usado: function (f) { return psUsos(f).canalI; } },
       { id: 't6', papel: 'Ferramenta de rosca externa', tipos: ['rosca'], opcional: true, usado: function (f) { return psUsos(f).rosca; } },
       { id: 't7', papel: 'Ferramenta de rosca interna', tipos: ['rosca'], opcional: true, usado: function (f) { return psUsos(f).roscaI; } }
     ],
@@ -3009,7 +3033,7 @@
   var PLANEJADOS = [
   ];
 
-  return { simTool: simTool, psCurvaCanto: psCurvaCanto, psCantos: psCantos, psCantosInt: psCantosInt, psMigra: psMigra, psRoscaD1: psRoscaD1, fmt: fmt, ascii: ascii, tcode: tcode, nomeArquivo: nomeArquivo, mesAno: mesAno, DEFAULT_MAQ: DEFAULT_MAQ, GERADORES: GERADORES, INTERNOS: INTERNOS, PLANEJADOS: PLANEJADOS };
+  return { conferirColchetes:conferirColchetes, simTool: simTool, psCurvaCanto: psCurvaCanto, psCantos: psCantos, psCantosInt: psCantosInt, psMigra: psMigra, psRoscaD1: psRoscaD1, fmt: fmt, ascii: ascii, tcode: tcode, nomeArquivo: nomeArquivo, mesAno: mesAno, DEFAULT_MAQ: DEFAULT_MAQ, GERADORES: GERADORES, INTERNOS: INTERNOS, PLANEJADOS: PLANEJADOS };
 });
 
 
