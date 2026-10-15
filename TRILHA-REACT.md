@@ -217,3 +217,11 @@ Consulta: `pnpm mapa:query --query "simulador interno profundo enquadramento"`; 
 - `tool-drawing.mjs:configuredParts`: mesmo suporte no cadastro e na animação; esquerda/direita mantidas na tela nas quatro montagens. Corte, referência e espessura preservados. `sim.js:configurableCut` conserva a geometria antiga ao ajustar apenas o suporte.
 - `toolsetup.js:standardCode`, `slotSetup`, `programTool`: T0404 sugerido no Gerador e associação inequívoca na Simulação; montagem e associação explícitas do trabalho prevalecem. T histórico preservado sem migração automática.
 - 133 testes unitários e Edge específico aprovados, incluindo salvar/reabrir, T0404/T0912, suporte vertical externo e animação em execução. Relatório: `RELATORIO-ASSENTO-SUPORTE-TPADRAO-3.1.26.md`. Backup: `../backups/react-3.1.25-antes-assento-suporte-tpadrao-20261015`; sem compactação.
+
+
+## Abertura da pasta e revisão escolhidas · 3.1.27
+
+- `Servidor-CNC.ps1`: identidade carregada do build, pasta absoluta e hashes dos scripts; `/api/revision` autenticada. Reaproveita somente a mesma identidade. Verifica processo/perfil antes de substituir o servidor, inclusive legado sem identidade e troca para versão anterior.
+- `watch-map.cjs:transformIndexHtml` e `App.jsx`: título e versão vêm de `package.json`; removido título 3.1.24 residual.
+- `test-opening-light.cjs`, `test-restart-light.cjs`, `test-light.cjs`: regressão de versão/build/pasta, reinício manual, servidor atualizado, título e campos das melhorias; preservação byte a byte do workspace, `.previous` e usuários em perfis temporários.
+- Relatório: `RELATORIO-ABERTURA-VERSAO-3.1.27.md`. Backup: `../backups/react-3.1.26-antes-correcao-abertura-20261015`. Graphify atualizado; entrega em pasta sem compactação.

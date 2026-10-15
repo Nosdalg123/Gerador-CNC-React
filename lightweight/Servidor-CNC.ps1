@@ -5,6 +5,10 @@ $root=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot 'app'))
 $profile=Join-Path $env:APPDATA 'CNC Torno React'
 if($UiTest){$profile=Join-Path ([IO.Path]::GetTempPath()) ('cnc-react-light-test-'+$PID)}
 if($UiTest -and $TestProfile){$testRoot=[IO.Path]::GetFullPath([IO.Path]::GetTempPath());$candidate=[IO.Path]::GetFullPath($TestProfile);if(!$candidate.StartsWith($testRoot,[StringComparison]::OrdinalIgnoreCase) -or !([IO.Path]::GetFileName($candidate)).StartsWith('cnc-react-light-test-')){throw 'Pasta de teste invalida.'};$profile=$candidate}
+function Get-CNCFileHash([string]$path){
+  $hash=[Security.Cryptography.SHA256]::Create();$stream=[IO.File]::OpenRead($path)
+  try{return [BitConverter]::ToString($hash.ComputeHash($stream)).Replace('-','')}finally{$stream.Dispose();$hash.Dispose()}
+}
 function Open-CNC([string]$url){
   if($UiTest){Write-Output $url}
   if(!$NoBrowser){
@@ -16,6 +20,10 @@ function Open-CNC([string]$url){
 $listener=$null;$lock=$null
 try {
   if(!(Test-Path -LiteralPath (Join-Path $root 'index.html'))){throw 'Pasta app ausente. Extraia todo o pacote antes de iniciar.'}
+  # A identidade vem do build e do servidor carregados, nunca do titulo da janela.
+  $built=[IO.File]::ReadAllText((Join-Path $root 'BUILD-REVISION.json'))|ConvertFrom-Json
+  if($built.version -notmatch '^\d+\.\d+\.\d+$' -or $built.sourceDigest -notmatch '^[a-f0-9]{64}$'){throw 'Identificacao do build invalida. Use a pasta completa da distribuicao.'}
+  $revision=@{version=$built.version;sourceDigest=$built.sourceDigest;appRoot=$root;serverDigest=(Get-CNCFileHash $PSCommandPath);usersDigest=(Get-CNCFileHash (Join-Path $PSScriptRoot 'Usuarios-CNC.ps1'))}
   if(!$UiTest -and (Get-Process -Name 'CNC-Torno' -ErrorAction SilentlyContinue)){throw 'Feche a versao Electron antes de abrir a versao leve.'}
   [IO.Directory]::CreateDirectory($profile)|Out-Null
   $sessionFile=Join-Path $profile 'lightweight.session.json'
@@ -26,18 +34,18 @@ try {
         $existingToken=$Matches[1];$existingOrigin=([Uri]$session.url).GetLeftPart([UriPartial]::Authority)
         $alive=Invoke-WebRequest -UseBasicParsing -Uri ($existingOrigin+'/api/alive') -Headers @{'X-CNC-Token'=$existingToken} -TimeoutSec 3
         if($alive.StatusCode -eq 200){
-          if(!$RestartExisting){
-            $versionPattern='<title>[^<]*?(\d+\.\d+\.\d+)</title>'
-            $currentVersion=[regex]::Match([IO.File]::ReadAllText((Join-Path $root 'index.html')),$versionPattern).Groups[1].Value
-            $previousHtml=(Invoke-WebRequest -UseBasicParsing -Uri $session.url -TimeoutSec 3).Content
-            $previousVersion=[regex]::Match($previousHtml,$versionPattern).Groups[1].Value
-            if($currentVersion -and $previousVersion -and [Version]$currentVersion -gt [Version]$previousVersion){$RestartExisting=$true}
-          }
-          if(!$RestartExisting){Open-CNC $session.url;return}
           $previousPid=[int]$session.pid
           $previousProcess=Get-CimInstance Win32_Process -Filter ('ProcessId='+$previousPid)
           $previousProfile=(Invoke-WebRequest -UseBasicParsing -Uri ($existingOrigin+'/api/path') -Headers @{'X-CNC-Token'=$existingToken} -TimeoutSec 3).Content|ConvertFrom-Json
           if($previousPid -eq $PID -or $previousProcess.Name -ne 'powershell.exe' -or $previousProcess.CommandLine -notmatch 'Servidor-CNC\.ps1' -or [IO.Path]::GetFullPath($previousProfile) -ne [IO.Path]::GetFullPath($profile)){throw 'A sessao anterior nao foi identificada com seguranca. Nenhum processo foi encerrado.'}
+          if(!$RestartExisting){
+            $previousRevision=$null
+            try{$previousRevision=(Invoke-WebRequest -UseBasicParsing -Uri ($existingOrigin+'/api/revision') -Headers @{'X-CNC-Token'=$existingToken} -TimeoutSec 3).Content|ConvertFrom-Json}catch{}
+            # Servidores antigos sem identidade precisam de uma troca verificada.
+            $sameRevision=$null -ne $previousRevision
+            foreach($key in $revision.Keys){if($previousRevision.$key -ne $revision[$key]){$sameRevision=$false}}
+            if($sameRevision){Open-CNC $session.url;return}
+          }
           Stop-Process -Id $previousPid -ErrorAction Stop
           for($retry=0;$retry -lt 30 -and !$lock;$retry++){try{$lock=New-Object IO.FileStream((Join-Path $profile 'lightweight.lock'),[IO.FileMode]::OpenOrCreate,[IO.FileAccess]::ReadWrite,[IO.FileShare]::None)}catch{Start-Sleep -Milliseconds 100}}
         }
@@ -60,7 +68,7 @@ globalThis.desktop={loadWorkspace:()=>request('/api/load'),saveWorkspace:data=>r
 setInterval(()=>request('/api/alive').catch(()=>{}),15000);
 "@
   $url=$origin+'/?token='+$token
-  [IO.File]::WriteAllText($sessionFile,(ConvertTo-Json -InputObject @{url=$url;pid=$PID} -Compress),$utf8)
+  [IO.File]::WriteAllText($sessionFile,(ConvertTo-Json -InputObject @{url=$url;pid=$PID;revision=$revision} -Depth 3 -Compress),$utf8)
   Open-CNC $url
   $last=[DateTime]::UtcNow;$cache=@{};$pending=$listener.GetContextAsync()
   while($listener.IsListening){
@@ -77,6 +85,7 @@ setInterval(()=>request('/api/alive').catch(()=>{}),15000);
           '/api/load' {if($req.HttpMethod -ne 'GET'){throw 'Metodo invalido.'};$body=if($null -eq $script:expected){'null'}else{$parsed=$script:expected|ConvertFrom-Json;if($parsed.format -ne 'cnc-workspace' -or $null -eq $parsed.tools -or $null -eq $parsed.drawings){throw 'Dados existentes invalidos; nao foram substituidos.'};$script:expected}}
           '/api/path' {$body=ConvertTo-Json -InputObject $profile -Compress}
           '/api/alive' {$body='true'}
+          '/api/revision' {$body=ConvertTo-Json -InputObject $revision -Compress}
           '/api/save' {
             if($req.HttpMethod -ne 'POST' -or $req.ContentLength64 -gt 31457280){throw 'Gravacao invalida ou backup excede 30 MB.'}
             $reader=New-Object IO.StreamReader($req.InputStream,$utf8);$text=$reader.ReadToEnd();$reader.Dispose()

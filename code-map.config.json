@@ -515,14 +515,22 @@
         "empacotar",
         "distribuir",
         "zip",
-        "executavel"
+        "executavel",
+        "versao errada",
+        "abertura",
+        "servidor antigo",
+        "trocar pasta"
       ],
       "files": [
         "lightweight/Servidor-CNC.ps1",
         "lightweight/Iniciar-CNC-Leve.cmd",
         "scripts/package-light.cjs",
         "scripts/test-light.cjs",
-        "package.json"
+        "package.json",
+        "scripts/test-restart-light.cjs",
+        "scripts/watch-map.cjs",
+        "index.html",
+        "scripts/test-opening-light.cjs"
       ],
       "symbols": [
         "Open-CNC"

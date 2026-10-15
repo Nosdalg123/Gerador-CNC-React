@@ -1,6 +1,6 @@
-# Mapa do código — versão 3.1.26
+# Mapa do código — versão 3.1.27
 
-Revisão: `056c20a6c223148da7960c2242383cd70b1eaaf3a778fcf55cffcd92b16e3484`. 180 arquivos, 3065 símbolos, 5957 chamadas resolvidas e 134 relações JSX.
+Revisão: `93495c0bcc3199ee17368cb82652e41078f6de40125ff673659e3ae5b6a7be29`. 182 arquivos, 3070 símbolos, 5978 chamadas resolvidas e 134 relações JSX.
 
 Leia AGENTS.md e TRILHA-REACT.md antes de qualquer revisão. O índice tem hashes e faixas de linhas; GRAFO-CODIGO.json contém relações e evidências.
 
@@ -17,7 +17,7 @@ Consultas atualizam o mapa antes de responder. Dev/build/package também atualiz
 
 ## Limites e evidência
 
-EXTRACTED: referência resolvida pelo AST/escopo. INFERRED: alias global ou associação de conceito revisada. AMBIGUOUS: mais de um destino. 11342 chamadas externas/dinâmicas não foram resolvidas e estão registradas. Callbacks e funções anônimas têm nós próprios. Resolução estática não prova execução.
+EXTRACTED: referência resolvida pelo AST/escopo. INFERRED: alias global ou associação de conceito revisada. AMBIGUOUS: mais de um destino. 11405 chamadas externas/dinâmicas não foram resolvidas e estão registradas. Callbacks e funções anônimas têm nós próprios. Resolução estática não prova execução.
 
 A busca por assunto usa vocabulário de CNC e texto local, sem LLM ou embeddings. Não interpreta imagens/PDFs como documentação semântica. PowerShell tem inventário e declaração de função, sem grafo completo de comandos. Não há promessa de redução de tokens medida.
 
@@ -37,7 +37,7 @@ A busca por assunto usa vocabulário de CNC e texto local, sem LLM ou embeddings
 - **Importar e revisar desenho PDF**: `src/components/PdfImport.jsx`, `src/pdf-state.mjs`, `public/engine/pdfdimensions.js`, `public/engine/pdfvector.js`, `public/engine/pdfprofile.js`, `public/engine/pdforientation.js`
 - **Editar, importar e revisar CAD DXF**: `src/components/CadImport.jsx`, `src/components/Drawing.jsx`, `public/engine/dxfimport.js`, `public/engine/dxfedit.js`, `public/engine/dxfcore.js`, `public/engine/dxfprofile.js`, `public/engine/dxfgeometry.js`, `src/assets/cad-panel.html`, `tests/dxf-geometry.test.cjs`, `scripts/test-dxf-operations.cjs`, `scripts/test-cad-pointer.cjs`
 - **Banco, giro e formato das ferramentas**: `src/components/Tools.jsx`, `src/components/ToolDrawing.jsx`, `src/assets/tool-drawing.mjs`, `src/domain.mjs`, `public/engine/seed.js`
-- **Executar e distribuir a versão leve**: `lightweight/Servidor-CNC.ps1`, `lightweight/Iniciar-CNC-Leve.cmd`, `scripts/package-light.cjs`, `scripts/test-light.cjs`, `package.json`
+- **Executar e distribuir a versão leve**: `lightweight/Servidor-CNC.ps1`, `lightweight/Iniciar-CNC-Leve.cmd`, `scripts/package-light.cjs`, `scripts/test-light.cjs`, `package.json`, `scripts/test-restart-light.cjs`, `scripts/watch-map.cjs`, `index.html`, `scripts/test-opening-light.cjs`
 - **Consultar, conferir e atualizar o mapa**: `scripts/code-map.cjs`, `scripts/query-map.cjs`, `scripts/watch-map.cjs`, `scripts/index.cjs`, `code-map.config.json`, `TRILHA-REACT.md`, `AGENTS.md`
 - **Meia seção superior CAD nativa, zoom e movimentação**: `public/engine/cadprofile.js`, `public/engine/dxfturn.js`, `public/engine/dxfprofile.js`, `public/engine/dxfaudit.js`, `public/engine/dxfimport.js`, `public/engine/core.js`, `src/domain.mjs`, `src/components/Drawing.jsx`, `src/assets/cad-panel.html`
 - **Disco 7: folga tangente, ajuste de conexões e salvamento**: `public/engine/dxfgeometry.js`, `public/engine/dxfturn.js`, `public/engine/dxfprofile.js`, `public/engine/dxfaudit.js`, `public/engine/dxfimport.js`, `src/assets/cad-panel.html`, `tests/dxf-repair.test.cjs`, `scripts/test-disco-real.cjs`
