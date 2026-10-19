@@ -22,7 +22,7 @@ export function generate(form,drawings,tools) {
   f.pressao=form.pressao||'';
   const selection=form.toolByTipo?.[type]||{},selected={};
   for(const [index,slot] of g.ferramentas.entries()){let t=tools.find(x=>x.id===selection[slot.id]);if(!t&&!Object.hasOwn(selection,slot.id))t=tools.find(x=>slot.tipos.includes(x.tipo));
-    if(t){const invalid=validateToolGeometry(t);if(invalid&&(!slot.usado||slot.usado(f)))return {erros:[slot.papel+': '+invalid],avisos:[]};const setup=slotSetup(form,type,slot.id,index,t);try{t={...t,t:composeCode(setup.position,setup.offset),tip:Number(setup.tip)}}catch(error){if(!slot.usado||slot.usado(f))return {erros:[slot.papel+': '+error.message],avisos:[]};}}
+    if(t){t=CNC.normalizeInsert(t);const invalid=validateToolGeometry(t);if(invalid&&(!slot.usado||slot.usado(f)))return {erros:[slot.papel+': '+invalid],avisos:[]};const setup=slotSetup(form,type,slot.id,index,t);try{t={...t,t:composeCode(setup.position,setup.offset),tip:Number(setup.tip)}}catch(error){if(!slot.usado||slot.usado(f))return {erros:[slot.papel+': '+error.message],avisos:[]};}}
     selected[slot.id]=slot.id==='t1'&&t?{...t,...Object.fromEntries(Object.entries(form.over?.[type]||{}).filter(([,v])=>v!==''&&Number.isFinite(Number(v))).map(([k,v])=>[k,Number(v)]))}:t;}
   const mountingErrors=validateMountings(g.ferramentas.filter(slot=>!slot.usado||slot.usado(f)).map(slot=>({tool:selected[slot.id],label:slot.papel})));
   if(mountingErrors.length)return {erros:mountingErrors,avisos:[]};

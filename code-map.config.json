@@ -986,6 +986,53 @@
         "validateUser",
         "passwordHash"
       ]
+    },
+    {
+      "id": "formatos-colisoes-inserto",
+      "label": "Formatos ISO de insertos, croqui vertical e colisões de haste / engajamento",
+      "terms": [
+        "formato do inserto",
+        "triangular",
+        "trígono",
+        "trigono",
+        "sangrador",
+        "WNMG",
+        "CNMG",
+        "IC",
+        "colisão da haste",
+        "colisao da haste",
+        "bastao na peça",
+        "bastão na peça",
+        "engajamento",
+        "incremento excedido",
+        "região longe da ponta",
+        "croqui vertical"
+      ],
+      "files": [
+        "public/engine/core.js",
+        "public/engine/sim.js",
+        "public/engine/toolsetup.js",
+        "public/engine/diagnostico.js",
+        "src/components/Tools.jsx",
+        "src/components/ToolDrawing.jsx",
+        "src/components/Simulation.jsx",
+        "src/tool-geometry-fields.mjs",
+        "src/assets/tool-drawing.mjs",
+        "tests/insert-formats-collisions.test.cjs",
+        "scripts/test-insert-formats.cjs",
+        "RELATORIO-INSERTOS-COLISOES-3.1.29.md"
+      ],
+      "symbols": [
+        "insertFormats",
+        "normalizeInsert",
+        "toolShape",
+        "configuredParts",
+        "simulationToolParts",
+        "engagementProfile",
+        "_bodyContact",
+        "analyze",
+        "Tools"
+      ]
     }
   ]
 }

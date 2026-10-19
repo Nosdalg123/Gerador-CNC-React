@@ -158,6 +158,9 @@
       solucao: ['Cancele com G40 num bloco de saída (ex.: G40G0X..) antes do retorno e do M30.'] },
 
     /* --- alertas do simulador --- */
+    simHaste: {sev:'erro',grupo:'Simulação',titulo:'Haste ou suporte dentro do material',causa:'O suporte da ferramenta ocupa material ainda presente, fora da região coberta pelo inserto.',solucao:['Confira espessura da haste, posição do inserto, orientação e espaço livre no furo ou no ombro.','Altere a aproximação ou use uma montagem que deixe o suporte fora da peça.']},
+    simInserto: {sev:'erro',grupo:'Simulação',titulo:'Contato afastado da aresta ativa',causa:'Há material na parte posterior ou em região afastada da ponta escolhida do inserto.',solucao:['Confira formato, IC, ângulo do suporte, ponta do corretor e lado de montagem.','Reduza o engajamento ou use outra ferramenta para alcançar a região. No sangrador, toda a largura frontal é considerada uma aresta de corte.']},
+    simIncremento: {sev:'erro',grupo:'Simulação',titulo:'Engajamento maior que o incremento',causa:'A profundidade de material encontrada pelo inserto supera o incremento do banco, com tolerância da malha de 0,5 mm.',solucao:['Confira o bruto e os incrementos de faceamento em Z e torneamento no raio no cadastro da ferramenta.','Divida o corte em mais passes. Avanço em mm/rot não é a profundidade por passe.']},
     simPlaca: { sev: 'erro', grupo: 'Simulação', titulo: 'Colisão com a placa', causa: 'A pastilha ou o porta-ferramenta chega nas castanhas.',
       solucao: ['Pare o corte a pelo menos 1 a 2 mm das castanhas: diminua o comprimento usinado em Z.', 'Puxe a peça para fora da placa (mais comprimento livre) ou use castanhas mais baixas/moles.', 'Confira o Ø da placa e o comprimento preso informados (Configurações e card "Bruto e fixação").'],
       gerador: ['Aumente o comprimento livre da peça ou reduza o comprimento de usinagem.', 'Confira "Máquina e placa" (Ø da placa e comprimento preso).'] },
@@ -236,6 +239,9 @@
   function codAlerta(a) {
     var t = a.text || '';
     if (a.type === 'placa') return 'simPlaca';
+    if (a.type === 'haste') return 'simHaste';
+    if (a.type === 'inserto') return 'simInserto';
+    if (a.type === 'incremento') return 'simIncremento';
     if (a.type === 'peca') return 'simPeca';
     if (a.type === 'rapido') return 'simRapido';
     if (a.type === 'sobra') return 'simSobra';

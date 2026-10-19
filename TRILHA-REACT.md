@@ -236,3 +236,12 @@ Consulta: `pnpm mapa:query --query "simulador interno profundo enquadramento"`; 
 - `data.mjs:mergeWorkspace`: mapas de IDs separados e remapeamento de `program.ferr` importado, preservando referências atuais não substituídas.
 - Regressões: `security-fixes.test.cjs`, `test-workspace-security.cjs`, `test-security-ui.cjs`; helpers antigos autenticados e regressão completa integrada a `test-light.cjs`. Perfis de teste únicos por execução.
 - Relatório: `RELATORIO-CORRECOES-FIND-BUGS-3.1.28.md`. Backup: `../backups/react-3.1.27-antes-correcoes-find-bugs-20261019`. Entrega leve em pasta, sem compactação.
+
+## Formatos de inserto, croqui e colisões · 3.1.29
+
+- `core.js:INSERT_FORMATS/insertFormats/normalizeInsert`: catálogo C/D/V/T/W/S/R, sangrador e rosca, filtros por tipo e raio do redondo = IC/2. Campo `formatoInserto` opcional preserva bancos antigos.
+- `Tools.jsx`, `tool-geometry-fields.mjs`, `ToolDrawing.jsx`, `style.css`: seletor de formato e croqui em coluna própria; altura adaptada para hastes verticais, com ações visíveis em 1366×768 e 1280×720.
+- `sim.js:simulationToolParts`: montagem física compartilhada por croqui, animação e colisões; `engagementProfile`, `_bodyContact` e `analyze` verificam suporte/material/placa e engajamento do inserto antes do corte. Remoção inicial alinhada entre análise e animação. Limites e heurística documentados no relatório e indicação 2D/malha na interface.
+- `toolsetup.js`, `domain.mjs`: normalização dos formatos e comparação da geometria da torre, com validação do corretor redondo.
+- Testes: `insert-formats-collisions.test.cjs`, `test-insert-formats.cjs`, cobertura dos diagnósticos em `testdiag.js`, regressões de geometria, montagem e animação.
+- Pesquisa oficial Mitsubishi/Sandvik e limites: `RELATORIO-INSERTOS-COLISOES-3.1.29.md`. Backup anterior em `.packaging/backup-3.1.28-insertos`. Entrega leve em pasta, sem compactação automática.

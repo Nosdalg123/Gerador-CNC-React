@@ -157,7 +157,7 @@ const CAB = 'G21G90G40G80\nG28U0\nT0101\nG96S250M4\nG50S1500\nM8\n', FIM = '\nG2
 /* ---- alertas do simulador ---- */
 {
   const alerta = (type, text) => ({ type, text, line: 3, x: 50, z: -5 });
-  const casos = [['placa', 'Colisão com a placa (castanhas) em X50 Z-5', 'simPlaca', 'erro'], ['peca', 'Corte dentro da peça acabada em X50 Z-5', 'simPeca', 'erro'], ['rapido', 'Avanço rápido (G0) dentro do material em X50 Z-5', 'simRapido', 'erro'],
+  const casos = [['haste','Haste / suporte em contato com o material','simHaste','erro'],['inserto','Contato em região do inserto afastada da ponta','simInserto','erro'],['incremento','Engajamento excede o incremento','simIncremento','erro'],['placa', 'Colisão com a placa (castanhas) em X50 Z-5', 'simPlaca', 'erro'], ['peca', 'Corte dentro da peça acabada em X50 Z-5', 'simPeca', 'erro'], ['rapido', 'Avanço rápido (G0) dentro do material em X50 Z-5', 'simRapido', 'erro'],
     ['limite', 'X450 passa do curso de X (400)', 'simLimiteX', 'aviso'], ['limite', 'X-8 abaixo do centro', 'simLimiteXneg', 'aviso'], ['limite', 'Z450 passa do curso de Z (+400)', 'simLimiteZ', 'aviso'],
     ['limite', 'Z-460 abaixo do curso de Z (-450)', 'simLimiteZneg', 'aviso'], ['sobra', 'Sobra de material no fim do programa: maior região ≈ 9.0 mm²', 'simSobra', 'aviso']];
   casos.forEach(([tp, tx, cod, sev]) => {

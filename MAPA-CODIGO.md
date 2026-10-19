@@ -1,6 +1,6 @@
-# Mapa do código — versão 3.1.28
+# Mapa do código — versão 3.1.29
 
-Revisão: `9e8243384a20d35f053a69ab60bf3d28cf620ba87076a428d5a1e6c66d38d0ef`. 191 arquivos, 3142 símbolos, 5972 chamadas resolvidas e 135 relações JSX.
+Revisão: `50283a0cc24891d7a8ecc55c4b46e5eef9662fc2cbadcdb5ddf78e796331cf44`. 194 arquivos, 3219 símbolos, 6069 chamadas resolvidas e 136 relações JSX.
 
 Leia AGENTS.md e TRILHA-REACT.md antes de qualquer revisão. O índice tem hashes e faixas de linhas; GRAFO-CODIGO.json contém relações e evidências.
 
@@ -17,7 +17,7 @@ Consultas atualizam o mapa antes de responder. Dev/build/package também atualiz
 
 ## Limites e evidência
 
-EXTRACTED: referência resolvida pelo AST/escopo. INFERRED: alias global ou associação de conceito revisada. AMBIGUOUS: mais de um destino. 11919 chamadas externas/dinâmicas não foram resolvidas e estão registradas. Callbacks e funções anônimas têm nós próprios. Resolução estática não prova execução.
+EXTRACTED: referência resolvida pelo AST/escopo. INFERRED: alias global ou associação de conceito revisada. AMBIGUOUS: mais de um destino. 12281 chamadas externas/dinâmicas não foram resolvidas e estão registradas. Callbacks e funções anônimas têm nós próprios. Resolução estática não prova execução.
 
 A busca por assunto usa vocabulário de CNC e texto local, sem LLM ou embeddings. Não interpreta imagens/PDFs como documentação semântica. PowerShell tem inventário e declaração de função, sem grafo completo de comandos. Não há promessa de redução de tokens medida.
 
@@ -51,3 +51,4 @@ A busca por assunto usa vocabulário de CNC e texto local, sem LLM ou embeddings
 - **Tempos em minutos, abertura sem terminal e ícone do torno**: `src/components/Simulation.jsx`, `lightweight/Iniciar-CNC-Leve.vbs`, `lightweight/Iniciar-CNC-Leve.cmd`, `scripts/package-light.cjs`, `public/assets/torno-cnc.svg`, `public/assets/torno-cnc-fonte.txt`, `scripts/export-icon.cjs`, `RELATORIO-MINUTOS-ABERTURA-ICONE-3.1.18.md`
 - **Marca de autoria no canto inferior direito**: `src/App.jsx`, `src/style.css`, `scripts/test-machine-tools.cjs`, `RELATORIO-AUTORIA-3.1.19.md`
 - **Usuários, permissões por módulo e tempo acumulado de uso**: `src/App.jsx`, `src/users.mjs`, `src/components/Users.jsx`, `lightweight/Usuarios-CNC.ps1`, `lightweight/Servidor-CNC.ps1`, `scripts/test-users.cjs`, `tests/users.test.cjs`
+- **Formatos ISO de insertos, croqui vertical e colisões de haste / engajamento**: `public/engine/core.js`, `public/engine/sim.js`, `public/engine/toolsetup.js`, `public/engine/diagnostico.js`, `src/components/Tools.jsx`, `src/components/ToolDrawing.jsx`, `src/components/Simulation.jsx`, `src/tool-geometry-fields.mjs`, `src/assets/tool-drawing.mjs`, `tests/insert-formats-collisions.test.cjs`, `scripts/test-insert-formats.cjs`, `RELATORIO-INSERTOS-COLISOES-3.1.29.md`

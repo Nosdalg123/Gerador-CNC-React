@@ -25,7 +25,7 @@ async function main(){
   await page.getByRole('button',{name:/Ferramentas$/}).first().click();
   const first=before.tools[0];await page.getByRole('row').filter({has:page.getByRole('cell',{name:first.nome,exact:false})}).first().getByRole('button',{name:'Editar',exact:true}).click();
   const modal=page.getByRole('dialog',{name:'Cadastro de ferramenta'});
-  await expect(modal.locator('legend')).toHaveText(['Identificação','Incrementos e sobremetal · mm','Rotação e avanços de corte','Observações','Geometria e suporte']);
+  await expect(modal.locator('legend')).toHaveText(['Identificação','Incrementos e sobremetal · mm','Rotação e avanços de corte','Pastilha e observações','Geometria e suporte']);
   const nameBox=await page.getByLabel('Nome',{exact:true}).boundingBox(),numberBox=await page.getByLabel('Tipo',{exact:true}).boundingBox();assert.ok(nameBox.width>numberBox.width*1.8,'Nome deve ocupar a largura inteira da identificação');
   for(const size of [{width:1366,height:768},{width:1280,height:720}]){
    await page.setViewportSize(size);assert.ok(await modal.evaluate(el=>el.scrollHeight<=el.clientHeight+1),'Editor deve caber sem rolagem em '+size.width+'x'+size.height);

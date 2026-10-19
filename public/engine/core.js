@@ -3,9 +3,9 @@
    Cada gerador devolve o codigo e tambem a "cena" do simulador (percurso da ferramenta
    marcado com a linha do G-code de cada movimento). */
 (function (root, factory) {
-  if (typeof module === 'object' && module.exports) module.exports = factory(require('./cadprofile.js'));
+  if (typeof module === 'object' && module.exports) module.exports = root.CNC = factory(require('./cadprofile.js'));
   else root.CNC = factory(root.CNCPerfilCAD);
-})(typeof self !== 'undefined' ? self : this, function (CAD) {
+})(globalThis, function (CAD) {
 
   /* ---------- utilitarios ---------- */
   // numero no estilo da casa: .45 em vez de 0.45
@@ -145,8 +145,26 @@
     });
   }
 
+  var INSERT_FORMATS=[
+    {id:'auto',label:'Atual / personalizado'},
+    {id:'C',label:'C · rômbico 80°',angle:80,example:'CNMG / CCMT'},
+    {id:'D',label:'D · rômbico 55°',angle:55,example:'DNMG / DCMT'},
+    {id:'V',label:'V · rômbico 35°',angle:35,example:'VNMG / VCMT'},
+    {id:'T',label:'T · triangular 60°',angle:60,example:'TNMG / TCMT'},
+    {id:'W',label:'W · trígono 80°',angle:80,example:'WNMG / WCMT'},
+    {id:'S',label:'S · quadrado 90°',angle:90,example:'SNMG / SCMT'},
+    {id:'R',label:'R · redondo',example:'RNMG / RCMT'},
+    {id:'sangrador',label:'Sangrador · canal / corte',types:['encaixe','bedame'],example:'MGMN / CoroCut'},
+    {id:'rosca60',label:'Rosca · triangular 60°',angle:60,types:['rosca'],example:'16ER / 16IR'}
+  ];
+  function insertFormats(type){return INSERT_FORMATS.filter(f=>f.id==='auto'||(f.types?f.types.includes(type):['externa','faceamento','interna','outra'].includes(type)));}
+  function normalizeInsert(tool){
+    var spec=insertFormats(tool.tipo).find(f=>f.id===tool.formatoInserto);if(!spec||spec.id==='auto')return tool;
+    return Object.assign({},tool,spec.angle?{angulo:spec.angle}:{},spec.id==='R'?{raio:(Number(tool.larguraInserto)||12)/2}:{});
+  }
   function simTool(tool, kind) {
-    function assembly(shape){var keys={larguraInserto:'insertWidth',comprimentoInserto:'insertLength',espessuraHaste:'shankThickness'};Object.keys(keys).forEach(function(key){if(tool[key]!==''&&tool[key]!=null)shape[keys[key]]=Number(tool[key]);});if(tool.posicaoInserto)shape.mount=tool.posicaoInserto;if(tool.tipo!=='furacao'&&tool.assentoInserto&&tool.assentoInserto!=='auto')shape.insertSeat=tool.assentoInserto;if(['externa','faceamento'].includes(tool.tipo)&&tool.orientacaoSuporte&&tool.orientacaoSuporte!=='auto')shape.holderOrientation=tool.orientacaoSuporte;if(shape.mount!=null||shape.insertWidth||shape.insertLength||shape.shankThickness){if(tool.apSuporte!==''&&tool.apSuporte!=null)shape.ap=Number(tool.apSuporte);if(kind==='rosca'||kind==='roscaint')shape.ang=Number(tool.angulo)||60;}return shape;}
+    tool=normalizeInsert(tool);
+    function assembly(shape){var format=tool.formatoInserto||'auto',spec=insertFormats(tool.tipo).find(f=>f.id===format);if(!spec)throw Error('Formato de inserto incompatível com o tipo da ferramenta.');if(format!=='auto')shape.insertShape=format;if(spec.angle)shape.ang=spec.angle;if(format==='R')shape.raio=(Number(tool.larguraInserto)||12)/2;shape.incFace=Number(tool.incFace)||0;shape.incTorn=Number(tool.incTorn)||0;shape.incCanal=Number(tool.incCanal)||0;var keys={larguraInserto:'insertWidth',comprimentoInserto:'insertLength',espessuraHaste:'shankThickness'};Object.keys(keys).forEach(function(key){if(tool[key]!==''&&tool[key]!=null)shape[keys[key]]=Number(tool[key]);});if(tool.posicaoInserto)shape.mount=tool.posicaoInserto;if(tool.tipo!=='furacao'&&tool.assentoInserto&&tool.assentoInserto!=='auto')shape.insertSeat=tool.assentoInserto;if(['externa','faceamento'].includes(tool.tipo)&&tool.orientacaoSuporte&&tool.orientacaoSuporte!=='auto')shape.holderOrientation=tool.orientacaoSuporte;if(shape.mount!=null||shape.insertWidth||shape.insertLength||shape.shankThickness){if(tool.apSuporte!==''&&tool.apSuporte!=null)shape.ap=Number(tool.apSuporte);if(kind==='rosca'||kind==='roscaint')shape.ang=Number(tool.angulo)||60;}return shape;}
     if (kind === 'canal' || kind === 'canalext' || kind === 'canalint') {
       var width=Number(tool.largura)||4.5,profile=tool.perfilCorte||'reto',radius=profile==='total'?width/2:profile==='raio'?Number(tool.raioCorte):0,length=Number(tool.comprimentoInserto)||({canal:12,canalext:14,canalint:8}[kind]);
       if(!['reto','raio','total'].includes(profile)||!Number.isFinite(radius)||radius<0||(profile==='raio'&&!(radius>0))||radius>width/2||radius>length)throw Error('Confira o raio do perfil de corte: deve caber na largura e no comprimento do inserto.');
@@ -3033,7 +3051,7 @@
   var PLANEJADOS = [
   ];
 
-  return { conferirColchetes:conferirColchetes, simTool: simTool, psCurvaCanto: psCurvaCanto, psCantos: psCantos, psCantosInt: psCantosInt, psMigra: psMigra, psRoscaD1: psRoscaD1, fmt: fmt, ascii: ascii, tcode: tcode, nomeArquivo: nomeArquivo, mesAno: mesAno, DEFAULT_MAQ: DEFAULT_MAQ, GERADORES: GERADORES, INTERNOS: INTERNOS, PLANEJADOS: PLANEJADOS };
+  return { conferirColchetes:conferirColchetes, simTool: simTool, INSERT_FORMATS:INSERT_FORMATS, insertFormats:insertFormats, normalizeInsert:normalizeInsert, psCurvaCanto: psCurvaCanto, psCantos: psCantos, psCantosInt: psCantosInt, psMigra: psMigra, psRoscaD1: psRoscaD1, fmt: fmt, ascii: ascii, tcode: tcode, nomeArquivo: nomeArquivo, mesAno: mesAno, DEFAULT_MAQ: DEFAULT_MAQ, GERADORES: GERADORES, INTERNOS: INTERNOS, PLANEJADOS: PLANEJADOS };
 });
 
 
