@@ -18,7 +18,7 @@ export function initialWorkspace(CNC,seeds,storage) {
   let drawings=read(KEYS.drawings,null);
   if(!Array.isArray(drawings)) { const def=CNC.GERADORES.peca_simples.campos.find(c=>c.id==='trechos1').def;const legacy=form.vals.peca_simples;
     drawings=[normalizeDrawing({...emptyDrawing(),nome:legacy?.trechos1?'Peça simples · dados anteriores':'Exemplo · eixo escalonado',trechos1:clone(def),...(legacy||{})},CNC)]; }
-  const extras={};if(storage)for(let i=0;i<storage.length;i++){const key=storage.key(i);if(key?.startsWith('cnc.')&&!Object.values(KEYS).includes(key))extras[key]=storage.getItem(key);}
+  const extras={};if(storage)for(let i=0;i<storage.length;i++){const key=storage.key(i);if(key?.startsWith('cnc.')&&!key.startsWith('cnc.access.')&&!Object.values(KEYS).includes(key))extras[key]=storage.getItem(key);}
   return {format:'cnc-workspace',version:3,cadDrafts:read(KEYS.cadDrafts,[]),tools,drawings:drawings.map(d=>normalizeDrawing(d,CNC)),work:read(KEYS.work,null),form,program:read(KEYS.program,{texto:'',ferr:{},orient:{},b:{}}),theme:read(KEYS.theme,storage?.getItem(KEYS.theme)||'alumasa'),seeded,legacyExtras:extras};
 }
 export function parseTransfer(value) {
@@ -34,7 +34,7 @@ export function parseTransfer(value) {
   throw new Error('Use um backup completo, banco de ferramentas ou lista de desenhos da versão anterior.');
 }
 export function mergeWorkspace(current,incoming,CNC) {
-  const next=clone(current),idMap={},draftMap={};
+  const next=clone(current),idMap={tools:{},drawings:{}},draftMap={};
   if(incoming.cadDrafts){
     const drafts=next.cadDrafts||[],seen=new Set(drafts.map(d=>JSON.stringify(d)));
     for(const raw of incoming.cadDrafts){if(seen.has(JSON.stringify(raw)))continue;const d=clone(raw);if(d.id&&drafts.some(old=>old.id===d.id)){const old=d.id;d.id=uid('cad');draftMap[old]=d.id}drafts.push(d);seen.add(JSON.stringify(raw))}
@@ -46,14 +46,15 @@ export function mergeWorkspace(current,incoming,CNC) {
     const item=key==='drawings'?remapDraft(normalizeDrawing(raw,CNC)):clone(raw);item.id ||= uid(key==='tools'?'t':'d');
     const existing=next[key].find(x=>x.id===item.id);
     if(existing&&JSON.stringify(existing)===JSON.stringify(item))continue;
-    if(existing){const old=item.id;item.id=uid(key==='tools'?'t':'d');idMap[old]=item.id;item.nome=(item.nome||'Sem nome')+' (importado)';}
+    if(existing){const old=item.id;item.id=uid(key==='tools'?'t':'d');idMap[key][old]=item.id;item.nome=(item.nome||'Sem nome')+' (importado)';}
     next[key].push(item);
   }
-  if(incoming.form){next.form={...next.form,...clone(incoming.form)};if(idMap[next.form.desenhoSel])next.form.desenhoSel=idMap[next.form.desenhoSel];
-    for(const key of ['cadPrimeiro','cadUsinagem'])if(incoming.form[key])next.form[key]={...clone(current.form?.[key]||{}),...Object.fromEntries(Object.entries(incoming.form[key]).map(([id,value])=>[idMap[id]||id,clone(value)]))};
-    for(const selection of Object.values(next.form.toolByTipo||{}))for(const slot of Object.keys(selection))if(idMap[selection[slot]])selection[slot]=idMap[selection[slot]];}
+  if(incoming.form){next.form={...next.form,...clone(incoming.form)};if(Object.hasOwn(incoming.form,'desenhoSel')&&idMap.drawings[next.form.desenhoSel])next.form.desenhoSel=idMap.drawings[next.form.desenhoSel];
+    for(const key of ['cadPrimeiro','cadUsinagem'])if(incoming.form[key])next.form[key]={...clone(current.form?.[key]||{}),...Object.fromEntries(Object.entries(incoming.form[key]).map(([id,value])=>[idMap.drawings[id]||id,clone(value)]))};
+    if(incoming.form.toolByTipo)for(const selection of Object.values(next.form.toolByTipo))for(const slot of Object.keys(selection))if(idMap.tools[selection[slot]])selection[slot]=idMap.tools[selection[slot]];}
   for(const key of ['work','program','theme','seeded'])if(incoming[key]!=null)next[key]=clone(incoming[key]);
-  if(next.work){next.work=normalizeDrawing(next.work,CNC);if(incoming.work)remapDraft(next.work);if(idMap[next.work.id])next.work.id=idMap[next.work.id];}
+  if(incoming.program?.ferr)for(const code of Object.keys(next.program.ferr))if(idMap.tools[next.program.ferr[code]])next.program.ferr[code]=idMap.tools[next.program.ferr[code]];
+  if(next.work){next.work=normalizeDrawing(next.work,CNC);if(incoming.work){remapDraft(next.work);if(idMap.drawings[next.work.id])next.work.id=idMap.drawings[next.work.id];}}
   next.legacyExtras={...next.legacyExtras,...incoming.legacyExtras};return next;
 }
 export function saveBrowser(storage,data) {

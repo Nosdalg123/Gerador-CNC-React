@@ -30,7 +30,7 @@ async function packageLight({ root = ROOT, createShortcut = process.platform ===
     await fs.rm(target, { recursive: true, force: true });
     await fs.cp(folder === 'app' ? path.join(root, 'dist') : revision, target, { recursive: true });
   }
-  for (const file of ['Iniciar-CNC-Leve.cmd', 'Iniciar-CNC-Leve.vbs', 'Reiniciar-CNC-Leve.cmd', 'Servidor-CNC.ps1', 'Usuarios-CNC.ps1', 'LEIA-ME.txt']) {
+  for (const file of ['Iniciar-CNC-Leve.cmd', 'Iniciar-CNC-Leve.vbs', 'Reiniciar-CNC-Leve.cmd', 'Servidor-CNC.ps1', 'Usuarios-CNC.ps1', 'Workspace-CNC.ps1', 'bridge.js', 'LEIA-ME.txt']) {
     await fs.copyFile(path.join(root, 'lightweight', file), path.join(out, file));
   }
   await fs.copyFile(path.join(root, 'public/assets/torno-cnc.ico'), path.join(out, 'torno-cnc.ico'));

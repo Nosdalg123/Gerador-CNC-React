@@ -11,6 +11,14 @@
  // Apenas o novo padrão explícito é usado. O T legado continua preservado como dado histórico.
  function standardCode(tool){var code=String(tool&&tool.tPadrao||'');return /^[0-9]{4}$/.test(code)&&Number(code.slice(0,2))>0&&Number(code.slice(2))>0?splitCode(code):null;}
  function slotSetup(form,type,slot,index,tool){var code=standardCode(tool);return Object.assign({position:code?code.position:String(index+1),offset:code?code.offset:String(index+1),tip:String(defaultTip(tool))},form.toolSetupByTipo&&form.toolSetupByTipo[type]&&form.toolSetupByTipo[type][slot]||{});}
+ function validateMountings(entries){
+  var positions={},errors=[],keys=['tipo','pastilha','raio','angulo','apSuporte','largura','diametro','larguraInserto','comprimentoInserto','espessuraHaste','posicaoInserto','assentoInserto','orientacaoSuporte','orient','perfilCorte','raioCorte'];
+  function geometry(tool){return JSON.stringify(keys.map(function(key){var value=tool[key];if(key==='tipo'&&value==='faceamento')value='externa';return value==null||value===''?null:typeof value==='number'?String(value):String(value).trim();}));}
+  entries.forEach(function(entry){if(!entry.tool)return;var position=splitCode(entry.tool.t).position,previous=positions[position];
+   if(previous&&geometry(previous.tool)!==geometry(entry.tool))errors.push('Posição '+position+' da torre usada por geometrias diferentes: '+previous.label+' e '+entry.label+'. Escolha posições distintas ou a mesma geometria física.');
+   else positions[position]=entry;
+  });return errors;
+ }
  function programTool(state,tools,reference){
   if(Object.prototype.hasOwnProperty.call(state.ferr||{},reference.codigo))return tools.find(function(t){return t.id===state.ferr[reference.codigo];});
   var byCode=tools.filter(function(t){var code=standardCode(t);return code&&code.code===reference.codigo;});
@@ -29,5 +37,5 @@
   copy.t=reference.codigo;
   return copy;
  }
- return {splitCode:splitCode,composeCode:composeCode,standardCode:standardCode,slotSetup:slotSetup,defaultTip:defaultTip,programTool:programTool,programOrientation:programOrientation,programGeometry:programGeometry};
+ return {splitCode:splitCode,composeCode:composeCode,standardCode:standardCode,slotSetup:slotSetup,validateMountings:validateMountings,defaultTip:defaultTip,programTool:programTool,programOrientation:programOrientation,programGeometry:programGeometry};
 });

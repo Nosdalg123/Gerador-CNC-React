@@ -10,7 +10,7 @@ function dxf(geometry){
 }
 async function main(){
  const url=process.env.CNC_TEST_URL;if(!url)throw Error('Use o teste leve com banco temporário.');const base=new URL(url),token=base.searchParams.get('token');
- const api=async(route,data)=>{const r=await fetch(base.origin+'/api/'+route,{method:data===undefined?'GET':'POST',headers:{'X-CNC-Token':token,'Content-Type':'application/json; charset=utf-8'},...(data===undefined?{}:{body:JSON.stringify(data)})});assert.equal(r.status,200);return r.json()};
+ const api=await require('./workspace-test-client.cjs').fixtureApi(url);
  const original=await api('load'),browser=await chromium.launch({channel:process.env.CNC_TEST_BROWSER||'msedge',headless:true}),page=await browser.newPage({viewport:{width:1600,height:1100}}),errors=[];
  const model=()=>page.evaluate(()=>structuredClone(CNCDXFImport.getModel())),saved=()=>expect(page.locator('header .save-status')).toHaveText('Dados salvos neste dispositivo');
  page.on('pageerror',e=>errors.push(e.message));page.on('dialog',d=>d.accept());

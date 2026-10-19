@@ -1,6 +1,6 @@
-# Mapa do código — versão 3.1.27
+# Mapa do código — versão 3.1.28
 
-Revisão: `93495c0bcc3199ee17368cb82652e41078f6de40125ff673659e3ae5b6a7be29`. 182 arquivos, 3070 símbolos, 5978 chamadas resolvidas e 134 relações JSX.
+Revisão: `9e8243384a20d35f053a69ab60bf3d28cf620ba87076a428d5a1e6c66d38d0ef`. 191 arquivos, 3142 símbolos, 5972 chamadas resolvidas e 135 relações JSX.
 
 Leia AGENTS.md e TRILHA-REACT.md antes de qualquer revisão. O índice tem hashes e faixas de linhas; GRAFO-CODIGO.json contém relações e evidências.
 
@@ -17,12 +17,13 @@ Consultas atualizam o mapa antes de responder. Dev/build/package também atualiz
 
 ## Limites e evidência
 
-EXTRACTED: referência resolvida pelo AST/escopo. INFERRED: alias global ou associação de conceito revisada. AMBIGUOUS: mais de um destino. 11405 chamadas externas/dinâmicas não foram resolvidas e estão registradas. Callbacks e funções anônimas têm nós próprios. Resolução estática não prova execução.
+EXTRACTED: referência resolvida pelo AST/escopo. INFERRED: alias global ou associação de conceito revisada. AMBIGUOUS: mais de um destino. 11919 chamadas externas/dinâmicas não foram resolvidas e estão registradas. Callbacks e funções anônimas têm nós próprios. Resolução estática não prova execução.
 
 A busca por assunto usa vocabulário de CNC e texto local, sem LLM ou embeddings. Não interpreta imagens/PDFs como documentação semântica. PowerShell tem inventário e declaração de função, sem grafo completo de comandos. Não há promessa de redução de tokens medida.
 
 ## Assuntos
 
+- **Segurança, sessão e revisão do workspace; correções find-bugs**: `lightweight/Servidor-CNC.ps1`, `lightweight/Workspace-CNC.ps1`, `lightweight/Usuarios-CNC.ps1`, `lightweight/bridge.js`, `src/use-workspace.mjs`, `src/App.jsx`, `src/data.mjs`, `src/domain.mjs`, `public/engine/core.js`, `public/engine/toolsetup.js`, `scripts/default-workspace.cjs`, `scripts/workspace-test-client.cjs`, `scripts/test-workspace-security.cjs`, `scripts/test-security-ui.cjs`, `tests/security-fixes.test.cjs`
 - **Inserto no suporte: centro/esquerda/direita, externo vertical e T padrão**: `src/components/Tools.jsx`, `src/tool-geometry-fields.mjs`, `src/assets/tool-drawing.mjs`, `src/components/Generator.jsx`, `src/components/Program.jsx`, `src/domain.mjs`, `src/tool-setup.mjs`, `public/engine/toolsetup.js`, `public/engine/core.js`, `public/engine/sim.js`, `tests/holder-seat-standard-code.test.cjs`, `scripts/test-holder-seat.cjs`
 - **Canal com raio, bedame e limite de colchetes FANUC**: `src/components/Tools.jsx`, `src/tool-geometry-fields.mjs`, `src/components/ToolDrawing.jsx`, `src/components/Program.jsx`, `public/engine/core.js`, `public/engine/sim.js`, `public/engine/progsim.js`, `public/engine/toolsetup.js`, `tests/groove-bedame-macros.test.cjs`, `scripts/test-groove-bedame.cjs`
 - **Geometria e suporte configuráveis: inserto, haste, montagem física e κ**: `src/components/Tools.jsx`, `src/tool-geometry-fields.mjs`, `src/assets/tool-drawing.mjs`, `public/engine/core.js`, `public/engine/sim.js`, `public/engine/toolsetup.js`, `src/components/Simulation.jsx`, `tests/tool-geometry.test.cjs`, `scripts/test-tool-geometry.cjs`

@@ -225,3 +225,14 @@ Consulta: `pnpm mapa:query --query "simulador interno profundo enquadramento"`; 
 - `watch-map.cjs:transformIndexHtml` e `App.jsx`: título e versão vêm de `package.json`; removido título 3.1.24 residual.
 - `test-opening-light.cjs`, `test-restart-light.cjs`, `test-light.cjs`: regressão de versão/build/pasta, reinício manual, servidor atualizado, título e campos das melhorias; preservação byte a byte do workspace, `.previous` e usuários em perfis temporários.
 - Relatório: `RELATORIO-ABERTURA-VERSAO-3.1.27.md`. Backup: `../backups/react-3.1.26-antes-correcao-abertura-20261015`. Graphify atualizado; entrega em pasta sem compactação.
+
+
+## Cinco correções find-bugs · 3.1.28
+
+- `core.js:cabecalhoPrograma`: data manual sanitizada como comentário; sem escape por parênteses/controles.
+- `Workspace-CNC.ps1`, `Servidor-CNC.ps1`, `bridge.js`: sessão/cota e permissões por campo, ETag/If-Match por cliente, HTTP 409 para revisão antiga, gravação atômica e proteção contra alteração externa. Credenciais seguem separadas.
+- `use-workspace.mjs`, `App.jsx`: carga após login, fila de gravação, exportação de alterações em conflito e recarga explícita. `default-workspace.cjs`: valores iniciais confiáveis do build para perfil vazio; usuários/sessões do fallback fora dos extras iniciais.
+- `toolsetup.js:validateMountings`, `domain.mjs`: bloqueio de geometrias incompatíveis na mesma estação, aplicando somente os papéis utilizados.
+- `data.mjs:mergeWorkspace`: mapas de IDs separados e remapeamento de `program.ferr` importado, preservando referências atuais não substituídas.
+- Regressões: `security-fixes.test.cjs`, `test-workspace-security.cjs`, `test-security-ui.cjs`; helpers antigos autenticados e regressão completa integrada a `test-light.cjs`. Perfis de teste únicos por execução.
+- Relatório: `RELATORIO-CORRECOES-FIND-BUGS-3.1.28.md`. Backup: `../backups/react-3.1.27-antes-correcoes-find-bugs-20261019`. Entrega leve em pasta, sem compactação.

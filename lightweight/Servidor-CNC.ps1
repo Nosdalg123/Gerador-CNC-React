@@ -3,7 +3,7 @@ $ErrorActionPreference='Stop'
 $utf8=New-Object System.Text.UTF8Encoding($false)
 $root=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot 'app'))
 $profile=Join-Path $env:APPDATA 'CNC Torno React'
-if($UiTest){$profile=Join-Path ([IO.Path]::GetTempPath()) ('cnc-react-light-test-'+$PID)}
+if($UiTest){$profile=Join-Path ([IO.Path]::GetTempPath()) ('cnc-react-light-test-'+$PID+'-'+[Guid]::NewGuid().ToString('N'))}
 if($UiTest -and $TestProfile){$testRoot=[IO.Path]::GetFullPath([IO.Path]::GetTempPath());$candidate=[IO.Path]::GetFullPath($TestProfile);if(!$candidate.StartsWith($testRoot,[StringComparison]::OrdinalIgnoreCase) -or !([IO.Path]::GetFileName($candidate)).StartsWith('cnc-react-light-test-')){throw 'Pasta de teste invalida.'};$profile=$candidate}
 function Get-CNCFileHash([string]$path){
   $hash=[Security.Cryptography.SHA256]::Create();$stream=[IO.File]::OpenRead($path)
@@ -23,7 +23,7 @@ try {
   # A identidade vem do build e do servidor carregados, nunca do titulo da janela.
   $built=[IO.File]::ReadAllText((Join-Path $root 'BUILD-REVISION.json'))|ConvertFrom-Json
   if($built.version -notmatch '^\d+\.\d+\.\d+$' -or $built.sourceDigest -notmatch '^[a-f0-9]{64}$'){throw 'Identificacao do build invalida. Use a pasta completa da distribuicao.'}
-  $revision=@{version=$built.version;sourceDigest=$built.sourceDigest;appRoot=$root;serverDigest=(Get-CNCFileHash $PSCommandPath);usersDigest=(Get-CNCFileHash (Join-Path $PSScriptRoot 'Usuarios-CNC.ps1'))}
+  $revision=@{version=$built.version;sourceDigest=$built.sourceDigest;appRoot=$root;serverDigest=(Get-CNCFileHash $PSCommandPath);usersDigest=(Get-CNCFileHash (Join-Path $PSScriptRoot 'Usuarios-CNC.ps1'));workspaceDigest=(Get-CNCFileHash (Join-Path $PSScriptRoot 'Workspace-CNC.ps1'));bridgeDigest=(Get-CNCFileHash (Join-Path $PSScriptRoot 'bridge.js'))}
   if(!$UiTest -and (Get-Process -Name 'CNC-Torno' -ErrorAction SilentlyContinue)){throw 'Feche a versao Electron antes de abrir a versao leve.'}
   [IO.Directory]::CreateDirectory($profile)|Out-Null
   $sessionFile=Join-Path $profile 'lightweight.session.json'
@@ -57,16 +57,12 @@ try {
   $script:expected=if([IO.File]::Exists($file)){[IO.File]::ReadAllText($file)}else{$null}
   . (Join-Path $PSScriptRoot 'Usuarios-CNC.ps1')
   Initialize-Users $profile
+  . (Join-Path $PSScriptRoot 'Workspace-CNC.ps1')
   if($Port -eq 0){$probe=New-Object Net.Sockets.TcpListener([Net.IPAddress]::Loopback,0);$probe.Start();$Port=$probe.LocalEndpoint.Port;$probe.Stop()}
   $origin='http://127.0.0.1:'+ $Port
   $token=[Guid]::NewGuid().ToString('N')+[Guid]::NewGuid().ToString('N')
   $listener=New-Object Net.HttpListener;$listener.Prefixes.Add($origin+'/');$listener.Start()
-  $bridge=@"
-const token='$token';
-async function request(path,data,session='',keepalive=false){const r=await fetch(path,{method:data===undefined?'GET':'POST',headers:{'X-CNC-Token':token,'X-CNC-Session':session,'Content-Type':'application/json'},keepalive,...(data===undefined?{}:{body:JSON.stringify(data)})});if(!r.ok)throw new Error(await r.text());return r.json()}
-globalThis.desktop={loadWorkspace:()=>request('/api/load'),saveWorkspace:data=>request('/api/save',data),dataPath:()=>request('/api/path'),access:(action,data,session,keepalive)=>request('/api/access/'+action,data,session,keepalive)};
-setInterval(()=>request('/api/alive').catch(()=>{}),15000);
-"@
+  $bridge=[IO.File]::ReadAllText((Join-Path $PSScriptRoot 'bridge.js')).Replace('__CNC_TOKEN__',$token)
   $url=$origin+'/?token='+$token
   [IO.File]::WriteAllText($sessionFile,(ConvertTo-Json -InputObject @{url=$url;pid=$PID;revision=$revision} -Depth 3 -Compress),$utf8)
   Open-CNC $url
@@ -75,6 +71,7 @@ setInterval(()=>request('/api/alive').catch(()=>{}),15000);
     if(!$pending.Wait(1000)){if(([DateTime]::UtcNow-$last).TotalMinutes -gt 30){break};continue}
     $ctx=$pending.Result;$pending=$listener.GetContextAsync();$req=$ctx.Request;$res=$ctx.Response
     try{
+      $script:requestStatus=400
       $route=$req.Url.AbsolutePath;$last=[DateTime]::UtcNow
       $res.Headers['Cache-Control']='no-store';$res.Headers['X-Content-Type-Options']='nosniff'
       if($req.Headers['Host'] -ne ('127.0.0.1:'+$Port)){throw 'Host invalido.'}
@@ -82,20 +79,36 @@ setInterval(()=>request('/api/alive').catch(()=>{}),15000);
         if($req.Headers['X-CNC-Token'] -ne $token -or ($req.Headers['Origin'] -and $req.Headers['Origin'] -ne $origin)){throw 'Origem nao autorizada.'}
         $res.ContentType='application/json; charset=utf-8'
         if($route.StartsWith('/api/access/')){$body=Invoke-UserAccess ($route.Substring(12)) $req}else{switch($route){
-          '/api/load' {if($req.HttpMethod -ne 'GET'){throw 'Metodo invalido.'};$body=if($null -eq $script:expected){'null'}else{$parsed=$script:expected|ConvertFrom-Json;if($parsed.format -ne 'cnc-workspace' -or $null -eq $parsed.tools -or $null -eq $parsed.drawings){throw 'Dados existentes invalidos; nao foram substituidos.'};$script:expected}}
+          '/api/load' {
+            $account=Get-WorkspaceUser $req
+            if($req.HttpMethod -ne 'GET'){throw 'Metodo invalido.'}
+            $defaults=Join-Path $root 'DEFAULT-WORKSPACE.json'
+            if($null -eq $script:expected -and [IO.File]::Exists($defaults)){
+              if([IO.File]::Exists($file)){Deny-Workspace 409 'Outro aplicativo criou os dados. Reabra para preservar o cadastro.'}
+              $initial=[IO.File]::ReadAllText($defaults);$parsed=$initial|ConvertFrom-Json
+              if($parsed.format -ne 'cnc-workspace' -or $parsed.tools -isnot [Array] -or $parsed.drawings -isnot [Array]){throw 'Dados iniciais invalidos.'}
+              [IO.File]::WriteAllText($file+'.tmp',$initial,$utf8);[IO.File]::Move($file+'.tmp',$file);$script:expected=$initial
+            }
+            $res.Headers['ETag']=Get-WorkspaceTag $script:expected
+            $body=if($null -eq $script:expected){'null'}else{$parsed=$script:expected|ConvertFrom-Json;if($parsed.format -ne 'cnc-workspace' -or $parsed.tools -isnot [Array] -or $parsed.drawings -isnot [Array]){throw 'Dados existentes invalidos; nao foram substituidos.'};$script:expected}
+          }
           '/api/path' {$body=ConvertTo-Json -InputObject $profile -Compress}
           '/api/alive' {$body='true'}
           '/api/revision' {$body=ConvertTo-Json -InputObject $revision -Compress}
           '/api/save' {
+            $account=Get-WorkspaceUser $req
             if($req.HttpMethod -ne 'POST' -or $req.ContentLength64 -gt 31457280){throw 'Gravacao invalida ou backup excede 30 MB.'}
             $reader=New-Object IO.StreamReader($req.InputStream,$utf8);$text=$reader.ReadToEnd();$reader.Dispose()
             if($utf8.GetByteCount($text) -gt 31457280){throw 'Backup excede 30 MB.'}
             $data=$text|ConvertFrom-Json;if($data.format -ne 'cnc-workspace' -or $data.tools -isnot [Array] -or $data.drawings -isnot [Array]){throw 'Dados invalidos.'}
             $disk=if([IO.File]::Exists($file)){[IO.File]::ReadAllText($file)}else{$null}
-            if($disk -cne $script:expected){throw 'Outro aplicativo alterou os dados. Exporte esta sessao e reabra para evitar sobrescrever.'}
+            if($disk -cne $script:expected){Deny-Workspace 409 'Outro aplicativo alterou os dados. Exporte esta sessao e reabra para evitar sobrescrever.'}
+            if($req.Headers['If-Match'] -cne (Get-WorkspaceTag $script:expected)){Deny-Workspace 409 'Outra janela salvou alteracoes. Exporte suas alteracoes ou recarregue os dados salvos antes de continuar.'}
+            $previous=if($null -eq $script:expected){$null}else{$script:expected|ConvertFrom-Json}
+            Assert-WorkspaceFields $account $previous $data
             [IO.File]::WriteAllText($file+'.tmp',$text,$utf8)
             if([IO.File]::Exists($file)){[IO.File]::Replace($file+'.tmp',$file,$file+'.previous')}else{[IO.File]::Move($file+'.tmp',$file)}
-            $script:expected=$text;$body='true'
+            $script:expected=$text;$res.Headers['ETag']=Get-WorkspaceTag $text;$body='true'
           }
           default {throw 'Rota desconhecida.'}
         }}
@@ -119,7 +132,7 @@ setInterval(()=>request('/api/alive').catch(()=>{}),15000);
     }catch{
       $requestError=$_.Exception.Message
       # A janela pode fechar durante uma resposta; essa desconexao nao encerra o servidor.
-      try{$res.StatusCode=400;$bytes=$utf8.GetBytes($requestError);$res.ContentType='text/plain; charset=utf-8';$res.ContentLength64=$bytes.Length;$res.OutputStream.Write($bytes,0,$bytes.Length)}catch{}
+      try{$res.StatusCode=$script:requestStatus;$bytes=$utf8.GetBytes($requestError);$res.ContentType='text/plain; charset=utf-8';$res.ContentLength64=$bytes.Length;$res.OutputStream.Write($bytes,0,$bytes.Length)}catch{}
     }finally{$res.Close()}
   }
 }catch{

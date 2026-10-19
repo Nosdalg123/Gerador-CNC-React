@@ -3,7 +3,7 @@ const arc=(id,c,r,start,end)=>({id,type:'ARC',c,r,start,end,layer:'perfil'}),lin
 const touching=()=>[arc('A',[10,20],10,90.5,180),arc('B',[10,40],10,270.5,0)],separate=()=>[arc('A',[10,20],10,90,180),arc('B',[10.1,40.01],10,270,0)];
 async function main(){
  const url=process.env.CNC_TEST_URL;if(!url)throw Error('Use o banco temporário do teste leve.');
- const base=new URL(url),token=base.searchParams.get('token'),api=async(route,data)=>{const r=await fetch(base.origin+'/api/'+route,{method:data===undefined?'GET':'POST',headers:{'X-CNC-Token':token,'Content-Type':'application/json; charset=utf-8'},...(data===undefined?{}:{body:JSON.stringify(data)})});assert.equal(r.status,200);return r.json()};
+ const base=new URL(url),token=base.searchParams.get('token'),api=await require('./workspace-test-client.cjs').fixtureApi(url);
  const original=await api('load'),browser=await chromium.launch({channel:process.env.CNC_TEST_BROWSER||'msedge',headless:true}),page=await browser.newPage({viewport:{width:1500,height:1050}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
  const model=()=>page.evaluate(()=>structuredClone(CNCDXFImport.getModel())),selection=()=>page.evaluate(()=>[...CNCDXFImport.getSelected().externo]);
  const click=async id=>{const locator=cadControl(page,'#dxfProjected [data-cad-segment="'+id+'"]').first();await locator.scrollIntoViewIfNeeded();const pt=await locator.evaluate(path=>{const p=path.getPointAtLength(path.getTotalLength()/2),screen=new DOMPoint(p.x,p.y).matrixTransform(path.getScreenCTM());return {x:screen.x,y:screen.y}});await page.mouse.click(pt.x,pt.y)};

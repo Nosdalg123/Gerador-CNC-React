@@ -1,7 +1,7 @@
 const {chromium,expect}=require('@playwright/test'),assert=require('node:assert/strict'),fs=require('node:fs/promises');
 async function main(){
  const url=process.env.CNC_TEST_URL;if(!url)throw Error('Execute pelo teste da versão leve, com perfil temporário.');
- const base=new URL(url),token=base.searchParams.get('token'),api=async(route,data)=>{const r=await fetch(base.origin+'/api/'+route,{method:data===undefined?'GET':'POST',headers:{'X-CNC-Token':token,'Content-Type':'application/json; charset=utf-8'},...(data===undefined?{}:{body:JSON.stringify(data)})});assert.equal(r.status,200);return r.json()};
+ const base=new URL(url),token=base.searchParams.get('token'),api=await require('./workspace-test-client.cjs').fixtureApi(url);
  const original=await api('load'),browser=await chromium.launch({channel:process.env.CNC_TEST_BROWSER||'msedge',headless:true}),page=await browser.newPage({viewport:{width:1536,height:1100}}),errors=[];
  page.on('pageerror',e=>errors.push(e.message));page.on('dialog',d=>d.accept());
  const read=()=>api('load'),modal=()=>page.getByRole('dialog'),add=name=>page.getByRole('button',{name:'Adicionar '+name,exact:true}).click();

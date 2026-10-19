@@ -363,7 +363,7 @@
   }
   function lerCampos(f, ks) { var n = {}; ks.forEach(function (k) { var v = Number(f[k]); n[k] = isFinite(v) ? v : NaN; }); return n; }
   function cabecalhoPrograma(P, mt) {
-    P('%'); P('<' + nomeArquivo(mt.nome) + '.txt>'); P(''); P('(' + ascii(mt.autor) + ' - ' + mt.data + ')'); P('');
+    P('%'); P('<' + nomeArquivo(mt.nome) + '.txt>'); P(''); P('(' + ascii(mt.autor) + ' - ' + ascii(mt.data) + ')'); P('');
   }
   function textoAcab(aF, aT, avA) {
     if (!(aF > 0) && !(aT > 0)) return 'Não há sobremetal para acabamento: o último passe do desbaste já é o final.';

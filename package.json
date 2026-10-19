@@ -1,6 +1,6 @@
 {
   "name": "gerador-cnc-react",
-  "version": "3.1.27",
+  "version": "3.1.28",
   "private": true,
   "description": "Gerador CNC Torno — React e distribuição leve local",
   "main": "electron/main.cjs",
@@ -19,7 +19,8 @@
     "mapa:check": "node scripts/index.cjs --check",
     "mapa:query": "node scripts/query-map.cjs",
     "mapa:watch": "node scripts/watch-map.cjs",
-    "test:mapa": "node --test tests/code-map.test.cjs"
+    "test:mapa": "node --test tests/code-map.test.cjs",
+    "test:seguranca": "node scripts/test-workspace-security.cjs"
   },
   "dependencies": {
     "pdfjs-dist": "6.4.299",

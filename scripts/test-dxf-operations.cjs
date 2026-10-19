@@ -10,7 +10,7 @@ const fixture=[...pair(0,'SECTION'),...pair(2,'HEADER'),...pair(9,'$INSUNITS'),.
  ...pair(0,'ENDSEC'),...pair(0,'EOF')].join('\r\n')+'\r\n';
 async function main(){
  const url=process.env.CNC_TEST_URL;if(!url)throw Error('Use o teste leve com perfil temporário.');
- const base=new URL(url),token=base.searchParams.get('token'),api=async(route,data)=>{const r=await fetch(base.origin+'/api/'+route,{method:data===undefined?'GET':'POST',headers:{'X-CNC-Token':token,'Content-Type':'application/json; charset=utf-8'},...(data===undefined?{}:{body:JSON.stringify(data)})});if(r.status!==200)throw Error('API '+route+': '+await r.text());return r.json()};
+ const base=new URL(url),token=base.searchParams.get('token'),api=await require('./workspace-test-client.cjs').fixtureApi(url);
  let original=await api('load');const browser=await chromium.launch({channel:process.env.CNC_TEST_BROWSER||'msedge',headless:true}),page=await browser.newPage({viewport:{width:1600,height:1100}}),errors=[];
  page.on('pageerror',e=>errors.push(e.message));page.on('dialog',d=>d.accept());
  const model=()=>page.evaluate(()=>structuredClone(CNCDXFImport.getModel())),mode=value=>selectCadMode(page,value);

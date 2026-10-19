@@ -1,4 +1,10 @@
-TORNO CNC 3.1.27 - VERSAO LEVE OFFLINE
+TORNO CNC 3.1.28 - VERSAO LEVE OFFLINE
+
+3.1.28: dados exigem login e permissoes; uma janela antiga nao sobrescreve
+a outra. Em caso de conflito, exporte as alteracoes e recarregue os dados
+salvos pelo botao da interface. Data manual permanece em comentario CNC.
+Geometrias diferentes na mesma estacao T bloqueiam o programa. Importacao
+de backup conserva a associacao da ferramenta quando o ID precisa mudar.
 
 3.1.27: abertura identifica a pasta, o build e o servidor carregado.
 Ao trocar de distribuicao, o servidor anterior e substituido com os dados

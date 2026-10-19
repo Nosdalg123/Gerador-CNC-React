@@ -2,6 +2,41 @@
   "schemaVersion": 1,
   "concepts": [
     {
+      "id": "correcoes-find-bugs",
+      "label": "Segurança, sessão e revisão do workspace; correções find-bugs",
+      "terms": [
+        "find-bugs",
+        "seguranca",
+        "segurança",
+        "permissoes por campo",
+        "login nos dados",
+        "etag",
+        "409",
+        "sobrescrever",
+        "duas janelas",
+        "data manual",
+        "T duplicado",
+        "backup ferramentas"
+      ],
+      "files": [
+        "lightweight/Servidor-CNC.ps1",
+        "lightweight/Workspace-CNC.ps1",
+        "lightweight/Usuarios-CNC.ps1",
+        "lightweight/bridge.js",
+        "src/use-workspace.mjs",
+        "src/App.jsx",
+        "src/data.mjs",
+        "src/domain.mjs",
+        "public/engine/core.js",
+        "public/engine/toolsetup.js",
+        "scripts/default-workspace.cjs",
+        "scripts/workspace-test-client.cjs",
+        "scripts/test-workspace-security.cjs",
+        "scripts/test-security-ui.cjs",
+        "tests/security-fixes.test.cjs"
+      ]
+    },
+    {
       "id": "assento-suporte-tpadrao",
       "label": "Inserto no suporte: centro/esquerda/direita, externo vertical e T padrão",
       "terms": [

@@ -1,7 +1,7 @@
 const {chromium,expect}=require('@playwright/test'),assert=require('node:assert/strict'),fs=require('node:fs/promises');
 const CAD=require('../public/engine/cadprofile.js'),G=require('../public/engine/dxfgeometry.js'),P=require('../public/engine/dxfprofile.js');globalThis.CNCPerfilCAD=CAD;
 async function main(){
- const url=process.env.CNC_TEST_URL;if(!url)throw Error('Use banco temporário');const base=new URL(url),token=base.searchParams.get('token'),api=async(route,data)=>{const r=await fetch(base.origin+'/api/'+route,{method:data===undefined?'GET':'POST',headers:{'X-CNC-Token':token,'Content-Type':'application/json; charset=utf-8'},...(data===undefined?{}:{body:JSON.stringify(data)})});assert.equal(r.status,200);return r.json()};
+ const url=process.env.CNC_TEST_URL;if(!url)throw Error('Use banco temporário');const base=new URL(url),token=base.searchParams.get('token'),api=await require('./workspace-test-client.cjs').fixtureApi(url);
  const original=await api('load'),browser=await chromium.launch({channel:process.env.CNC_TEST_BROWSER||'msedge',headless:true}),page=await browser.newPage({viewport:{width:1550,height:1100}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
  const fixture=require('../tests/fixtures/disco-7-gap.json'),geometry=structuredClone(fixture.geometry);G.repairEndpoints(geometry,fixture.ids);const p=P.analyze({geometry,units:4},null,fixture.axis,'direita',new Set(fixture.ids)).nativeProfile,{createOppositeCadSide}=await import('../src/cad-sides.mjs');
  const d=createOppositeCadSide({id:'test-disco-safety',nome:'Disco 7 · teste de percurso',dRef:200,lPeca:p.length,lados:'1',trechos1:[{tipo:'cadperfil',path:p.path}],internos1:[],internos2:[],trechos2:[],cadOrigem:{verificado:true,incompleto:false}});
