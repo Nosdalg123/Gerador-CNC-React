@@ -46,8 +46,10 @@ function writeAtomic(file,text){fs.mkdirSync(path.dirname(file),{recursive:true}
 // Serializa consultas, watcher, build e package para evitar gravações concorrentes.
 function withMapLock(root,work){
  const lock=path.join(root,'.code-map','update.lock');fs.mkdirSync(path.dirname(lock),{recursive:true});const until=Date.now()+15000;
- while(true){let fd;try{fd=fs.openSync(lock,'wx');fs.writeFileSync(fd,JSON.stringify({pid:process.pid}));fs.closeSync(fd);break}catch(e){if(fd!==undefined){fs.closeSync(fd);fs.unlinkSync(lock);throw e}if(e.code!=='EEXIST')throw e;
-  let alive=true;try{const owner=readJSON(lock,null,{recover:true});if(owner?.pid>0){try{process.kill(owner.pid,0)}catch(error){if(error.code==='ESRCH')alive=false;else if(error.code!=='EPERM')throw error}}else alive=Date.now()-fs.statSync(lock).mtimeMs<2000;if(!alive){fs.unlinkSync(lock);continue}}catch(error){if(error.code==='ENOENT')continue;throw error}
+ while(true){let fd;try{fd=fs.openSync(lock,'wx');fs.writeFileSync(fd,JSON.stringify({pid:process.pid}));fs.closeSync(fd);break}catch(e){if(fd!==undefined){fs.closeSync(fd);fs.unlinkSync(lock);throw e}if(e.code!=='EEXIST'&&!(e.code==='EPERM'&&fs.existsSync(lock)))throw e;
+  // No Drive para Windows, um lock de outro processo pode existir e recusar leitura
+  // temporariamente com EPERM. Isso significa ocupado: nunca remover nem ignorar o lock.
+  let alive=true;try{const owner=readJSON(lock,null,{recover:true});if(owner?.pid>0){try{process.kill(owner.pid,0)}catch(error){if(error.code==='ESRCH')alive=false;else if(error.code!=='EPERM')throw error}}else alive=Date.now()-fs.statSync(lock).mtimeMs<2000;if(!alive){fs.unlinkSync(lock);continue}}catch(error){if(error.code==='ENOENT')continue;if(error.code!=='EPERM')throw error}
   if(Date.now()>until)throw Error('Outra atualização do mapa ainda está em andamento. Tente novamente.');Atomics.wait(new Int32Array(new SharedArrayBuffer(4)),0,0,50);
  }}
  try{return work()}finally{fs.unlinkSync(lock)}

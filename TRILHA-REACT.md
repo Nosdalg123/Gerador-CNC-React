@@ -245,3 +245,15 @@ Consulta: `pnpm mapa:query --query "simulador interno profundo enquadramento"`; 
 - `toolsetup.js`, `domain.mjs`: normalização dos formatos e comparação da geometria da torre, com validação do corretor redondo.
 - Testes: `insert-formats-collisions.test.cjs`, `test-insert-formats.cjs`, cobertura dos diagnósticos em `testdiag.js`, regressões de geometria, montagem e animação.
 - Pesquisa oficial Mitsubishi/Sandvik e limites: `RELATORIO-INSERTOS-COLISOES-3.1.29.md`. Backup anterior em `.packaging/backup-3.1.28-insertos`. Entrega leve em pasta, sem compactação automática.
+
+
+## G71 por passes e contatos do programa literal · 3.1.30
+
+- Regressão baseada no programa enviado e no cadastro da imagem em `tests/fixtures/g71-user-3.1.30.json`, sem dados reais nos testes.
+- `progsim.js:ciclo71`: camadas e bolsões, navegação por passe, contexto U/W do ciclo, sem execução implícita P/Q; preserva G70 explícito. Orçamento de expansão e profundidade conhecidos, C1.5/C.5 resolvidos em retas perpendiculares.
+- `core.js:psLado/cyc71/cyc71i/cyc72`: remove passada implícita também na cena do Gerador; metadados de passe e profundidade. Paridade com interpretação preservada.
+- `sim.js:engagementProfile/analyze`, `Simulation.jsx`: compara limite do banco e ciclo, marca contato real, banner visível, verifica haste/material/placa antes da remoção e informa ausência de limites conhecidos.
+- `toolsetup.js`, `diagnostico.js`: T0000 exige associação explícita; avisos sobre G71 Z/R e ativação de tipo II, sem alterar o programa original.
+- Testes novos: `g71-contact-regression.test.cjs`, `test-g71-contact.cjs`; cobertura histórica/diagnósticos corrigida para a semântica P/Q. Relatório e referências: `RELATORIO-G71-CONTATOS-3.1.30.md`.
+- Backup anterior em `.packaging/backup-3.1.29-g71`. Entrega leve em pasta, sem compactação; mapa e Graphify renovados após ajustes.
+- `code-map.cjs:withMapLock`: EPERM transitório de lock existente no Drive é tratado como ocupado; aguarda sem burlar exclusão. Verificado pelo teste concorrente existente com três processos.

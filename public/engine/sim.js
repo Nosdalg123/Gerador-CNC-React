@@ -285,7 +285,7 @@
         rpm = self.rpmAt((pos.x + m.x) / 2, m.spin || tool); // m.spin: G96/G97 e S do proprio programa (modulo Simulacao)
         dur = len / Math.max(1e-6, (m.f || 0.1) * rpm / 60);
       }
-      segs.push({ x0: pos.x, z0: pos.z, x1: m.x, z1: m.z, len: len, t0: t, dur: dur, type: m.t, line: m.line, tool: m.tool, label: m.label || '', f: m.f || 0, rpm: rpm, dec: m.dec || '',pass:m.pass,passes:m.passes });
+      segs.push({ x0: pos.x, z0: pos.z, x1: m.x, z1: m.z, len: len, t0: t, dur: dur, type: m.t, line: m.line, tool: m.tool, label: m.label || '', f: m.f || 0, rpm: rpm, dec: m.dec || '',pass:m.pass,passes:m.passes,cutContext:m.cutContext });
       t += dur; pos = { x: m.x, z: m.z };
     });
     this.segs = segs; this.total = t;
@@ -355,11 +355,11 @@
         if (!mat[k] && !chk[k]) continue;
         var cz = this.zlo + (i + 0.5) * cs - tz;
         if (!insideShape(sh, cz, cr)) continue;
-        if (chk[k]) { if (info) info.chuck++; continue; }
+        if (chk[k]) { if (info){info.chuck++;info.chuckPoint??={x:2*(tr+cr),z:tz+cz};} continue; }
         if(info&&cut&&info.engagement){
           var e=info.engagement,depth=cz*e.normal[0]+cr*e.normal[1]-e.front;
-          if(e.limit>0&&depth>e.limit+e.tolerance){info.overload++;info.maxDepth=Math.max(info.maxDepth,depth);}
-          if(e.remote(cz,cr))info.remote++;
+          if(e.limit>0&&depth>e.limit+e.tolerance){info.overload++;info.maxDepth=Math.max(info.maxDepth,depth);info.overloadPoint??={x:2*(tr+cr),z:tz+cz};}
+          if(e.remote(cz,cr)){info.remote++;info.remotePoint??={x:2*(tr+cr),z:tz+cz};}
         }
         if (cut) { mat[k] = 0; if (info && prot[k]) info.gouge++; }
         else if (info) info.mat++;
@@ -378,7 +378,7 @@
       var k=j*this.nz+i;if(!this.mat[k]&&!this.chk[k])continue;
       var dz=this.zlo+(i+.5)*cs-z,dr=this.rlo+(j+.5)*cs-tr;
       if(!inPoly(poly,dz,dr)||distPoly(poly,dz,dr)<=MARGEM||inPoly(shape.pts,dz,dr))continue;
-      if(this.chk[k])info.bodyChuck++;else info.body++;
+      if(this.chk[k]){info.bodyChuck++;info.bodyChuckPoint??={x:2*(tr+dr),z:z+dz};}else{info.body++;info.bodyPoint??={x:2*(tr+dr),z:z+dz};}
     }
   };
 
@@ -389,12 +389,15 @@
     var groove=['canal','canalext','canalint'].includes(tool.kind),thread=['rosca','roscaint'].includes(tool.kind),mount=mounting(tool),signR=['interna','canalint','roscaint'].includes(tool.kind)?-1:1;
     var dx=(s.x1-s.x0)/2,dz=s.z1-s.z0,axial=Math.abs(dz)>=Math.abs(dx),normal=axial?[0,1]:[1,0],center=shape.pts.reduce((a,p)=>[a[0]+p[0]/shape.pts.length,a[1]+p[1]/shape.pts.length],[0,0]);
     if(center[0]*normal[0]+center[1]*normal[1]<0)normal=normal.map(v=>-v);
-    var front=Math.min(...shape.pts.map(p=>p[0]*normal[0]+p[1]*normal[1])),limit=groove||thread?0:axial?tool.incTorn:tool.incFace;
+    var cycle=s.cutContext,programLimit=cycle&&cycle.depth>0?Number(cycle.depth):0,axis=programLimit>0?cycle.axis:axial?'r':'z';
+    normal=axis==='z'?[Math.sign(center[0])||mount.z,0]:[0,Math.sign(center[1])||signR*mount.r];
+    var front=Math.min(...shape.pts.map(p=>p[0]*normal[0]+p[1]*normal[1])),bankLimit=groove||thread?0:axis==='r'?Number(tool.incTorn):Number(tool.incFace),limit=bankLimit>0?bankLimit:0;
+    if(programLimit>0&&!groove&&!thread)limit=limit>0?Math.min(limit,programLimit):programLimit;
     var radius=Number(tool.raio)||0,ic=positive(tool.insertWidth,12),configuredIncrement=groove?tool.incCanal:limit,reach=Math.max(ic*.55,2*radius+(Number(configuredIncrement)||0)/Math.max(.25,Math.sin((Number(tool.ang)||80)*DEG/2)));
-    var nose=shape.nose||[0,0],axis=groove?(tool.kind==='canal'?[mount.z,0]:[0,signR*mount.r]):null;
-    return {normal,front,limit:Number(limit)||0,tolerance:cs*.8+MARGEM,remote:function(z,r){
+    var nose=shape.nose||[0,0],grooveAxis=groove?(tool.kind==='canal'?[mount.z,0]:[0,signR*mount.r]):null;
+    return {normal,front,limit:Number(limit)||0,axis,source:programLimit>0?(bankLimit>0&&bankLimit<programLimit?'banco':cycle.cycle):'banco',tolerance:cs*.8+MARGEM,remote:function(z,r){
       if(groove){
-        var back=z*axis[0]+r*axis[1],length=positive(tool.insertLength,tool.kind==='canalint'?8:tool.kind==='canal'?12:14);
+        var back=z*grooveAxis[0]+r*grooveAxis[1],length=positive(tool.insertLength,tool.kind==='canalint'?8:tool.kind==='canal'?12:14);
         // Sem falso alerta na largura inteira: somente o corpo atrás da aresta ativa.
         return back>Math.max(Number(tool.raioPerfil)||0,Math.min(length*.55,positive(tool.incCanal,1)))+cs*.8;
       }
@@ -428,23 +431,23 @@
     var saveMat = this.mat, saveT = this.t;
     this.mat = new Uint8Array(this.mat0);
     // um alerta por (tipo, linha do G-code); repeticoes viram contagem
-    function add(type, s, i, x, z, text, tt) {
+    function add(type, s, i, x, z, text, tt,contact) {
       var key = type + ':' + s.line;
       if (seen[key]) { seen[key].n++; return; }
-      var a = { type: type, t: tt, seg: i, line: s.line, x: x, z: z, text: text, label: s.label, n: 1 };
+      var a = { type: type, t: tt, seg: i, line: s.line, x: x, z: z, text: text, label: s.label, n: 1,contact:contact||null };
       seen[key] = a;
       if (alerts.length < 60) alerts.push(a);
     }
     // limites minimos de sobreposicao (celulas de 0,25 mm2): evita ruido de raspadas de decimos de mm
-    var MIN_RAPIDO = 6, MIN_PECA = 3,lastSegment=-1,engagement=null;
+    var MIN_RAPIDO = 6, MIN_PECA = 3, MIN_CONTACT = 1,lastSegment=-1,engagement=null,unverifiedDepth={};
     function inspect(s,i,x,z,tt){
       var info = { chuck:0,gouge:0,mat:0,body:0,bodyChuck:0,remote:0,overload:0,maxDepth:0,engagement };
       self._bodyContact(s.tool,x,z,info);
       self._stamp(s.tool, x, z, s.type === 'f', info);
-      if (info.chuck||info.bodyChuck) add('placa', s, i, x, z, 'Colisão '+(info.bodyChuck?'da haste / suporte':'do inserto')+' com a placa (castanhas) em X' + fx(x) + ' Z' + fx(z), tt);
-      if(info.body>=MIN_PECA)add('haste',s,i,x,z,'Haste / suporte em contato com o material em X'+fx(x)+' Z'+fx(z),tt);
-      if(info.overload>=MIN_PECA)add('incremento',s,i,x,z,'Engajamento do inserto ≈ '+fx(info.maxDepth)+' mm excede o incremento '+(Math.abs(s.z1-s.z0)>=Math.abs((s.x1-s.x0)/2)?'de torneamento no raio':'de faceamento em Z')+' de '+fx(engagement.limit)+' mm em X'+fx(x)+' Z'+fx(z),tt);
-      if(info.remote>=MIN_PECA)add('inserto',s,i,x,z,'Contato em região do inserto afastada da ponta / aresta de corte em X'+fx(x)+' Z'+fx(z),tt);
+      if (info.chuck||info.bodyChuck) add('placa', s, i, x, z, 'Colisão '+(info.bodyChuck?'da haste / suporte':'do inserto')+' com a placa (castanhas) em X' + fx(x) + ' Z' + fx(z), tt,info.bodyChuckPoint||info.chuckPoint);
+      if(info.body>=MIN_CONTACT)add('haste',s,i,x,z,'Haste / suporte em contato com o material em X'+fx(x)+' Z'+fx(z),tt,info.bodyPoint);
+      if(info.overload>=MIN_CONTACT)add('incremento',s,i,x,z,'Engajamento do inserto ≈ '+fx(info.maxDepth)+' mm excede o incremento '+(engagement.axis==='r'?'de torneamento no raio':'de faceamento em Z')+' de '+fx(engagement.limit)+' mm ('+engagement.source+') em X'+fx(x)+' Z'+fx(z),tt,info.overloadPoint);
+      if(info.remote>=MIN_CONTACT)add('inserto',s,i,x,z,'Contato em região do inserto afastada da ponta / aresta de corte em X'+fx(x)+' Z'+fx(z),tt,info.remotePoint);
       if (info.gouge >= MIN_PECA) add('peca', s, i, x, z, 'Corte dentro da peça acabada em X' + fx(x) + ' Z' + fx(z), tt);
       if (s.type === 'r' && info.mat >= MIN_RAPIDO) add('rapido', s, i, x, z, 'Avanço rápido (G0) dentro do material em X' + fx(x) + ' Z' + fx(z), tt);
       if (maq.xMax && x > maq.xMax) add('limite', s, i, x, z, 'X' + fx(x) + ' passa do curso de X (' + maq.xMax + ')', tt);
@@ -453,7 +456,7 @@
       if (maq.zMin != null && z < maq.zMin) add('limite', s, i, x, z, 'Z' + fx(z) + ' abaixo do curso de Z (' + maq.zMin + ')', tt);
     }
     this._walk(0,this.total,function(s,i,x,z,tt){
-      if(i!==lastSegment){lastSegment=i;engagement=engagementProfile(sc.tools[s.tool]||{},s,self.shapes[s.tool],self.cs);inspect(s,i,s.x0,s.z0,s.t0);}
+      if(i!==lastSegment){lastSegment=i;var tool=sc.tools[s.tool]||{};engagement=engagementProfile(tool,s,self.shapes[s.tool],self.cs);if(s.type==='f'&&engagement&&!(engagement.limit>0)&&['rombo','interna'].includes(tool.kind))unverifiedDepth[s.tool+':'+engagement.axis]={tool:s.tool,axis:engagement.axis};inspect(s,i,s.x0,s.z0,s.t0);}
       inspect(s,i,x,z,tt);
     });
     // alerta com o tempo exato do primeiro passo problemático: usa t0 do segmento
@@ -491,7 +494,7 @@
     var tCut = 0, tRap = 0, dCut = 0, dRap = 0;
     this.segs.forEach(function (s) { if (s.type !== 'r') { tCut += s.dur; dCut += s.len; } else { tRap += s.dur; dRap += s.len; } });
     this.mat = saveMat; this.t = saveT;
-    return { alerts: alerts, total: this.total, tCut: tCut, tRapid: tRap, dCut: dCut, dRapid: dRap, sobraArea: area };
+    return { alerts: alerts, total: this.total, tCut: tCut, tRapid: tRap, dCut: dCut, dRapid: dRap, sobraArea: area,unverifiedDepth:Object.values(unverifiedDepth) };
   };
   function fx(v) { return (Math.round(v * 100) / 100).toString(); }
 

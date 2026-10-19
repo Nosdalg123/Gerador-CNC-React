@@ -202,7 +202,7 @@ const BASE = 'G1900D62L50K0.\nG21G90G40G80\nG28U0\nG0Z250\nT0101(DESBASTE)\nG54\
   const R4 = run('#1=10\nT0101\nG96S200M4\nG0X80Z2\nG71U1R.5\nG71P10Q20U.5W.1F.2\nN10G0X[#1*2]Z2\nG1Z-20\nN20X50\nG0X80Z2\nG70P10Q20\nM30');
   const g70 = R4.moves.filter(m => m.label === 'RETORNO (G70)')[0], cont = R4.moves.filter(m => m.line === 6);
   ok(g70 && g70.dec === 'G70P10Q20', 'decodificado: o retorno do G70 mostra o bloco G70 (nao o ultimo do contorno)', g70 && g70.dec);
-  ok(cont.length === 2 && cont.every(m => m.dec === 'N10 G0X[20]Z2'), 'decodificado: bloco N10 do contorno, no movimento normal e dentro do G70', cont.map(m => m.dec));
+  ok(cont.length === 1 && cont.every(m => m.dec === 'N10 G0X[20]Z2'), 'decodificado: N10 só executa no G70, sem acabamento implícito após G71', cont.map(m => m.dec));
   // a cena e o estado do simulador carregam o texto decodificado
   const sim = new S.Sim(P.montarCena(R, {}));
   ok(sim.segs.length === 1 && sim.segs[0].dec === 'G0Z[8]', 'decodificado: o segmento do simulador leva o texto', sim.segs.map(s => s.dec));

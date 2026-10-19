@@ -21,6 +21,7 @@
  }
  function programTool(state,tools,reference){
   if(Object.prototype.hasOwnProperty.call(state.ferr||{},reference.codigo))return tools.find(function(t){return t.id===state.ferr[reference.codigo];});
+  if(reference.codigo==='0000')return undefined;
   var byCode=tools.filter(function(t){var code=standardCode(t);return code&&code.code===reference.codigo;});
   if(byCode.length){var typed=byCode.filter(function(t){return t.tipo===(reference.sug&&reference.sug.tipo);});return typed.length===1?typed[0]:byCode.length===1?byCode[0]:undefined;}
   var matches=tools.filter(function(t){return t.tipo===(reference.sug&&reference.sug.tipo);});

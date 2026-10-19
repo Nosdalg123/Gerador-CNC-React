@@ -1,6 +1,6 @@
-# Mapa do código — versão 3.1.29
+# Mapa do código — versão 3.1.30
 
-Revisão: `50283a0cc24891d7a8ecc55c4b46e5eef9662fc2cbadcdb5ddf78e796331cf44`. 194 arquivos, 3219 símbolos, 6069 chamadas resolvidas e 136 relações JSX.
+Revisão: `42be88e78ce055dda7194d177ef3b20cabfe9c30ba0c30075db5a8a82fa189c0`. 198 arquivos, 3318 símbolos, 6128 chamadas resolvidas e 136 relações JSX.
 
 Leia AGENTS.md e TRILHA-REACT.md antes de qualquer revisão. O índice tem hashes e faixas de linhas; GRAFO-CODIGO.json contém relações e evidências.
 
@@ -17,7 +17,7 @@ Consultas atualizam o mapa antes de responder. Dev/build/package também atualiz
 
 ## Limites e evidência
 
-EXTRACTED: referência resolvida pelo AST/escopo. INFERRED: alias global ou associação de conceito revisada. AMBIGUOUS: mais de um destino. 12281 chamadas externas/dinâmicas não foram resolvidas e estão registradas. Callbacks e funções anônimas têm nós próprios. Resolução estática não prova execução.
+EXTRACTED: referência resolvida pelo AST/escopo. INFERRED: alias global ou associação de conceito revisada. AMBIGUOUS: mais de um destino. 12647 chamadas externas/dinâmicas não foram resolvidas e estão registradas. Callbacks e funções anônimas têm nós próprios. Resolução estática não prova execução.
 
 A busca por assunto usa vocabulário de CNC e texto local, sem LLM ou embeddings. Não interpreta imagens/PDFs como documentação semântica. PowerShell tem inventário e declaração de função, sem grafo completo de comandos. Não há promessa de redução de tokens medida.
 
@@ -52,3 +52,4 @@ A busca por assunto usa vocabulário de CNC e texto local, sem LLM ou embeddings
 - **Marca de autoria no canto inferior direito**: `src/App.jsx`, `src/style.css`, `scripts/test-machine-tools.cjs`, `RELATORIO-AUTORIA-3.1.19.md`
 - **Usuários, permissões por módulo e tempo acumulado de uso**: `src/App.jsx`, `src/users.mjs`, `src/components/Users.jsx`, `lightweight/Usuarios-CNC.ps1`, `lightweight/Servidor-CNC.ps1`, `scripts/test-users.cjs`, `tests/users.test.cjs`
 - **Formatos ISO de insertos, croqui vertical e colisões de haste / engajamento**: `public/engine/core.js`, `public/engine/sim.js`, `public/engine/toolsetup.js`, `public/engine/diagnostico.js`, `src/components/Tools.jsx`, `src/components/ToolDrawing.jsx`, `src/components/Simulation.jsx`, `src/tool-geometry-fields.mjs`, `src/assets/tool-drawing.mjs`, `tests/insert-formats-collisions.test.cjs`, `scripts/test-insert-formats.cjs`, `RELATORIO-INSERTOS-COLISOES-3.1.29.md`
+- **G71/G72 por camadas, bolsões, P/Q, C e contatos limitados pelo programa**: `public/engine/progsim.js`, `public/engine/core.js`, `public/engine/sim.js`, `public/engine/toolsetup.js`, `public/engine/diagnostico.js`, `src/components/Simulation.jsx`, `tests/g71-contact-regression.test.cjs`, `tests/fixtures/g71-user-3.1.30.json`, `scripts/test-g71-contact.cjs`, `RELATORIO-G71-CONTATOS-3.1.30.md`

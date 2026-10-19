@@ -1,0 +1,20 @@
+{
+  "text": "g291\ng21g40g90g95\nt00\ng54g0x200z200\nm08\nt0101\ng92s200m4\ng96s1200\ng0x51z2\ng71u1.5z2\ng71p10q20u.8w.1f.35\nn10g0x0\ng1z0\nx20c1.5\nz-50\nx18z-52\nz-55\nx40c.5\nz-60\ng2x20z-70r10\ng2x40z-80r10\nn20g1x51\nt00\ng54g0x200z200\nt0201\ng97s1400m4\ng0x51z2\nt00\ng54g0x200z200\nt0301\ng97s1000m4\ng0x22\ng76p020060q50r0.05\ng76x17.4z-54.9p1300q100f2\nt00\ng54g0x200z200\nm76\nm09\ng70p10q20f.12\nm30",
+  "tool": {
+    "id": "foto",
+    "nome": "DESBASTE EXTERNO 90 GRAUS",
+    "tipo": "externa",
+    "tPadrao": "0909",
+    "formatoInserto": "auto",
+    "modo": "G96",
+    "sentido": 4,
+    "rpm": 500,
+    "raio": 1,
+    "larguraInserto": 16,
+    "espessuraHaste": 25,
+    "apSuporte": 90,
+    "assentoInserto": "esquerda",
+    "orientacaoSuporte": "vertical",
+    "posicaoInserto": "inferior_esquerdo"
+  }
+}

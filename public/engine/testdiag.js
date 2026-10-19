@@ -106,6 +106,8 @@ const CAB = 'G21G90G40G80\nG28U0\nT0101\nG96S250M4\nG50S1500\nM8\n', FIM = '\nG2
 {
   const cont = 'N1G0X50\nG1Z-20\nN2X60\n';
   const ciclo = (par, chamada, c) => CAB + 'G0X70Z2\n' + par + chamada + '\n' + (c || cont) + 'G0X70Z2\nG70P1Q2F.1' + FIM;
+  tem(ciclo('G71U1.5Z2\n','G71P1Q2U.3W.05F.2'),'g71Recuo','Z não substitui R no recuo','aviso');
+  tem('T00\nG97S1000M4\nG0X50Z2\nG1Z-10F.2\nM30','corteT00','corte com corretor/ferramenta T00 indefinida','aviso');
   tem(ciclo('', 'G71P1Q2U.3W.05F.2'), 'cicloSemPar', 'G71 sem U R', 'aviso');
   tem(ciclo('G71U2R1\n', 'G71P1Q9U.3W.05F.2'), 'cicloSemContorno', 'P/Q para bloco inexistente', 'erro');
   tem(ciclo('G71U0R1\n', 'G71P1Q2U.3W.05F.2'), 'cicloProf', 'G71 com U0', 'erro');

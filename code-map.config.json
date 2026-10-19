@@ -1033,6 +1033,52 @@
         "analyze",
         "Tools"
       ]
+    },
+    {
+      "id": "g71-passes-contatos",
+      "label": "G71/G72 por camadas, bolsões, P/Q, C e contatos limitados pelo programa",
+      "terms": [
+        "G71",
+        "G72",
+        "G71U1.5",
+        "G71P10Q20",
+        "bolsão",
+        "bolsao",
+        "desbaste em passe único",
+        "desbaste em passe unico",
+        "tipo II",
+        "P/Q",
+        "C1.5",
+        "chanfro C",
+        "T0000",
+        "incremento do ciclo",
+        "contato vermelho"
+      ],
+      "files": [
+        "public/engine/progsim.js",
+        "public/engine/core.js",
+        "public/engine/sim.js",
+        "public/engine/toolsetup.js",
+        "public/engine/diagnostico.js",
+        "src/components/Simulation.jsx",
+        "tests/g71-contact-regression.test.cjs",
+        "tests/fixtures/g71-user-3.1.30.json",
+        "scripts/test-g71-contact.cjs",
+        "RELATORIO-G71-CONTATOS-3.1.30.md"
+      ],
+      "symbols": [
+        "ciclo71",
+        "ciclo70",
+        "mover",
+        "cyc71",
+        "cyc71i",
+        "cyc72",
+        "psLado",
+        "engagementProfile",
+        "_bodyContact",
+        "analyze",
+        "Simulation"
+      ]
     }
   ]
 }

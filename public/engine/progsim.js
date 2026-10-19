@@ -244,7 +244,7 @@
     }
 
     /* ----- estado da maquina ----- */
-    var st = { x: xHome, z: zHome, mode: 0, abs: true, f: 0, fmin: false, tool: null, modo: 'G97', vc: 0, rpm: 0, lim: 0, spinObj: null, cyc83: null, c71: null, c72: null, c73: null, cRe: null, c76: null, comp: 0, compOff: false,
+    var st = { x: xHome, z: zHome, mode: 0, abs: true, f: 0, fmin: false, tool: null, modo: 'G97', vc: 0, rpm: 0, lim: 0, spinObj: null, cyc83: null, c71: null, c72: null, cutContext:null, c73: null, cRe: null, c76: null, comp: 0, compOff: false,
       giro: false, refri: false, emTrabalho: false, linhaModo: -1, linhaComp: -1, linhaFim: -1 };
     var decAtual = ''; // bloco em execucao com variaveis e expressoes ja calculadas (visor decodificado)
     function snapshot() { return { x: st.x, z: st.z, mode: st.mode, abs: st.abs, f: st.f, fmin: st.fmin, comp: st.comp }; }
@@ -281,8 +281,9 @@
     }
 
     /* ----- emissao de movimentos (ctx.cap = leitura de contorno, sem emitir) ----- */
+    function checaFerramentaCorte(i){if(st.tool==='0000')aviso(i,'Corte com T00/T0000 ativo: confira a ferramenta física e o corretor. Associe a geometria de T0000 explicitamente para analisar este trecho.','corteT00','corteT00');}
     function emite(t, x, z, f, i, label, ctx) {
-      if (ctx && ctx.cap) { ctx.cap.push({ t: t, x: x, z: z }); st.x = x; st.z = z; return; }
+      if (ctx && ctx.cap) { ctx.cap.push({ t: t, x: x, z: z, line:i }); st.x = x; st.z = z; return; }
       if (moves.length >= MAX_MOV) { truncado = true; fim = true; st.x = x; st.z = z; return; }
       if (Math.abs(x - st.x) < 1e-9 && Math.abs(z - st.z) < 1e-9) return; // movimento nulo
       var tool = st.tool || '0000';
@@ -290,11 +291,13 @@
         if (t !== 'r') aviso(i, 'Avanço de corte antes de qualquer comando T: a ferramenta ficou indefinida.', 'semT');
         if (!ferr['0000']) fichaFerr('0000', i, { com: '(sem comando T no programa)' });
       }
+      if(t!=='r')checaFerramentaCorte(i);
       var fi = ferr[tool], m = { t: t, x: x, z: z, line: i, label: label, tool: tool, spin: spin(), dec: decAtual, comp: st.compOff ? 0 : st.comp };
       if (t !== 'r') {
         m.f = f; st.emTrabalho = true;
         if (!st.giro) aviso(i, 'Corte sem o fuso ligado: nenhum M3/M4 foi comandado antes do primeiro corte.', 'semGiro', 'semGiro');
       }
+      if(st.cutContext)m.cutContext=Object.assign({},st.cutContext);
       moves.push(m);
       fi.nMov++;
       if (t === 'r') { if (fi.preAvanco && z > 0.001 && z <= 20.001) fi.zAntes = fi.zAntes == null ? z : Math.min(fi.zAntes, z); }
@@ -344,7 +347,23 @@
         modo = 1;
       }
       if (modo === 0) { rapido(a.x, a.z, i, 'RÁPIDO (G0)', ctx); return; }
-      if (modo === 1) { checaS(i); avanco(a.x, a.z, i, 'AVANÇO (G1)', ctx); return; }
+      if (modo === 1) {
+        checaS(i);
+        if(w.C!=null){
+          if(!(w.C>0))falha('chanfro C deve ser positivo');
+          var next=i+1;while(next<NB&&B[next].kind==='vazio')next++;
+          if(next>=NB||B[next].kind!=='normal')falha('chanfro C precisa de um movimento linear seguinte');
+          var nextWords={},nextGs=[],savedParser=R;
+          palavras(B[next].rest,next).forEach(p=>{if(p.l==='G')nextGs.push(p.v);else nextWords[p.l]=p.v;});R=savedParser;
+          if(nextGs.some(g=>g!==1)||!temCoord(nextWords))falha('chanfro C: próximo bloco precisa de uma reta G1 em X/Z');
+          var oldX=st.x,oldZ=st.z;st.x=a.x;st.z=a.z;var target=alvo(nextWords);st.x=oldX;st.z=oldZ;
+          var incoming=[a.z-oldZ,(a.x-oldX)/2],outgoing=[target.z-a.z,(target.x-a.x)/2],li=Math.hypot(...incoming),lo=Math.hypot(...outgoing);
+          if(!(li>w.C&&lo>w.C)||Math.abs(incoming[0]*outgoing[0]+incoming[1]*outgoing[1])>1e-7*li*lo)falha('chanfro C: o tamanho deve caber em duas retas perpendiculares');
+          avanco(a.x-2*w.C*incoming[1]/li,a.z-w.C*incoming[0]/li,i,'ENTRADA DO CHANFRO C',ctx);
+          avanco(a.x+2*w.C*outgoing[1]/lo,a.z+w.C*outgoing[0]/lo,i,'CHANFRO C'+numTxt(w.C),ctx);
+        }else avanco(a.x,a.z,i,'AVANÇO (G1)',ctx);
+        return;
+      }
       // arcos
       var p0 = [st.z, st.x / 2], p1 = [a.z, a.x / 2], ccw = modo === 3, c = null, k;
       if (w.R != null && w.R !== 0) {
@@ -381,7 +400,8 @@
 
     function ciclo71(w, i, tipo) { // G71 (longitudinal) e G72 (transversal): w = bloco com P Q U W F
       var par = tipo === 71 ? st.c71 : st.c72, nome = 'G' + tipo;
-      if (!par) { aviso(i, nome + ' sem o bloco ' + nome + (tipo === 71 ? ' U R' : ' W R') + ' antes: usei profundidade 1 e retorno 1.', 'sempar' + tipo); par = { d: 1, e: 1 }; }
+      if(w.D!=null)par={d:w.D,e:w.R!=null?w.R:.5};
+      if (!par) { aviso(i, nome + ' sem o bloco ' + nome + (tipo === 71 ? ' U R' : ' W R') + ' antes: profundidade desconhecida; ciclo não expandido.', 'sempar' + tipo); erro(i,nome+': informe a profundidade no primeiro bloco ou D no formato de um bloco.','cicloProf');return; }
       var iP = acha(Math.round(w.P), i), iQ = iP < 0 ? -1 : acha(Math.round(w.Q), iP);
       if (iP < 0 || iQ < 0) { erro(i, nome + ': não achei o bloco N' + (iP < 0 ? Math.round(w.P) : Math.round(w.Q)) + ' do contorno.', 'cicloSemContorno'); return; }
       checaContorno(iP, i, nome);
@@ -389,7 +409,8 @@
       if (!(f > 0)) f = st.f;
       var fr = f > 0 ? (st.fmin ? f / Math.max(rpmDe(spin(), st.x), 1) : f) : fRev(st.x, i);
       if (cap.length < 2) { aviso(i, nome + ': contorno com menos de 2 movimentos; ciclo ignorado.', 'cap' + i); return; }
-      if (!(d > 0)) { erro(i, nome + ': profundidade de corte (' + (tipo === 71 ? 'U' : 'W') + ') deve ser maior que zero.', 'cicloProf'); return; }
+      if(cap.length>20000){erro(i,nome+': contorno ultrapassa 20000 pontos; simulação incompleta.','truncado');truncado=true;fim=true;return;}
+      if (!Number.isFinite(d)||!(d>0)||!Number.isFinite(e)||e<0) { erro(i, nome + ': profundidade de corte (' + (tipo === 71 ? 'U' : 'W') + ') deve ser positiva e o recuo R não pode ser negativo.', 'cicloProf'); return; }
       checaS(i); nota(i, 'g' + tipo);
       var eixoSobe = false, eixoDesce = false; // eixo principal do ciclo (Z no G71, X no G72) tem de andar sempre no mesmo sentido
       for (k = 1; k < cap.length; k++) {
@@ -399,30 +420,51 @@
       if (eixoSobe && eixoDesce) dica(iP, nome + ' (linha ' + (i + 1) + '): o contorno volta em ' + (tipo === 71 ? 'Z' : 'X') + ' (anda nos dois sentidos); o simulador desbasta como se andasse só num sentido. Alguns comandos alarmam esse formato.', 'eixo' + i, 'cicloEixo');
       var xA = st.x, zA = st.z, rA = xA / 2, PZ = [], PR = [], k;
       cap.forEach(function (p) { PZ.push(p.z + dw); PR.push(p.x / 2 + du / 2); });
-      var n = cap.length, lab = 'DESBASTE ' + nome;
+      var n = cap.length, lab = 'DESBASTE ' + nome,roughStart=moves.length;
       if (tipo === 71) {
         var r0 = cap[0].x / 2, ext = r0 < rA - 1e-6 ? true : (r0 > rA + 1e-6 ? false : du >= 0 && !(du === 0 && 1 / du < 0));
         if (du !== 0 && (ext ? du < 0 : du > 0)) aviso(i, 'G71 ' + (ext ? 'externo' : 'interno') + ' com U' + numTxt(du) + ': o sobremetal de acabamento deve ser ' + (ext ? 'positivo' : 'negativo') + ' (senão o desbaste corta dentro do perfil).', 'g71sinal' + i, 'g71Sinal');
         var sg = ext ? 1 : -1, rFloor = ext ? Math.min.apply(null, PR) : Math.max.apply(null, PR), lv = [], r = rA - sg * d;
-        if (Math.abs(cap[0].z - zA) > 0.01) aviso(i, 'G71 tipo II (primeiro bloco do contorno com Z) foi simulado como tipo I.', 'g71ii');
-        var subiu = false, desceu = false;
-        for (k = 1; k < n; k++) { if (PR[k] > PR[k - 1] + 0.01) subiu = true; if (PR[k] < PR[k - 1] - 0.01) desceu = true; }
-        if (subiu && desceu) aviso(i, 'G71: o contorno sobe e desce em X (cavidade): o simulador desbasta como tipo I e pode deixar a cavidade sem usinar no desbaste.', 'g71cav');
-        while (sg * (r - rFloor) > 1e-9 && lv.length < 3000) { lv.push(r); r -= sg * d; }
-        if (sg * (rA - rFloor) > 1e-6) lv.push(rFloor);
-        if (ext) nota(i, 'ext'); else { nota(i, 'int'); var fi71 = st.tool && ferr[st.tool]; if (fi71) fi71.ops.intXA = fi71.ops.intXA == null ? xA : Math.min(fi71.ops.intXA, xA); }
-        lv.forEach(function (rl) {
-          var stop = PZ[n - 1], q;
-          if (sg * (PR[0] - rl) >= -1e-9) stop = PZ[0];
-          else for (q = 1; q < n; q++) {
-            if (sg * (PR[q] - rl) >= -1e-9) { var den = PR[q] - PR[q - 1]; stop = Math.abs(den) < 1e-12 ? PZ[q] : PZ[q - 1] + (rl - PR[q - 1]) / den * (PZ[q] - PZ[q - 1]); break; }
+        var firstWords=palavras(B[iP].rest,iP),typeII=firstWords.some(p=>p.l==='Z'||p.l==='W');
+        var subiu=false,desceu=false;
+        for(k=1;k<n;k++){if(PR[k]>PR[k-1]+.01)subiu=true;if(PR[k]<PR[k-1]-.01)desceu=true;}
+        if(typeII)aviso(i,'G71 tipo II: cavidades expandidas por níveis; confira suporte e inserto nos bolsões.','g71ii','g71ii');
+        if(subiu&&desceu&&!typeII)aviso(i,'G71: o contorno sobe e desce em X (cavidade), mas N'+B[iP].n+' não declara Z/W para tipo II. A prévia de segurança expande os bolsões por níveis; confira a ativação do tipo II no comando.','g71cav','g71cav');
+        while(sg*(r-rFloor)>1e-9&&lv.length<3000){lv.push(r);r-=sg*d;}
+        if(sg*(r-rFloor)>1e-9){erro(i,'G71 ultrapassou 3000 níveis: simulação incompleta.','truncado');truncado=true;fim=true;return;}
+        if(sg*(rA-rFloor)>1e-6)lv.push(rFloor);
+        if(lv.length*n>2000000){erro(i,'G71: perfil e quantidade de níveis excedem o limite de análise; simplifique o contorno ou confira o incremento.','truncado');truncado=true;fim=true;return;}
+        var dirZ=cap[n-1].z<zA?-1:1;
+        // Reversões em Z usam o envelope conservador das interseções, com o aviso cicloEixo acima.
+        if(ext)nota(i,'ext');else{nota(i,'int');var fi71=st.tool&&ferr[st.tool];if(fi71)fi71.ops.intXA=fi71.ops.intXA==null?xA:Math.min(fi71.ops.intXA,xA);}
+        // Interseção de cada camada com TODOS os trechos do perfil. Bolsões separados
+        // são alcançados pelo diâmetro de aproximação, sem atravessar o ressalto em G0.
+        lv.forEach(function(rl,passIndex){
+          var blocked=[],intervals=[],extent=Math.max(...PZ.map(z=>dirZ*(z-zA)));
+          for(var q=1;q<n;q++){
+            var ua=dirZ*(PZ[q-1]-zA),ub=dirZ*(PZ[q]-zA),ra=PR[q-1],rb=PR[q];
+            if(ub<ua){var swap=ua;ua=ub;ub=swap;swap=ra;ra=rb;rb=swap;}
+            if(ub<=ua+1e-10)continue;
+            var a=ua,b=ub,ha=sg*(rl-ra),hb=sg*(rl-rb);
+            if(ha>1e-9&&hb>1e-9)continue;
+            if(ha>1e-9||hb>1e-9){var cross=ua+(ub-ua)*ha/(ha-hb);if(ha>1e-9)a=cross;else b=cross;}
+            a=Math.max(0,a);if(b<=a+1e-8)continue;
+            blocked.push([a,b]);
           }
-          stop = Math.min(zA, stop);
-          if (stop >= zA - 1e-6) return;
-          rapido(2 * rl, zA, i, lab);
-          avanco(2 * rl, stop, i, lab, null, fr);
-          rapido(2 * (rl + sg * e), stop + e, i, lab);
-          rapido(2 * (rl + sg * e), zA, i, lab);
+          // Conservar a peça em qualquer interseção do perfil; nunca unir regiões através de um ressalto.
+          blocked.sort((a,b)=>a[0]-b[0]);var cursor=0;
+          blocked.forEach(function(range){if(range[0]>cursor+1e-8)intervals.push([cursor,range[0]]);cursor=Math.max(cursor,range[1]);});
+          if(extent>cursor+1e-8)intervals.push([cursor,extent]);
+          var first=moves.length;
+          intervals.forEach(function(range){
+            var enter=zA+dirZ*range[0],stop=zA+dirZ*range[1];
+            rapido(xA,zA,i,lab);rapido(xA,enter,i,lab);
+            if(range[0]<1e-8)rapido(2*rl,enter,i,lab);else avanco(2*rl,enter,i,lab,null,fr);
+            avanco(2*rl,stop,i,lab,null,fr);
+            var retreat=Math.min(e,range[1]-range[0]);rapido(2*(rl+sg*e),stop-dirZ*retreat,i,lab);
+            rapido(xA,stop-dirZ*retreat,i,lab);rapido(xA,zA,i,lab);
+          });
+          for(var pm=first;pm<moves.length;pm++){moves[pm].pass=passIndex+1;moves[pm].passes=lv.length+1;}
         });
       } else {
         var rEnd = cap[n - 1].x / 2, ext2 = rEnd < rA - 1e-6 ? true : (rEnd > rA + 1e-6 ? false : du >= 0 && !(du === 0 && 1 / du < 0));
@@ -430,7 +472,8 @@
         while (z > zFloor + 1e-9 && lz.length < 3000) { lz.push(z); z -= d; }
         if (zFloor < zA - 1e-6) lz.push(zFloor);
         if (ext2) nota(i, 'ext'); else nota(i, 'int');
-        lz.forEach(function (zl) {
+        lz.forEach(function (zl,passIndex) {
+          var first=moves.length;
           var rs = PR[n - 1], q; // primeiro cruzamento do contorno com o nivel Z (de fora para dentro no externo, do furo para fora no interno)
           for (q = 1; q < n; q++) {
             var za = PZ[q - 1], zb = PZ[q];
@@ -442,18 +485,26 @@
           avanco(2 * rs, zl, i, lab, null, fr);
           rapido(2 * rs, zl + e, i, lab);
           rapido(xA, zl + e, i, lab);
+          for(var pm=first;pm<moves.length;pm++){moves[pm].pass=passIndex+1;moves[pm].passes=lz.length+1;}
         });
       }
-      // passada no contorno com sobremetal e volta ao ponto de partida
+      // Níveis tangentes ao piso podem ser vazios. Numerar somente os passes emitidos.
+      var passOrder=new Map();for(var rp=roughStart;rp<moves.length;rp++)if(!passOrder.has(moves[rp].pass))passOrder.set(moves[rp].pass,passOrder.size+1);
+      for(var rp=roughStart;rp<moves.length;rp++){moves[rp].pass=passOrder.get(moves[rp].pass);moves[rp].passes=passOrder.size+1;}
+      // Contorno com sobremetal depois das camadas; identificado separadamente do desbaste.
+      var contourStart=moves.length;
       rapido(2 * PR[0], Math.min(zA, PZ[0]), i, lab);
       for (k = 1; k < n; k++) avanco(2 * PR[k], Math.min(zA, PZ[k]), i, lab, null, fr);
       rapido(xA, zA, i, lab);
+      for(var cm=contourStart;cm<moves.length;cm++){moves[cm].pass=passOrder.size+1;moves[cm].passes=moves[cm].pass;moves[cm].label='CONTORNO COM SOBREMETAL '+nome;}
+      return iQ>i?iQ+1:null;
     }
 
     function ciclo70(w, i) { // acabamento: repete os blocos P..Q com o avanco do G70 e volta ao ponto de partida
       var iP = acha(Math.round(w.P), i), iQ = iP < 0 ? -1 : acha(Math.round(w.Q), iP);
       if (iP < 0 || iQ < 0) { erro(i, 'G70: não achei o bloco N' + (iP < 0 ? Math.round(w.P) : Math.round(w.Q)) + ' do contorno.', 'cicloSemContorno'); return; }
       nota(i, 'g70');
+      checaFerramentaCorte(i);
       var xA = st.x, zA = st.z, fAnt = st.f, ctx = { forcaF: true, sub: true }, j, dCiclo = decAtual;
       if (w.F != null) st.f = w.F; else aviso(i, 'G70 sem F: usei o avanço em vigor.', 'g70f');
       checaS(i);
@@ -686,8 +737,8 @@
           switch (cic) {
             case 70: ciclo70(w, i); break;
             case 71: case 72:
-              if (w.P == null && w.Q == null) { if (cic === 71) st.c71 = { d: w.U != null ? w.U : 1, e: w.R != null ? w.R : 0.5 }; else st.c72 = { d: w.W != null ? w.W : 1, e: w.R != null ? w.R : 0.5 }; }
-              else ciclo71(w, i, cic); // como nos programas da casa, os blocos N(P)..N(Q) seguintes rodam depois em movimento normal
+              if (w.P == null && w.Q == null) { if(w.Z!=null&&cic===71)aviso(i,'G71: Z não define o recuo do ciclo. Confira U/R; Z foi ignorado. Sem R explícito, a prévia usa recuo de 0,5 mm.','g71z','g71Recuo'); if (cic === 71) st.c71 = { d: w.U, e: w.R != null ? w.R : 0.5 }; else st.c72 = { d: w.W, e: w.R != null ? w.R : 0.5 }; }
+              else {st.cutContext={cycle:'G'+cic,axis:cic===71?'r':'z',depth:w.D!=null?w.D:(cic===71?st.c71:st.c72)?.d||0};try{var next71=ciclo71(w,i,cic);if(next71!=null)return next71;}finally{st.cutContext=null;}}
               break;
             case 73:
               if (w.P == null && w.Q == null) st.c73 = { di: w.U != null ? w.U : 0, dk: w.W != null ? w.W : 0, d: w.R==null?undefined:Math.round(w.R) };

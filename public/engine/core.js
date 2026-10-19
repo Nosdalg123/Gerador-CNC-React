@@ -1998,19 +1998,24 @@
     var lim = rMax - o.du / 2, levels = [], r = o.rF + o.U;
     while (r < lim - 1e-9) { levels.push(r); r += o.U; }
     if (lim > o.rF + 1e-6) levels.push(lim);
-    levels.forEach(function (rl) {
+    levels.forEach(function (rl,passIndex) {
+      var first=pb.moves.length;
       var stop = Math.min(0, psAcertoInt(cp, rl + o.du / 2) + o.dw);
       if (stop > -1e-6) return;
       pb.rapid(2 * rl, o.zA, line, 'MANDRILAR G71', T);
       pb.feed(2 * rl, stop, o.f, line, 'MANDRILAR G71', T);
       pb.rapid(2 * (rl - o.Rr), stop + o.Rr, line, 'MANDRILAR G71', T);
       pb.rapid(2 * (rl - o.Rr), o.zA, line, 'MANDRILAR G71', T);
+      for(var pm=first;pm<pb.moves.length;pm++){pb.moves[pm].pass=passIndex+1;pb.moves[pm].passes=levels.length+1;pb.moves[pm].cutContext={cycle:'G71',axis:'r',depth:o.U};}
     });
+    var contour=pb.moves.length;
     pb.rapid(2 * (cp[0][1] - o.du / 2), o.zA, line, 'MANDRILAR G71', T);
     cp.forEach(function (p) {
       pb.feed(2 * (p[1] - o.du / 2), Math.min(0, p[0] + o.dw), o.f, line, 'MANDRILAR G71', T);
     });
     pb.rapid(o.xA, o.zA, line, 'MANDRILAR G71', T);
+    for(var cm=contour;cm<pb.moves.length;cm++){pb.moves[cm].pass=levels.length+1;pb.moves[cm].passes=levels.length+1;pb.moves[cm].cutContext={cycle:'G71',axis:'r',depth:o.U};}
+
   }
 
   // G72 tipo I (desbaste TRANSVERSAL, externo ou interno): niveis em Z a cada W; cada passe corta em X ate o contorno.
@@ -2019,19 +2024,24 @@
     var line = o.line, T = o.tool, sg = o.interno ? -1 : 1, zFim = cp[cp.length - 1][0] + o.dw, lv = [], z = -o.W;
     while (z > zFim + 1e-9) { lv.push(z); z -= o.W; }
     if (zFim < -1e-6) lv.push(zFim);
-    lv.forEach(function (zk) {
+    lv.forEach(function (zk,passIndex) {
+      var first=pb.moves.length;
       var rc = psRaioEm(cp, -zk + o.dw) + sg * o.du / 2;
       pb.rapid(o.xA, zk, line, 'DESBASTE G72', T);
       pb.feed(2 * rc, zk, o.f, line, 'DESBASTE G72', T);
       pb.rapid(2 * rc, zk + o.Rr, line, 'DESBASTE G72', T);
       pb.rapid(o.xA, zk + o.Rr, line, 'DESBASTE G72', T);
+      for(var pm=first;pm<pb.moves.length;pm++){pb.moves[pm].pass=passIndex+1;pb.moves[pm].passes=lv.length+1;pb.moves[pm].cutContext={cycle:'G72',axis:'z',depth:o.W};}
     });
+    var contour=pb.moves.length;
     pb.rapid(o.xA, o.zA, line, 'DESBASTE G72', T);
     pb.rapid(2 * (cp[0][1] + sg * o.du / 2), o.zA, line, 'DESBASTE G72', T);
     cp.forEach(function (p) {
       pb.feed(2 * (p[1] + sg * o.du / 2), Math.min(0, p[0] + o.dw), o.f, line, 'DESBASTE G72', T);
     });
     pb.rapid(o.xA, o.zA, line, 'DESBASTE G72', T);
+    for(var cm=contour;cm<pb.moves.length;cm++){pb.moves[cm].pass=lv.length+1;pb.moves[cm].passes=lv.length+1;pb.moves[cm].cutContext={cycle:'G72',axis:'z',depth:o.W};}
+
   }
 
   // G73 (desbaste paralelo ao perfil, externo): repete o contorno N1..N2 `d` vezes, deslocado no raio (e em Z) do afastamento TOTAL (U/W do 1o bloco),
@@ -2073,18 +2083,23 @@
     var rFloor = cp[0][1] + o.du / 2, levels = [], r = o.R0 - o.U, T = o.tool, line = o.line;
     while (r > rFloor + 1e-9) { levels.push(r); r -= o.U; }
     if (o.R0 > rFloor + 1e-6) levels.push(rFloor);
-    levels.forEach(function (rl) {
+    levels.forEach(function (rl,passIndex) {
+      var first=pb.moves.length;
       var stop = Math.min(0, psAcerto(cp, rl - o.du / 2) + o.dw);
       pb.rapid(2 * rl, o.zA, line, 'DESBASTE G71', T);
       pb.feed(2 * rl, stop, o.f, line, 'DESBASTE G71', T);
       pb.rapid(2 * rl + 2 * o.Rr, stop + o.Rr, line, 'DESBASTE G71', T);
       pb.rapid(2 * rl + 2 * o.Rr, o.zA, line, 'DESBASTE G71', T);
+      for(var pm=first;pm<pb.moves.length;pm++){pb.moves[pm].pass=passIndex+1;pb.moves[pm].passes=levels.length+1;pb.moves[pm].cutContext={cycle:'G71',axis:'r',depth:o.U};}
     });
+    var contour=pb.moves.length;
     pb.rapid(2 * rFloor, o.zA, line, 'DESBASTE G71', T);
     cp.forEach(function (p) {
       pb.feed(2 * (p[1] + o.du / 2), Math.min(0, p[0] + o.dw), o.f, line, 'DESBASTE G71', T);
     });
     pb.rapid(o.xA, o.zA, line, 'DESBASTE G71', T);
+    for(var cm=contour;cm<pb.moves.length;cm++){pb.moves[cm].pass=levels.length+1;pb.moves[cm].passes=levels.length+1;pb.moves[cm].cutContext={cycle:'G71',axis:'r',depth:o.U};}
+
   }
 
   // G75 em canal externo: ferramenta posicionada em (xs, zs) = canto da ponta do lado da face; desce em P ate xf; Q em Z ate ze.
@@ -2429,7 +2444,7 @@
         P('G71P1Q2U#11W#12F#6', 'g71');
         cyc71(pb, cp, { R0: R0, xA: o.dBruto, zA: 1, U: incX, Rr: 0.5, du: acabT, dw: acabF, f: avD, line: 'g71', tool: 'a' });
       }
-      // contorno (executado uma vez em movimento normal, como nos programas da casa)
+      // P/Q define a geometria do ciclo; o acabamento só ocorre no G70.
       var runC = function (feed, key, label) {
         ct.moves.forEach(function (m) {
           var z = m.to[0] == null ? pb.pos.z : m.to[0], k = key || m.key;
@@ -2439,7 +2454,7 @@
         });
       };
       ct.moves.forEach(function (m, ix) { P(o.comp && ix === ct.moves.length - 1 ? m.code.replace(/^(N\d+)/, '$1G40') : m.code, m.key); }); // com compensacao o ultimo bloco (saida do contorno) cancela com G40
-      if(sentE!=='G73')runC(av, null, 'CONTORNO');
+      // Sem execução implícita dos blocos P/Q.
       P('');
       P('G0Z1', 'g0z1b'); pb.rapid(pb.pos.x, 1, 'g0z1b', 'RETORNO', 'a');
       P('X#1', 'g0x1b'); pb.rapid(o.dBruto, 1, 'g0x1b', 'RETORNO', 'a');
@@ -2558,7 +2573,7 @@
         });
       };
       ci.moves.forEach(function (m, ix) { P(o.comp && ix === ci.moves.length - 1 ? m.code.replace(/^(N\d+)/, '$1G40') : m.code, m.key); }); // com compensacao o ultimo bloco (saida) cancela com G40
-      runI(avIA, null, 'CONTORNO INTERNO');
+      // Sem execução implícita dos blocos P/Q internos.
       P('');
       P('G0Z1', 'gi0z1'); pb.rapid(pb.pos.x, 1, 'gi0z1', 'RETORNO', 'd');
       P('X' + ci.furo.vd, 'gi0x'); pb.rapid(xAi, 1, 'gi0x', 'RETORNO', 'd');
